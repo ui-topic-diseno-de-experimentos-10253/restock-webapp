@@ -7,12 +7,15 @@ import {catchError, firstValueFrom, map, Observable, retry, throwError} from 'rx
 import { CategoryService } from './category.service';
 import { BatchService } from './batch.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { CustomSupplyService } from './custom-supply.service';
+import { CustomSupplyAssembler } from './custom-supply.assembler';
 
 @Injectable({ providedIn: 'root' })
 export class SupplyService extends BaseService<any> {
 
   private readonly categoryService = inject(CategoryService);
   private readonly batchService = inject(BatchService);
+  private readonly customSupplyService = inject(CustomSupplyService);
 
 
   constructor() {
@@ -26,20 +29,30 @@ export class SupplyService extends BaseService<any> {
   }
 
   async getSuppliesEnrichedByUserIds(userIds: number[]): Promise<Supply[]> {
-    const [rawSupplies, rawBatches] = await Promise.all([
+    const [catalogSupplies, batchesByUser, customsByUser] = await Promise.all([
       firstValueFrom(this.http.get<any[]>(`${environment.serverBaseUrlBackend}${this.resourceEndpoint}`, this.httpOptions)
         .pipe(retry(2), catchError(this.handleError))),
-      this.batchService.getAllBatchesWithSupplies()
+      Promise.all(userIds.map(userId => this.batchService.getBatchesByUserId(userId))),
+      Promise.all(userIds.map(async userId => ({
+        userId,
+        customs: await firstValueFrom(this.customSupplyService.getByUser(userId))
+      })))
     ]);
-    const filteredSupplies = rawSupplies.filter(supply =>
-      userIds.includes(supply.user_id)
+    const rawBatches = batchesByUser.flat();
+    const allCustoms = customsByUser.flatMap(entry =>
+      (entry.customs || []).map(custom => ({
+        ...custom,
+        user_id: custom.userId ?? entry.userId
+      }))
     );
 
-    return filteredSupplies.map(raw => {
-      const supply = Supply.fromPersistence(raw);
+    return allCustoms.map(raw => {
+      const sourceSupplyId = raw.supply?.id ?? null;
+      const catalog = catalogSupplies.find(s => Number(s.id) === Number(sourceSupplyId));
+      const supply = CustomSupplyAssembler.toEntity(raw, catalog);
 
       const relatedBatches = rawBatches.filter(
-        b => b.customSupplyId === raw.id && b.user_id === raw.user_id
+        b => Number(b.customSupplyId) === Number(raw.id) && Number(b.user_id) === Number(raw.user_id)
       );
 
       (supply as any).batches = relatedBatches;

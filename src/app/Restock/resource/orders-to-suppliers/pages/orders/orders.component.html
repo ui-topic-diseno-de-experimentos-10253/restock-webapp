@@ -7,24 +7,33 @@
   >
   </orders-toolbar>
 
-  <orders-table
-    [orders]="filteredOrders"
-    [suppliers]="supplierOptions"
-    (orderSelected)="onOrderSelected($event)"
-    (viewDetails)="openDetails($event)"
-    (deleteOrder)="onDeleteOrder($event)"
-    (leaveFeedback)="openFeedback($event)"
-  >
-  </orders-table>
+  @if (isLoadingOrders() || isLoadingSuppliers()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <orders-table
+      [orders]="filteredOrders"
+      [suppliers]="supplierOptions"
+      (orderSelected)="onOrderSelected($event)"
+      (viewDetails)="openDetails($event)"
+      (deleteOrder)="onDeleteOrder($event)"
+      (leaveFeedback)="openFeedback($event)"
+    >
+    </orders-table>
+  }
 
   <create-orders-modal
     [providerSupplies]="providerSupplies"
     [providerProfiles]="providerProfiles"
+    [isLoadingBatches]="isLoadingBatches()"
+    (orderCreated)="loadOrders()"
   ></create-orders-modal>
 
   <order-details-modal
     [order]="selectedOrder"
     [providerProfiles]="providerProfiles"
+    [suppliers]="supplierOptions"
   />
 
   <order-feedback-modal

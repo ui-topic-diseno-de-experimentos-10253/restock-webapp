@@ -1,73 +1,188 @@
 import { Injectable, inject } from '@angular/core';
-import { BaseService } from '../../../../shared/services/base.service';
-import { firstValueFrom } from 'rxjs';
-
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 import { OrderToSupplier } from '../model/order-to-supplier.entity';
-import { OrderToSupplierAssembler } from './order-to-supplier.assembler';
-import { OrderStateService } from './order-to-supplier-state.service';
-import { OrderSituationService } from './order-to-supplier-situation.service';
-import { OrderToSupplierBatchService } from './order-to-supplier-batch.service';
-
-import { SupplyService } from '../../inventory/services/supply.service';
-import {BatchService} from '../../inventory/services/batch.service';
+import { OrderToSupplierBatch } from '../model/order-to-supplier-batch.entity';
+import {
+  CreateOrderRequest,
+  UpdateOrderStateRequest
+} from '../model/create-order-request';
 
 @Injectable({ providedIn: 'root' })
-export class OrderToSupplierService extends BaseService<OrderToSupplier> {
-    private readonly stateService = inject(OrderStateService);
-    private readonly situationService = inject(OrderSituationService);
-    private readonly batchOrderService = inject(OrderToSupplierBatchService);
-    private readonly batchDomainService = inject(BatchService);
+export class OrderToSupplierService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = environment.serverBaseUrlBackend;
+  private readonly endpoint = '/orders';
 
-    constructor() {
-        super();
-        this.resourceEndpoint = '/orders_to_supplier';
-    }
-    async getAllEnriched(): Promise<OrderToSupplier[]> {
-        const [rawOrders, states, situations, allOrderBatches] = await Promise.all([
-            firstValueFrom(this.getAll()),
-            this.stateService.getAllStates(),
-            this.situationService.getAllSituations(),
-            this.batchOrderService.getAllSupplies(),
-            this.batchDomainService.getAllBatchesWithSupplies()
-        ]);
+  create(payload: CreateOrderRequest): Observable<any> {
+    return this.http.post(`${this.baseUrl}${this.endpoint}`, payload);
+  }
 
-        return rawOrders.map(raw => {
-            const state = states.find(s => s.id === raw.order_to_supplier_state_id);
-            const situation = situations.find(s => s.id === raw.order_to_supplier_situation_id);
+  getByRestaurant(adminRestaurantId: number): Observable<OrderToSupplier[]> {
+    return this.http
+      .get<any>(`${this.baseUrl}${this.endpoint}/admin-restaurant/${adminRestaurantId}`)
+      .pipe(
+        map(response => this.extractArray(response)),
+        map(items => items.map(item => this.toEntity(item)))
+      );
+  }
 
-            const batchesOrder = allOrderBatches
-                .filter(ob => ob.order_to_supplier_id === raw.id)
+  getBySupplier(supplierId: number): Observable<OrderToSupplier[]> {
+    return this.http
+      .get<any>(`${this.baseUrl}${this.endpoint}/supplier/${supplierId}`)
+      .pipe(
+        map(response => this.extractArray(response)),
+        map(items => items.map(item => this.toEntity(item)))
+      );
+  }
 
-            return new OrderToSupplier({
-                ...OrderToSupplierAssembler.toEntity(raw, state, situation, batchesOrder)
-            });
+  updateState(orderId: number, state: UpdateOrderStateRequest): Observable<any> {
+    return this.http.put(`${this.baseUrl}${this.endpoint}/${orderId}/state`, state);
+  }
+
+  getAllOrders(): Promise<OrderToSupplier[]> {
+    return new Promise((resolve, reject) => {
+      this.http.get<any[]>(`${this.baseUrl}${this.endpoint}`)
+        .pipe(
+          map(response => this.extractArray(response)),
+          map(items => items.map(item => this.toEntity(item)))
+        )
+        .subscribe({
+          next: resolve,
+          error: reject
         });
-    }
+    });
+  }
 
+  // Legacy method kept for existing widgets/components.
+  getAllEnriched(): Promise<OrderToSupplier[]> {
+    return this.getAllOrders();
+  }
 
-    async getAllOrders(): Promise<OrderToSupplier[]> {
-        const rawOrders = await firstValueFrom(this.getAll());
-        return rawOrders.map(dto => OrderToSupplierAssembler.toEntity(dto));
-    }
+  getOrderById(id: number): Promise<OrderToSupplier> {
+    return new Promise((resolve, reject) => {
+      this.http.get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
+        .pipe(map(item => this.toEntity(item)))
+        .subscribe({
+          next: resolve,
+          error: reject
+        });
+    });
+  }
 
-    async getOrderById(id: number): Promise<OrderToSupplier> {
-        const dto = await firstValueFrom(this.getById(id));
-        return OrderToSupplierAssembler.toEntity(dto);
-    }
+  // Legacy query-style API used by some widgets.
+  getByQuery(field: string, value: string | number): Observable<OrderToSupplier[]> {
+    return this.http.get<any[]>(`${this.baseUrl}${this.endpoint}`).pipe(
+      map(response => this.extractArray(response)),
+      map(items => items.map(item => this.toEntity(item))),
+      map(items => items.filter(item => (item as any)[field] === value))
+    );
+  }
 
-    async createOrder(order: OrderToSupplier): Promise<OrderToSupplier> {
-        const dto = OrderToSupplierAssembler.toDTO(order);
-        const created = await firstValueFrom(this.create(dto));
-        return OrderToSupplierAssembler.toEntity(created);
-    }
+  updateOrder(id: number, order: OrderToSupplier): Promise<OrderToSupplier> {
+    return new Promise((resolve, reject) => {
+      this.http.put<any>(`${this.baseUrl}${this.endpoint}/${id}`, order)
+        .pipe(map(item => this.toEntity(item)))
+        .subscribe({
+          next: resolve,
+          error: reject
+        });
+    });
+  }
 
-    async updateOrder(id: number, order: OrderToSupplier): Promise<OrderToSupplier> {
-        const dto = OrderToSupplierAssembler.toDTO(order);
-        const updated = await firstValueFrom(this.update(id, dto));
-        return OrderToSupplierAssembler.toEntity(updated);
-    }
+  createOrder(order: CreateOrderRequest): Promise<OrderToSupplier> {
+    return new Promise((resolve, reject) => {
+      this.create(order).pipe(map(item => this.toEntity(item))).subscribe({
+        next: resolve,
+        error: reject
+      });
+    });
+  }
 
-    async deleteOrder(id: number): Promise<void> {
-        await firstValueFrom(this.delete(id));
-    }
+  deleteOrder(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}${this.endpoint}/${id}`);
+  }
+
+  private toEntity(raw: any): OrderToSupplier {
+    const rawBatches = Array.isArray(raw?.batchItems)
+      ? raw.batchItems
+      : (Array.isArray(raw?.batches) ? raw.batches : []);
+    const orderBatches = rawBatches.map((batch: any) => new OrderToSupplierBatch({
+      batch_id: Number(batch.batchId ?? batch.batch_id ?? 0),
+      quantity: Number(batch.quantity ?? 0),
+      accepted: Boolean(batch.accept ?? batch.accepted ?? false),
+      batch: this.mapBatch(batch.batch)
+    }));
+
+    const stateName = this.normalizeEnumLabel(raw.state ?? raw.stateName ?? raw.orderState);
+    const situationName = this.normalizeEnumLabel(raw.situation ?? raw.situationName ?? raw.orderSituation);
+    const stateId = Number(raw.stateId ?? raw.order_to_supplier_state_id ?? 0);
+    const situationId = Number(raw.situationId ?? raw.order_to_supplier_situation_id ?? 0);
+
+    return new OrderToSupplier({
+      id: Number(raw.id ?? 0),
+      date: raw.date ?? null,
+      description: raw.description ?? null,
+      admin_restaurant_id: Number(raw.adminRestaurantId ?? raw.admin_restaurant_id ?? 0),
+      supplier_id: Number(raw.supplierId ?? raw.supplier_id ?? 0),
+      order_to_supplier_state_id: stateId,
+      order_to_supplier_situation_id: situationId,
+      totalPrice: Number(raw.totalPrice ?? raw.total_price ?? 0),
+      estimated_ship_date: raw.estimatedShipDate ?? raw.estimated_ship_date ?? null,
+      estimated_ship_time: raw.estimatedShipTime ?? raw.estimated_ship_time ?? null,
+      requested_products_count: Number(raw.requestedProductsCount ?? raw.requested_products_count ?? orderBatches.length),
+      partially_accepted: Boolean(raw.partiallyAccepted ?? raw.partially_accepted ?? false),
+      orderBatches,
+      state: {
+        id: stateId,
+        name: stateName
+      } as any,
+      situation: {
+        id: situationId,
+        name: situationName
+      } as any
+    });
+  }
+
+  private extractArray(response: any): any[] {
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response?.value)) return response.value;
+    return [];
+  }
+
+  private normalizeEnumLabel(value: any): string {
+    if (!value || typeof value !== 'string') return '';
+    return value
+      .toLowerCase()
+      .split('_')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  private mapBatch(rawBatch: any): any | undefined {
+    if (!rawBatch) return undefined;
+    const customSupply = rawBatch.customSupply;
+    const catalogSupply = customSupply?.supply;
+    return {
+      id: Number(rawBatch.id ?? 0),
+      customSupplyId: Number(rawBatch.customSupplyId ?? customSupply?.id ?? 0),
+      stock: Number(rawBatch.stock ?? 0),
+      expiration_date: rawBatch.expirationDate ?? rawBatch.expiration_date ?? null,
+      user_id: Number(rawBatch.userId ?? rawBatch.user_id ?? 0),
+      supply: {
+        id: customSupply?.id ?? null,
+        supplyId: catalogSupply?.id ?? null,
+        user_id: customSupply?.userId ?? rawBatch.userId ?? null,
+        name: catalogSupply?.name ?? 'Unknown supply',
+        description: customSupply?.description ?? catalogSupply?.description ?? '',
+        perishable: Boolean(catalogSupply?.perishable ?? false),
+        min_stock: Number(customSupply?.minStock ?? 0),
+        max_stock: Number(customSupply?.maxStock ?? 0),
+        price: Number(customSupply?.price ?? 0),
+        category: catalogSupply?.category ?? '',
+        unit_abbreviation: customSupply?.unitAbbreviaton ?? customSupply?.unitAbbreviation ?? ''
+      }
+    };
+  }
 }
