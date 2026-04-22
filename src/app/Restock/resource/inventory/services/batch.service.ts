@@ -76,17 +76,22 @@ export class BatchService {
     return firstValueFrom(res$);
   }
 
-  async update(id: number | null, payload: Batch): Promise<Batch> {
+  async update(id: string | number | null, payload: Batch): Promise<Batch> {
+    if (id == null) {
+      throw new Error('Cannot update batch without id');
+    }
     const dto: any = BatchAssembler.toDTO(payload);
     dto.customSupplyId = Number(dto.customSupplyId);
     dto.userId = Number(dto.userId);
-    const res$ = this.http.put(`${this.baseUrl}${this.endpoint}`, dto, this.httpOptions)
+    dto.id = Number(id);
+    const res$ = this.http.put(`${this.baseUrl}${this.endpoint}/${id}`, dto, this.httpOptions)
       .pipe(retry(2), catchError(this.handleError));
     const updated = await firstValueFrom(res$);
     return BatchAssembler.toEntity(updated);
   }
 
-  async delete(id: number | null): Promise<void> {
+  async delete(id: string | number | null): Promise<void> {
+    if (id == null) return;
     const res$ = this.http.delete(`${this.baseUrl}${this.endpoint}/${id}`, this.httpOptions)
       .pipe(retry(2), catchError(this.handleError));
     await firstValueFrom(res$);
