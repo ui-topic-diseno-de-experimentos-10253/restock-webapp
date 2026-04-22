@@ -4,7 +4,12 @@
       <mat-card-title class="text">{{ 'profile.title' | translate }}</mat-card-title>
     </mat-card-header>
 
-    <img mat-card-image [src]="profile.avatar" alt="User photo" class="profile-photo" />
+    <img
+      mat-card-image
+      [src]="getAvatarUrl(profile.avatar)"
+      [alt]="profile.name"
+      class="profile-photo"
+      (error)="onImageError($event)" />
 
     <mat-card-content class="text">
       <div class="personal-details-form">

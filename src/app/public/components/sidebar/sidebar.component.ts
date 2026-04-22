@@ -31,6 +31,7 @@ import {Profile} from '../../../Restock/profiles/model/profile.entity';
 export class SidebarComponent implements OnDestroy {
   @Input() menu: Array<any> = [];
   @Input() profile: Profile = new Profile();
+  private readonly defaultAvatar = 'assets/admin-avatar.png';
 
   protected isMobile = signal(true);
 
@@ -47,5 +48,13 @@ export class SidebarComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this._mobileQuery.removeEventListener('change', this._mobileQueryListener);
+  }
+
+  getAvatarUrl(url: string | null | undefined): string {
+    return url && url.trim() !== '' ? url : this.defaultAvatar;
+  }
+
+  onImageError(event: Event): void {
+    (event.target as HTMLImageElement).src = this.defaultAvatar;
   }
 }

@@ -6,7 +6,11 @@
 
   @if (profile; as u) {
   <div class="user-info">
-    <img [src]="u.avatar" [alt]="u.avatar" class="user-photo">
+    <img
+      [src]="getAvatarUrl(u.avatar)"
+      [alt]="u.name"
+      class="user-photo"
+      (error)="onImageError($event)">
     <div>
       <p class="user-name">{{ u.name }}</p>
       <p class="user-email">{{ u.email }}</p>

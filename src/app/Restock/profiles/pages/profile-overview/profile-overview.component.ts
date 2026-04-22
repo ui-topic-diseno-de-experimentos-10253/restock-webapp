@@ -10,6 +10,7 @@ import {ProfileService} from '../../services/profile.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {BusinessService} from '../../services/business.service';
 import {SessionService} from '../../../../shared/services/session.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-profile-overview',
@@ -40,17 +41,32 @@ export class ProfileOverviewComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadProfile();
-    await this.loadUser();
-    await this.loadBusiness();
   }
 
   async loadProfile() {
     try {
-      this.profile = await this.profileService.getProfileById(this.sessionService.getProfileId()!);
+      const sessionProfileId = this.sessionService.getProfileId();
+      if (sessionProfileId) {
+        this.profile = await this.profileService.getProfileById(sessionProfileId);
+      } else {
+        const userId = this.sessionService.getUserId();
+        if (!userId) throw new Error('Missing session user id');
+        this.profile = await firstValueFrom(this.profileService.loadProfileByUserId(userId));
+        this.sessionService.setProfileId(this.profile.id);
+      }
+
+      await this.loadUser();
+      await this.loadBusiness();
+      this.profile = {
+        ...this.profile,
+        user: this.user,
+        business: this.business
+      };
       this.categoriesArray = this.profile.business?.categories.split(',').map(cat => cat.trim()) || [];
       console.log('Profile loaded:', this.profile);
     } catch (error) {
       console.error('Error loading profile:', error);
+      this.invalidUpdate('Error loading profile data');
     }
   }
 
@@ -72,10 +88,17 @@ export class ProfileOverviewComponent implements OnInit {
     }
   }
 
-  updateProfile(profile: Profile) {
+  async updateProfile(profile: Profile) {
 
-    if(profile === this.profile)
-    {
+    const noChanges =
+      profile.name === this.profile.name &&
+      profile.last_name === this.profile.last_name &&
+      profile.email === this.profile.email &&
+      profile.phone === this.profile.phone &&
+      profile.address === this.profile.address &&
+      profile.country === this.profile.country;
+
+    if (noChanges) {
       this.invalidUpdate('No changes detected in profile');
       console.warn('No changes detected in profile. Update skipped.');
       return;
@@ -87,27 +110,40 @@ export class ProfileOverviewComponent implements OnInit {
       return;
     }
 
-    this.profileService.updateProfile(profile.id, profile);
-    this.loadProfile();
-    this.successfulUpdate('Successful personal data update');
+    try {
+      const payload = {
+        ...profile,
+        business: this.profile.business,
+        user: this.profile.user
+      } as Profile;
+      await this.profileService.updateProfile(profile.id, payload);
+      await this.loadProfile();
+      this.successfulUpdate('Successful personal data update');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      this.invalidUpdate('Failed to update profile');
+    }
 
   }
 
-  updateProfileAndBusiness(business: Business) {
+  async updateProfileAndBusiness(business: Business) {
 
     if(this.profile.business_id == business.id)
     {
-      const updatedProfile = {
+      const updatedProfile: Profile = {
         ...this.profile,
         business: business
+      } as Profile;
+
+      try {
+        await this.businessService.updateBusiness(business.id, business);
+        await this.profileService.updateProfile(updatedProfile.id, updatedProfile);
+        await this.loadProfile();
+        this.successfulUpdate('Successful business data update');
+      } catch (error) {
+        console.error('Error updating business/profile:', error);
+        this.invalidUpdate('Failed to update business data');
       }
-
-      this.profileService.updateProfile(updatedProfile.id, updatedProfile);
-      this.businessService.updateBusiness(business.id, business);
-      this.loadProfile();
-      this.loadBusiness();
-
-      this.successfulUpdate('Successful business data update');
     }
     else
     {
@@ -117,20 +153,18 @@ export class ProfileOverviewComponent implements OnInit {
     }
   }
 
-  updateProfileAndUser(user: User) {
+  async updateProfileAndUser(user: User) {
 
     if(this.profile.user_id == user.id)
     {
-      const updatedProfile = {
-        ...this.profile,
-        user: user
+      try {
+        await this.userService.updateUser(user.id, user);
+        await this.loadProfile();
+        this.successfulUpdate('Successful password update');
+      } catch (error) {
+        console.error('Error updating user password:', error);
+        this.invalidUpdate('Failed to update password');
       }
-      this.profileService.updateProfile(updatedProfile.id, updatedProfile);
-      this.userService.updateUser(user.id, user);
-      this.loadProfile();
-      this.loadUser();
-
-      this.successfulUpdate('Successful password update');
     }
     else
     {
