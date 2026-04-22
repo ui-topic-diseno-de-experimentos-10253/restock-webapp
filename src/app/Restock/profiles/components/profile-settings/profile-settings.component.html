@@ -8,6 +8,7 @@
         <mat-tab [label]="'profile.settings.personal-info' | translate " >
           <app-personal-data-settings
             [profile]="profile"
+            [refreshTrigger]="refreshTrigger"
             (profileUpdated)="onSaveChanges($event)"
           />
         </mat-tab>
@@ -17,6 +18,7 @@
             [business]="profile.business!"
             [currentCategories]="categories"
             [categoriesOptions]="categoriesOptions"
+            [refreshTrigger]="refreshTrigger"
             (profileAndBusinessUpdated)="onProfileAndBusinessChanges($event)"
           />
         </mat-tab>

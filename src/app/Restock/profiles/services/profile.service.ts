@@ -116,14 +116,18 @@ export class ProfileService extends BaseService<Profile> {
   }
 
   getByUserId(userId: number): Observable<UserProfile> {
+    const url = `${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}`;
     return this.http
-      .get<any>(`${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}`, this.httpOptions)
-      .pipe(map(response => this.normalizeUserProfileResponse(response)));
+      .get<any>(url, this.httpOptions)
+      .pipe(
+        map(response => this.normalizeUserProfileResponse(response))
+      );
   }
 
   updatePersonal(userId: number, payload: UpdatePersonalProfileRequest): Observable<any> {
+    const url = `${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}/personal`;
     return this.http.put(
-      `${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}/personal`,
+      url,
       payload,
       this.httpOptions
     );

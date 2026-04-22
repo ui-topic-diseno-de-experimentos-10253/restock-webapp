@@ -30,6 +30,7 @@ export class ProfileSettingsComponent {
   @Input() profile: Profile = new Profile();
   @Input() categories: string[] = [];
   @Input() categoriesOptions: string[] = [];
+  @Input() refreshTrigger: number = 0;
 
   @Output() profileUpdated: EventEmitter<Profile> = new EventEmitter<Profile>();
   @Output() profileAndBusinessUpdated: EventEmitter<Business> = new EventEmitter<Business>();
