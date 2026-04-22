@@ -1,9 +1,6 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {
-  CreateAndEditFormComponent,
-  FormFieldSchema
-} from '../../../../../shared/components/create-and-edit-form/create-and-edit-form.component';
+import {FormFieldSchema} from '../../../../../shared/components/create-and-edit-form/create-and-edit-form.component';
 import {DeleteComponent} from '../../../../../shared/components/delete/delete.component';
 import {EmptySectionComponent} from '../../../../../shared/components/empty-section/empty-section.component';
 import {RecipeService} from '../../services/recipe.service';
@@ -39,32 +36,40 @@ import {TranslatePipe, TranslateService} from '@ngx-translate/core';
   templateUrl: './restaurant-recipes-overview.component.html',
   styleUrls: ['./restaurant-recipes-overview.component.css']
 })
-export class RestaurantRecipesOverviewComponent {
+export class RestaurantRecipesOverviewComponent implements OnInit {
 
   recipes: any[] = [];
   search: string = '';
   formVisible = false;
   sortByPrice = false;
+  formSchema: FormFieldSchema[] = [];
+
+  private get currentUserId(): number {
+    // Fix: get userId from localStorage instead of hardcoding 1
+    const userId = localStorage.getItem('userId');
+    return userId ? parseInt(userId, 10) : 0;
+  }
 
   constructor(
     private recipeService: RecipeService,
     private recipeSupplyService: RecipeSupplyService,
     private modalService: BaseModalService,
     private translate: TranslateService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    this.buildFormSchema();
+    this.loadRecipes();
   }
 
   get filteredRecipes(): any[] {
     let filtered = this.recipes.filter(r =>
-      r.name.toLowerCase().includes(this.search.toLowerCase())
+      r.name?.toLowerCase().includes(this.search.toLowerCase())
     );
-
     return this.sortByPrice
       ? filtered.sort((a, b) => a.price - b.price)
       : filtered;
   }
-
-  formSchema: FormFieldSchema[] = [];
 
   buildFormSchema(): void {
     this.formSchema = [
@@ -108,14 +113,23 @@ export class RestaurantRecipesOverviewComponent {
   }
 
   async loadRecipes(): Promise<void> {
-    const recipes = await firstValueFrom(this.recipeService.getAll());
-    this.recipes = await Promise.all(
-      recipes.map(async r => {
-        const entity = RecipeAssembler.toEntity(r);
-        const supplies = await firstValueFrom(this.recipeSupplyService.getByRecipe(r.id));
-        return { ...entity, supplies };
-      })
-    );
+    try {
+      const recipes = await firstValueFrom(this.recipeService.getAll());
+      this.recipes = await Promise.all(
+        recipes.map(async r => {
+          const entity = RecipeAssembler.toEntity(r);
+          try {
+            const supplies = await firstValueFrom(this.recipeSupplyService.getByRecipe(r.id));
+            return { ...entity, supplies };
+          } catch {
+            return { ...entity, supplies: [] };
+          }
+        })
+      );
+    } catch (error) {
+      console.error('Error loading recipes:', error);
+      this.recipes = [];
+    }
   }
 
   openCreateDialog(): void {
@@ -124,7 +138,7 @@ export class RestaurantRecipesOverviewComponent {
       description: '',
       price: 0,
       imageUrl: '',
-      userId: 1,
+      userId: this.currentUserId, // Fix: use real userId from localStorage
       supplies: []
     };
 
@@ -135,16 +149,26 @@ export class RestaurantRecipesOverviewComponent {
       initialData: initialRecipeData,
       mode: 'create'
     }).afterClosed().subscribe(async result => {
-      if (result) {
+      if (!result) return;
+      try {
         const { supplies, ...recipeData } = result;
-
-        const created = await firstValueFrom(this.recipeService.create(recipeData));
-        await firstValueFrom(this.recipeSupplyService.bulkCreate(created.id, supplies));
+        const payload = {
+          name: recipeData.name,
+          description: recipeData.description,
+          imageUrl: recipeData.imageUrl,
+          price: recipeData.price,
+          userId: this.currentUserId
+        };
+        const created = await firstValueFrom(this.recipeService.create(payload  as any));
+        if (supplies && supplies.length > 0) {
+          await firstValueFrom(this.recipeSupplyService.bulkCreate(created.id, supplies));
+        }
         await this.loadRecipes();
+      } catch (error) {
+        console.error('Error creating recipe:', error);
       }
     });
   }
-
 
   async openEditDialog(recipe: Recipe): Promise<void> {
     try {
@@ -176,9 +200,16 @@ export class RestaurantRecipesOverviewComponent {
       if (!result) return;
 
       const { supplies: newSupplies, ...recipeData } = result;
+      const payload = {
+        name: recipeData.name,
+        description: recipeData.description,
+        imageUrl: recipeData.imageUrl,
+        price: recipeData.price,
+        userId: recipe.userId
+      };
 
-      await firstValueFrom(this.recipeService.update(recipe.id, recipeData));
-      await this.recipeSupplyService.replaceSupplies(recipe.id, newSupplies);
+      await firstValueFrom(this.recipeService.update(recipe.id, payload as any));
+      await this.recipeSupplyService.replaceSupplies(recipe.id, newSupplies || []);
       await this.loadRecipes();
 
     } catch (error) {
@@ -191,21 +222,20 @@ export class RestaurantRecipesOverviewComponent {
       title: this.translate.instant('shared.deleteTitle'),
       contentComponent: DeleteComponent,
       width: '25rem',
-      label: 'delete ' +  recipe.name
+      label: 'delete ' + recipe.name
     }).afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
-        await firstValueFrom(this.recipeService.delete(recipe.id));
-        await this.loadRecipes();
+        try {
+          await firstValueFrom(this.recipeService.delete(recipe.id));
+          await this.loadRecipes();
+        } catch (error) {
+          console.error('Error deleting recipe:', error);
+        }
       }
     });
   }
 
   closeForm() {
     this.formVisible = false;
-  }
-
-  ngOnInit(): void {
-    this.loadRecipes();
-    this.buildFormSchema();
   }
 }
