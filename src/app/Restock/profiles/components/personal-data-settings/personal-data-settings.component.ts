@@ -23,22 +23,22 @@ import {TranslatePipe} from '@ngx-translate/core';
 })
 export class PersonalDataSettingsComponent implements OnChanges {
   @Input() profile: Profile = new Profile();
+  @Input() refreshTrigger: number = 0;
 
   localProfile: Profile = new Profile();
 
   @Output() profileUpdated: EventEmitter<Profile> = new EventEmitter<Profile>();
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['profile'] && changes['profile'].currentValue) {
+    if ((changes['profile'] && changes['profile'].currentValue) || 
+        (changes['refreshTrigger'] && changes['refreshTrigger'].currentValue)) {
       this.localProfile = {
-        ...changes['profile'].currentValue
+        ...this.profile
       };
     }
   }
 
   onSaveChanges() {
-
     this.profileUpdated.emit(this.localProfile);
-
   }
 }

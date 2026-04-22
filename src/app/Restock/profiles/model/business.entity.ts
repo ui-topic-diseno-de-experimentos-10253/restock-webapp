@@ -5,6 +5,7 @@ export class Business {
   categories: string;
   email: string;
   phone: string;
+  description: string;
 
   constructor(data: Partial<Business> = {}) {
     this.id = data.id || 0;
@@ -13,5 +14,6 @@ export class Business {
     this.phone = data.phone ||'';
     this.address = data.address || '';
     this.categories = data.categories || '';
+    this.description = data.description || '';
   }
 }

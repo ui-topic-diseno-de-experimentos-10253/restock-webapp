@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {MatCard} from '@angular/material/card';
 import {ProfileSettingsComponent} from '../../components/profile-settings/profile-settings.component';
 import {ProfileDetailsComponent} from '../../components/profile-details/profile-details.component';
@@ -30,6 +30,7 @@ export class ProfileOverviewComponent implements OnInit {
 
   categoriesArray: string[] = [];
   categoriesOptions: string[] = [ 'Fast Food', 'Fruits', 'Vegetables', 'Dairy', 'Pizzeria', 'Grid', 'Fitness', 'Bakery' ];
+  refreshTrigger: number = 0;
 
   constructor(
     private profileService: ProfileService,
@@ -37,6 +38,7 @@ export class ProfileOverviewComponent implements OnInit {
     private businessService: BusinessService,
     private snackBar: MatSnackBar,
     private sessionService: SessionService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   async ngOnInit() {
@@ -45,25 +47,23 @@ export class ProfileOverviewComponent implements OnInit {
 
   async loadProfile() {
     try {
-      const sessionProfileId = this.sessionService.getProfileId();
-      if (sessionProfileId) {
-        this.profile = await this.profileService.getProfileById(sessionProfileId);
-      } else {
-        const userId = this.sessionService.getUserId();
-        if (!userId) throw new Error('Missing session user id');
-        this.profile = await firstValueFrom(this.profileService.loadProfileByUserId(userId));
-        this.sessionService.setProfileId(this.profile.id);
-      }
+      const userId = this.sessionService.getUserId();
+      if (!userId) throw new Error('Missing session user id');
+      
+      const rawProfile = await firstValueFrom(this.profileService.loadProfileByUserId(userId));
+      
+      // Create a new object to force change detection
+      this.profile = JSON.parse(JSON.stringify(rawProfile));
+      this.sessionService.setProfileId(this.profile.id);
 
       await this.loadUser();
       await this.loadBusiness();
-      this.profile = {
+      this.profile = JSON.parse(JSON.stringify({
         ...this.profile,
         user: this.user,
         business: this.business
-      };
-      this.categoriesArray = this.profile.business?.categories.split(',').map(cat => cat.trim()) || [];
-      console.log('Profile loaded:', this.profile);
+      }));
+      this.categoriesArray = this.profile.business?.categories?.split(',').map(cat => cat.trim()) || [];
     } catch (error) {
       console.error('Error loading profile:', error);
       this.invalidUpdate('Error loading profile data');
@@ -100,24 +100,37 @@ export class ProfileOverviewComponent implements OnInit {
 
     if (noChanges) {
       this.invalidUpdate('No changes detected in profile');
-      console.warn('No changes detected in profile. Update skipped.');
       return;
     }
 
-    if(this.profile.id !== profile.id) {
-      this.invalidUpdate('Failed to update profile');
-      console.error('Profile ID mismatch. Cannot update profile with different ID.');
+    const userId = this.sessionService.getUserId();
+    if (!userId) {
+      this.invalidUpdate('Failed to update profile - no user ID');
       return;
     }
 
     try {
       const payload = {
-        ...profile,
-        business: this.profile.business,
-        user: this.profile.user
-      } as Profile;
-      await this.profileService.updateProfile(profile.id, payload);
-      await this.loadProfile();
+        firstName: profile.name,
+        lastName: profile.last_name,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+        country: profile.country,
+        avatar: profile.avatar || ''
+      };
+      
+      await this.profileService.updatePersonal(userId, payload).toPromise();
+      
+      // Force a new object reference to ensure change detection
+      const newProfile = await firstValueFrom(this.profileService.loadProfileByUserId(userId));
+      this.profile = JSON.parse(JSON.stringify(newProfile));
+      
+      this.refreshTrigger++;
+      
+      // Force change detection
+      this.cdr.detectChanges();
+      
       this.successfulUpdate('Successful personal data update');
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -130,15 +143,22 @@ export class ProfileOverviewComponent implements OnInit {
 
     if(this.profile.business_id == business.id)
     {
-      const updatedProfile: Profile = {
-        ...this.profile,
-        business: business
-      } as Profile;
+      const userId = this.sessionService.getUserId();
+      if (!userId) {
+        this.invalidUpdate('Failed to update business data');
+        console.error('No user ID in session. Cannot update business.');
+        return;
+      }
 
       try {
-        await this.businessService.updateBusiness(business.id, business);
-        await this.profileService.updateProfile(updatedProfile.id, updatedProfile);
+        const payload = {
+          businessName: business.name,
+          businessAddress: business.address,
+          description: business.description || ''
+        };
+        await this.profileService.updateBusiness(userId, payload);
         await this.loadProfile();
+        this.refreshTrigger++;
         this.successfulUpdate('Successful business data update');
       } catch (error) {
         console.error('Error updating business/profile:', error);
