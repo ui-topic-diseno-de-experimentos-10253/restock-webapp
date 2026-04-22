@@ -1,7 +1,7 @@
 <form class="custom-supply-form">
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>Supply</mat-label>
-    <mat-select [(ngModel)]="selectedId" name="supply" (selectionChange)="onSupplyChange($event.value)">
+    <mat-select [(ngModel)]="selectedId" name="supply" (selectionChange)="onSupplyChange($event.value)" [disabled]="mode === 'edit'">
       @for (supply of supplies; track supply.id) {
         <mat-option [value]="supply.id">{{ supply.name }}</mat-option>
       }
@@ -29,11 +29,30 @@
         <mat-label>Unit Price</mat-label>
         <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" />
       </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Unit</mat-label>
+        <mat-select [(ngModel)]="selectedUnitOption" name="unitOption" (selectionChange)="onUnitChange($event.value)">
+          @for (option of unitOptions; track option.label) {
+            <mat-option [value]="option.unitName + '|' + option.unitAbbreviaton">
+              {{ option.label }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </div>
   }
 
   <div class="actions">
     <button mat-button type="button" (click)="cancel()">Cancel</button>
-    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="!selectedSupply">Save</button>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="!selectedSupply || isLoading()">
+      {{ mode === 'edit' ? 'Update' : 'Save' }}
+    </button>
   </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="24" />
+    </div>
+  }
 </form>

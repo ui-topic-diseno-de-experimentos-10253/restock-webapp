@@ -1,21 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, firstValueFrom, retry, throwError } from 'rxjs';
+import { catchError, firstValueFrom, Observable, retry, throwError } from 'rxjs';
 import { CategoryService } from './category.service';
 import { Supply } from '../model/supply.entity';
 import {environment} from '../../../../../environments/environment';
 import {CatalogSupplyService} from './catalog-supply.service';
 import {CustomSupplyAssembler} from './custom-supply.assembler';
 import {SessionService} from '../../../../shared/services/session.service';
-
-export interface CustomSupplyPayload {
-  supplyId: string;
-  description: string;
-  minStock: number;
-  maxStock: number;
-  price: number;
-  userId: number;
-}
+import { CreateCustomSupplyRequest, CustomSupply } from './custom-supply.contract';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +21,51 @@ export class CustomSupplyService {
   private userEndpoint = '/custom-supplies/user';
   private httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
+  create(payload: CreateCustomSupplyRequest): Observable<CustomSupply> {
+    return this.http
+      .post<CustomSupply>(`${this.baseUrl}${this.endpoint}`, payload, this.httpOptions)
+      .pipe(retry(2), catchError(this.handleError));
+  }
+
+  getByUser(userId: number): Observable<CustomSupply[]> {
+    return this.http
+      .get<CustomSupply[]>(`${this.baseUrl}${this.endpoint}/user/${userId}`, this.httpOptions)
+      .pipe(retry(2), catchError(this.handleError));
+  }
+
+  getById(id: number): Observable<CustomSupply> {
+    return this.http
+      .get<CustomSupply>(`${this.baseUrl}${this.endpoint}/${id}`, this.httpOptions)
+      .pipe(retry(2), catchError(this.handleError));
+  }
+
+  update(id: number, payload: CreateCustomSupplyRequest): Observable<CustomSupply> {
+    return this.http
+      .put<CustomSupply>(`${this.baseUrl}${this.endpoint}/${id}`, payload, this.httpOptions)
+      .pipe(retry(2), catchError(this.handleError));
+  }
+
+  deleteById(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.baseUrl}${this.endpoint}/${id}`, this.httpOptions)
+      .pipe(retry(2), catchError(this.handleError));
+  }
+
+  // Backward compatible Promise-based delete used by inventory pages
+  async delete(id: string | number | null): Promise<void> {
+    if (id == null) return;
+    await firstValueFrom(this.deleteById(Number(id)));
+  }
+
+  /**
+   * Legacy API used by current inventory pages (returns merged Supply entities).
+   * Kept for compatibility with the rest of the inventory section.
+   */
   async getAll(): Promise<Supply[]> {
     const userId = this.session.getUserId();
+    if (userId == null) {
+      throw new Error('User ID not found in session');
+    }
     const [customs, catalogSupplies] = await Promise.all([
       firstValueFrom(
         this.http.get<any[]>(`${this.baseUrl}${this.userEndpoint}/${userId}`, this.httpOptions)
@@ -39,37 +74,16 @@ export class CustomSupplyService {
       this.catalog.getCatalogSupplies(),
     ]);
     return customs.map(custom => {
-      const catalog = catalogSupplies.find(c => c.id === custom.supplyId);
+      const sourceSupplyId = custom.supplyId ?? custom.supply?.id;
+      const catalog = catalogSupplies.find(c => Number(c.id) === Number(sourceSupplyId));
       return CustomSupplyAssembler.toEntity(custom, catalog);
     });
   }
 
-  async create(payload: CustomSupplyPayload | Supply): Promise<any> {
-    const dto = (payload instanceof Supply)
-      ? CustomSupplyAssembler.toDTO(payload)
-      : payload;
-    const res$ = this.http.post(`${this.baseUrl}${this.endpoint}`, dto, this.httpOptions)
-      .pipe(retry(2), catchError(this.handleError));
-    return firstValueFrom(res$);
-  }
-
-  async update(id: string | number | null, payload: CustomSupplyPayload | Supply): Promise<any> {
-    const dto = (payload instanceof Supply)
-      ? CustomSupplyAssembler.toDTO(payload)
-      : payload;
-    const res$ = this.http.put(`${this.baseUrl}${this.endpoint}`, dto, this.httpOptions)
-      .pipe(retry(2), catchError(this.handleError));
-    return firstValueFrom(res$);
-  }
-
-  async delete(id: string | number | null): Promise<any> {
-    const res$ = this.http.delete(`${this.baseUrl}${this.endpoint}/${id}`, this.httpOptions)
-      .pipe(retry(2), catchError(this.handleError));
-    return firstValueFrom(res$);
-  }
-
   private handleError(error: HttpErrorResponse) {
     console.error(error);
-    return throwError(() => new Error('Error in custom supply service'));
+    // IMPORTANT: rethrow the original HttpErrorResponse so callers can read
+    // status codes and backend error bodies for debugging.
+    return throwError(() => error);
   }
 }

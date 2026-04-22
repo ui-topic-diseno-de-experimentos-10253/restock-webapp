@@ -3,6 +3,11 @@ import { Category } from './category.entity';
 export class Supply {
   constructor(
     public readonly id: string | number | null,
+    /**
+     * For custom supplies, this references the catalog supply id.
+     * For catalog supplies, it can be null/undefined.
+     */
+    public readonly supplyId: string | number | null,
     public readonly user_id: number | null,
     public readonly name: string,
     public readonly description: string,
@@ -17,6 +22,7 @@ export class Supply {
   static fromPersistence(raw: any): Supply {
     return new Supply(
       raw.id ?? null,
+      raw.supplyId ?? raw.supply_id ?? null,
       raw.user_id ?? raw.userId ?? null,
       raw.name ?? raw.supplyName ?? '',
       raw.description ?? '',
@@ -32,6 +38,7 @@ export class Supply {
   static fromForm(data: Omit<Supply, 'user_id'>, userId: number | null): Supply {
     return new Supply(
       (data as any).id ?? null,
+      (data as any).supplyId ?? null,
       userId,
       data.name,
       data.description,

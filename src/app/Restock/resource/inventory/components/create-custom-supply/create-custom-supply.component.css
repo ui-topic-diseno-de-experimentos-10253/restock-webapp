@@ -11,3 +11,14 @@
   justify-content: flex-end;
   gap: 0.5rem;
 }
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+/* Improve select readability against dark theme overlays */
+:host ::ng-deep .mat-mdc-option .mdc-list-item__primary-text {
+  color: #222 !important;
+}

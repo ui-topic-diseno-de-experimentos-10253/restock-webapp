@@ -1,4 +1,9 @@
-<div class="inventory-container">
+@if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="inventory-container">
 
   <!-- Sección para botón de crear supply -->
   <app-supplier-supply-section
@@ -25,4 +30,5 @@
     (add)="openAddSupplyToInventory()"
   />
 
-</div>
+  </div>
+}

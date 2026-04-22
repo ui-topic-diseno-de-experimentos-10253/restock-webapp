@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {Supply} from '../../model/supply.entity';
 import {Category} from '../../model/category.entity';
 import {FormFieldSchema} from '../../../../../shared/components/create-and-edit-form/create-and-edit-form.component';
@@ -13,11 +13,11 @@ import {BaseModalService} from '../../../../../shared/services/base-modal.servic
 import {Batch} from '../../model/batch.entity';
 import {BatchService} from '../../services/batch.service';
 import {AddBatchToInventoryComponent} from '../../components/add-batch-to-inventory/add-batch-to-inventory.component';
-import {CreateAndEditSupplyComponent} from '../../components/create-and-edit-supply/create-and-edit-supply.component';
 import {TranslateService} from '@ngx-translate/core';
 import {CustomSupplyService} from '../../services/custom-supply.service';
 import {CreateCustomSupplyComponent} from '../../components/create-custom-supply/create-custom-supply.component';
 import {SessionService} from '../../../../../shared/services/session.service';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-restaurant-inventory',
@@ -26,7 +26,8 @@ import {SessionService} from '../../../../../shared/services/session.service';
   imports: [
     SupplyCarouselComponent,
     SupplySectionComponent,
-    InventoryTableComponent
+    InventoryTableComponent,
+    MatProgressSpinnerModule
   ],
   styleUrls: ['./restaurant-inventory.component.css']
 })
@@ -37,6 +38,7 @@ export class RestaurantInventoryComponent implements OnInit {
 
   formSchema: FormFieldSchema[] = [];
   private editSchema: FormFieldSchema[] = [];
+  isLoading = signal(false);
 
   constructor(
     private supplyService: SupplyService,
@@ -51,8 +53,7 @@ export class RestaurantInventoryComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.buildFormSchema();
-    await this.loadSupplies();
-    await this.loadBatches();
+    await this.loadData();
     console.log(this.supplies)
   }
 
@@ -139,13 +140,30 @@ export class RestaurantInventoryComponent implements OnInit {
     return schema;
   }
 
-  async loadSupplies(): Promise<void> {
-    this.supplies = await this.customSupplyService.getAll();
-    console.log(this.supplies);
+  private ensureBatchExpirationDate(result: any): any {
+    if (result?.expiration_date) {
+      const expiration = new Date(result.expiration_date);
+      if (!Number.isNaN(expiration.getTime())) {
+        return { ...result, expiration_date: expiration.toISOString().split('T')[0] };
+      }
+    }
+
+    // Backend batches endpoint requires expirationDate in all cases.
+    const today = new Date().toISOString().split('T')[0];
+    return { ...result, expiration_date: today };
   }
 
-  async loadBatches(): Promise<void> {
-    this.batches = await this.batchService.getAllBatchesWithSupplies();
+  async loadData(): Promise<void> {
+    try {
+      this.isLoading.set(true);
+      this.supplies = await this.customSupplyService.getAll();
+      this.batches = await this.batchService.getAllBatchesWithSupplies();
+    } catch (e) {
+      console.error(e);
+      this.snackBar.open('Error loading inventory data', 'Close', {duration: 3000});
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   openCreateModal(): void {
@@ -154,9 +172,8 @@ export class RestaurantInventoryComponent implements OnInit {
       contentComponent: CreateCustomSupplyComponent
     }).afterClosed().subscribe(async result => {
       if (result) {
-        await this.loadSupplies();
-        await this.loadBatches();
-        this.snackBar.open('Supply created', 'Close', { duration: 3000 });
+        await this.loadData();
+        this.snackBar.open('Supply created', 'Close', {duration: 3000});
       }
     });
   }
@@ -164,20 +181,13 @@ export class RestaurantInventoryComponent implements OnInit {
   editSupply(supply: Supply): void {
     this.modalService.open({
       title: this.translate.instant('inventory.editSupply'),
-      contentComponent: CreateAndEditSupplyComponent,
-      schema: this.editSchema,
+      contentComponent: CreateCustomSupplyComponent,
       initialData: {...supply},
       mode: 'edit'
     }).afterClosed().subscribe(async result => {
       if (result) {
-        const updated = Supply.fromForm({
-          ...supply,
-          ...result
-        } as any, supply.user_id);
-        await this.customSupplyService.update(supply.id, updated);
-        await this.loadSupplies();
-        await this.loadBatches();
-        this.snackBar.open('Supply updated', 'Close', { duration: 3000 });
+        await this.loadData();
+        this.snackBar.open('Supply updated', 'Close', {duration: 3000});
       }
     });
   }
@@ -190,10 +200,17 @@ export class RestaurantInventoryComponent implements OnInit {
       initialData: {label: supply.name}
     }).afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
-        await this.customSupplyService.delete(supply.id);
-        await this.loadSupplies();
-        await this.loadBatches();
-        this.snackBar.open('Supply deleted', 'Close', { duration: 3000 });
+        try {
+          this.isLoading.set(true);
+          await this.customSupplyService.delete(supply.id);
+          await this.loadData();
+          this.snackBar.open('Supply deleted', 'Close', {duration: 3000});
+        } catch (e) {
+          console.error(e);
+          this.snackBar.open('Error deleting supply', 'Close', {duration: 3000});
+        } finally {
+          this.isLoading.set(false);
+        }
       }
     });
   }
@@ -234,12 +251,20 @@ export class RestaurantInventoryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
-        const userId = this.sessionService.getUserId() ?? 0;
-        const updated = Batch.fromForm(result, userId);
-        await this.batchService.update(batch.id, updated);
-        await this.loadSupplies();
-        await this.loadBatches();
-        this.snackBar.open('Batch updated', 'Close', { duration: 3000 });
+        try {
+          this.isLoading.set(true);
+          const userId = this.sessionService.getUserId() ?? 0;
+          const normalizedResult = this.ensureBatchExpirationDate(result);
+          const updated = Batch.fromForm(normalizedResult, userId);
+          await this.batchService.update(batch.id, updated);
+          await this.loadData();
+          this.snackBar.open('Batch updated', 'Close', {duration: 3000});
+        } catch (e) {
+          console.error(e);
+          this.snackBar.open('Error updating batch', 'Close', {duration: 3000});
+        } finally {
+          this.isLoading.set(false);
+        }
       }
     });
   }
@@ -254,10 +279,17 @@ export class RestaurantInventoryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
-        await this.batchService.delete(batch.id);
-        await this.loadSupplies();
-        await this.loadBatches();
-        this.snackBar.open('Batch deleted', 'Close', { duration: 3000 });
+        try {
+          this.isLoading.set(true);
+          await this.batchService.delete(batch.id);
+          await this.loadData();
+          this.snackBar.open('Batch deleted', 'Close', {duration: 3000});
+        } catch (e) {
+          console.error(e);
+          this.snackBar.open('Error deleting batch', 'Close', {duration: 3000});
+        } finally {
+          this.isLoading.set(false);
+        }
       }
     });
   }
@@ -293,7 +325,7 @@ export class RestaurantInventoryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
-        const selectedSupply = this.supplies.find(s => s.id === result.supplyId);
+        const selectedSupply = this.supplies.find(s => Number(s.id) === Number(result.supplyId));
 
         if (!selectedSupply) {
           this.snackBar.open('Supply not found', 'Close', {duration: 3000});
@@ -308,17 +340,29 @@ export class RestaurantInventoryComponent implements OnInit {
           return;
         }
 
-        const userId = this.sessionService.getUserId() ?? 0;
-        const batch = Batch.fromForm(result, userId);
-        await this.batchService.create(batch);
+        try {
+          this.isLoading.set(true);
+          const userId = this.sessionService.getUserId() ?? 0;
+          const normalizedResult = this.ensureBatchExpirationDate(result);
+          const batch = Batch.fromForm(normalizedResult, userId);
+          await this.batchService.create(batch);
 
-        this.snackBar.open('Batch registered', 'Close', {
-          duration: 3000,
-          panelClass: 'snackbar-success'
-        });
+          this.snackBar.open('Batch registered', 'Close', {
+            duration: 3000,
+            panelClass: 'snackbar-success'
+          });
 
-        await this.loadSupplies();
-        await this.loadBatches();
+          await this.loadData();
+        } catch (e) {
+          console.error(e);
+          const err: any = e;
+          const details = typeof err?.error === 'string'
+            ? err.error
+            : (err?.error?.message ?? JSON.stringify(err?.error ?? {}));
+          this.snackBar.open(`Error registering batch (${err?.status ?? 'unknown'}): ${details}`, 'Close', {duration: 6000});
+        } finally {
+          this.isLoading.set(false);
+        }
       }
     });
   }
