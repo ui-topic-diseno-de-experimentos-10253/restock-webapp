@@ -2,7 +2,7 @@ import {Recipe} from '../model/recipe.entity';
 
 export class RecipeAssembler {
   static toEntity(dto: any): Recipe {
-      return Recipe.fromPersistence(dto);
+    return Recipe.fromPersistence(dto);
   }
 
   static toDTO(entity: Recipe): any {
@@ -11,8 +11,8 @@ export class RecipeAssembler {
       name: entity.name,
       description: entity.description,
       price: entity.price,
-      image_url: entity.imageUrl,
-      user_id: entity.userId
+      imageUrl: entity.imageUrl,   // fix: was image_url (snake_case)
+      userId: entity.userId        // fix: was user_id (snake_case)
     };
   }
 }
