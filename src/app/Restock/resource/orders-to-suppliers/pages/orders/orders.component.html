@@ -7,7 +7,7 @@
   >
   </orders-toolbar>
 
-  @if (isLoadingOrders()) {
+  @if (isLoadingOrders() || isLoadingSuppliers()) {
     <div class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
@@ -33,6 +33,7 @@
   <order-details-modal
     [order]="selectedOrder"
     [providerProfiles]="providerProfiles"
+    [suppliers]="supplierOptions"
   />
 
   <order-feedback-modal

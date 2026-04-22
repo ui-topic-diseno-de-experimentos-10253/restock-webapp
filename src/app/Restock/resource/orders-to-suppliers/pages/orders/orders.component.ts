@@ -40,6 +40,7 @@ export class OrdersComponent implements OnInit {
   selectedSupplierId: number | null = null;
   providerSupplies: Supply[] = [];
   isLoadingOrders = signal(false);
+  isLoadingSuppliers = signal(false);
   isLoadingBatches = signal(false);
 
   @ViewChild(CreateOrdersModalComponent)
@@ -85,6 +86,7 @@ export class OrdersComponent implements OnInit {
   }
   //tester
   async loadProviderProfiles() {
+    this.isLoadingSuppliers.set(true);
     this.isLoadingBatches.set(true);
     try {
       const providerUserIds = await this.userService.getSupplierUserIds(); // esto ya es un array de IDs
@@ -144,6 +146,7 @@ export class OrdersComponent implements OnInit {
       console.error('Error loading provider supplies:', error);
       this.snackBar.open('Error loading available supplies', 'Close', { duration: 3000 });
     } finally {
+      this.isLoadingSuppliers.set(false);
       this.isLoadingBatches.set(false);
     }
   }
@@ -188,8 +191,8 @@ export class OrdersComponent implements OnInit {
   }
 
   getSupplierName(supplierId: number): string {
-    const profile = this.providerProfiles.find(p => p.id === supplierId);
-    return profile ? profile.name : '';
+    const supplier = this.supplierOptions.find(s => Number(s.id) === Number(supplierId));
+    return supplier ? supplier.name : `Supplier ${supplierId}`;
   }
   openDetails(order: OrderToSupplier): void {
     this.selectedOrder = order;
