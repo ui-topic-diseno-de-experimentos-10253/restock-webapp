@@ -1,6 +1,4 @@
-import { Component, inject } from '@angular/core';
-import { SubscriptionService } from '../../services/subscription.service';
-import { mockUser } from '../../../../shared/mocks/user.mock';
+import { Component } from '@angular/core';
 import { SubscriptionsCardsComponent } from '../../components/subscriptions-cards/subscriptions-cards.component';
 import { Subscription } from '../../model/subscription.entity';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -16,25 +14,58 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class SubscriptionOverviewComponent {
 
-  subscriptions: Array<Subscription> = [];
-
-  //fake api
-  private subscriptionApi: SubscriptionService = inject(SubscriptionService);
-
-  user = mockUser;
-
-  ngOnInit(): void {
-
-    // // Continuar con lógica normal si todo está bien
-    // this.subscriptionApi.getAll().subscribe(subs => this.subscriptions = subs);
-    //aca se valida porque no hay backend aun, esto deberia estar en backend
-    this.subscriptionApi.getAll().subscribe(subs => {
-      console.log("subs: ", subs);
-      this.subscriptions = subs.filter(
-        s => s.rol_id === String(this.user.role_id.id)
-      );
-      console.log("subscriptions:", this.subscriptions);
-    });
-  }
+  // Planes estáticos hardcodeados (Básico, Pro, Premium)
+  subscriptions: Array<Subscription> = [
+    {
+      id: 1,
+      name: 'Básico',
+      price: 29.99,
+      duration: 1,
+      status: true,
+      popular: false,
+      features: [
+        'Gestión de inventario básica',
+        'Hasta 100 productos',
+        'Reportes simples',
+        'Soporte por email'
+      ],
+      rol_id: '2'
+    },
+    {
+      id: 2,
+      name: 'Pro',
+      price: 79.99,
+      duration: 1,
+      status: true,
+      popular: true,
+      features: [
+        'Gestión de inventario avanzada',
+        'Productos ilimitados',
+        'Reportes detallados',
+        'Integración con proveedores',
+        'Soporte prioritario',
+        'Análisis de ventas'
+      ],
+      rol_id: '2'
+    },
+    {
+      id: 3,
+      name: 'Premium',
+      price: 149.99,
+      duration: 1,
+      status: true,
+      popular: false,
+      features: [
+        'Todo en Plan Pro',
+        'Gestión multi-sucursal',
+        'API completa',
+        'Personalización avanzada',
+        'Soporte 24/7',
+        'Capacitación incluida',
+        'Análisis predictivo'
+      ],
+      rol_id: '2'
+    }
+  ];
 
 }
