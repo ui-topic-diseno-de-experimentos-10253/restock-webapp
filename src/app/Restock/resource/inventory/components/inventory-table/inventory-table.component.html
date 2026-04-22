@@ -27,7 +27,7 @@
 
     <ng-container matColumnDef="category">
       <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableCategory' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.supply?.category?.name || '-' }} </mat-cell>
+      <mat-cell *matCellDef="let e"> {{ e.supply?.category?.name || e.supply?.category || '-' }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="unit">
