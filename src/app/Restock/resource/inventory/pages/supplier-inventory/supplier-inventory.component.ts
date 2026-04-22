@@ -198,7 +198,7 @@ export class SupplierInventory implements OnInit {
       title: 'Confirm deletion',
       contentComponent: DeleteComponent,
       width: '25rem',
-      initialData: {label: supply.name}
+      label: supply.name
     }).afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
         try {
