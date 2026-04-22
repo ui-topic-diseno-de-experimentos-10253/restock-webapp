@@ -1,0 +1,70 @@
+.widget-title {
+  font-family: Poppins, sans-serif;
+  font-weight: 400;
+  font-size: 23px;
+  margin-bottom: 10px;
+}
+
+.widget-container {
+  background: #fff;
+  padding: 20px 30px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 30px;
+  max-height: 300px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 330px;
+  }
+
+.scroll-wrapper {
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.view-all-button-container {
+  text-align: right;
+  margin-top: 10px;
+}
+
+/* Estilos exclusivos para la tabla del widget */
+::ng-deep .custom-orders-table table.mat-table {
+  background-color: white !important;
+  border-collapse: collapse;
+}
+
+::ng-deep .custom-orders-table .mat-row,
+::ng-deep .custom-orders-table .mat-header-row {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Ocultar columna "actions" en el widget */
+::ng-deep .custom-orders-table .mat-column-actions {
+  display: none !important;
+}
+/* Forzar fondo blanco en todas las filas de situación solo en el widget */
+::ng-deep .widget-context .situation-pending,
+::ng-deep .widget-context .situation-approved,
+::ng-deep .widget-context .situation-declined {
+  background-color: white !important;
+}
+/* Responsive: ocultar columnas menos relevantes en mobile */
+@media (max-width: 768px) {
+  ::ng-deep .custom-orders-table .mat-column-situation,
+  ::ng-deep .custom-orders-table .mat-column-date,
+  ::ng-deep .custom-orders-table .mat-column-requestedProducts {
+    display: none !important;
+  }
+
+  ::ng-deep .custom-orders-table .mat-header-cell,
+  ::ng-deep .custom-orders-table .mat-cell {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+  }
+  .widget-container {
+    padding: 15px;
+  }
+}

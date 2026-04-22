@@ -1,0 +1,58 @@
+<h3 class="widget-title">Last Notifications</h3>
+<div class="widget-container">
+  <mat-tab-group>
+    <mat-tab label="Inventory">
+      <div class="scroll-wrapper">
+        <mat-table [dataSource]="inventoryAlerts" class="mat-elevation-z1">
+          <ng-container matColumnDef="ingredient">
+            <mat-header-cell *matHeaderCellDef> Supplies</mat-header-cell>
+            <mat-cell *matCellDef="let alert"> {{ alert.ingredient }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef> Status</mat-header-cell>
+            <mat-cell *matCellDef="let alert">
+              <button mat-flat-button
+                      [ngClass]="{
+                        'low-stock': alert.status === 'Low stock',
+                        'max-stock': alert.status === 'Max stock'
+                      }">
+                {{ alert.status }}
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Orders">
+      <div class="scroll-wrapper">
+        <mat-table [dataSource]="orderAlerts" class="mat-elevation-z1">
+          <ng-container matColumnDef="ingredient">
+            <mat-header-cell *matHeaderCellDef> Order</mat-header-cell>
+            <mat-cell *matCellDef="let alert"> {{ alert.ingredient }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef> Status</mat-header-cell>
+            <mat-cell *matCellDef="let alert">
+              <button mat-flat-button
+                      [ngClass]="{
+                        'low-stock': alert.status?.toLowerCase().includes('delivered'),
+                        'max-stock': alert.status?.toLowerCase().includes('updated')
+                      }">
+                {{ alert.status }}
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -1,0 +1,9 @@
+.profile-settings-card {
+  height: 1080px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-width: 60vw;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  background-color: #FFFFFF;
+}

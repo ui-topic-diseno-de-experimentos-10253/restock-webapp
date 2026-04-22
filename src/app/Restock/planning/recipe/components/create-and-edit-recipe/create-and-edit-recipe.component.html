@@ -1,0 +1,11 @@
+<div class="recipe-modal-content">
+  <app-create-and-edit-form
+    [schema]="schema"
+    [initialData]="initialData"
+    [mode]="mode"
+    [customComponents]="{'supplySelector': SupplySelectorComponent}"
+    (formChange)="handleFormChange($event)"
+    (submit)="onSubmit($event)"
+  ></app-create-and-edit-form>
+
+</div>

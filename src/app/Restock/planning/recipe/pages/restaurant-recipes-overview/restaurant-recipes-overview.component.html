@@ -1,0 +1,65 @@
+<div class="recipes-view">
+  <!-- Header -->
+  <div class="recipes-header">
+    <div class="recipes-header__top">
+      <h2 class="recipes-title">{{ 'recipes.title' | translate }}</h2>
+    </div>
+
+    <div class="recipes-header__middle">
+      <mat-form-field class="search-field" appearance="outline">
+        <input
+          matInput
+          [placeholder]="'recipes.searchPlaceholder' | translate"
+          [(ngModel)]="search"
+        />
+      </mat-form-field>
+
+      <div class="sort-toggle">
+        <label for="sortByPrice">{{ 'recipes.sortByPrice' | translate }}</label>
+        <mat-slide-toggle
+          id="sortByPrice"
+          [(ngModel)]="sortByPrice"
+        ></mat-slide-toggle>
+      </div>
+    </div>
+
+    <div class="recipes-header__actions">
+      <button class="green-button" action mat-stroked-button (click)="openCreateDialog()">
+        <mat-icon>add_circle</mat-icon>
+        {{ 'recipes.create' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  @if (filteredRecipes.length === 0) {
+    <app-empty-section>
+      <div icon>
+        <mat-icon style="font-size: 3rem; color: #bcbcbc;">assignment</mat-icon>
+      </div>
+      {{ 'recipes.noRecipes' | translate }}
+    </app-empty-section>
+  }
+
+  <!-- Grid -->
+  @if (filteredRecipes.length > 0) {
+    <div class="recipes-grid">
+      @for (recipe of filteredRecipes; track recipe.id) {
+        <div class="recipe-card">
+          <img [src]="recipe.imageUrl" alt="Dish image" />
+          <h3>{{ recipe.name }}</h3>
+          <p>{{ 'recipes.totalCost' | translate }}: S/.{{ recipe.price }}</p>
+          <div class="recipe-card__actions">
+            <button mat-icon-button (click)="openEditDialog(recipe)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="openDeleteDialog(recipe)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

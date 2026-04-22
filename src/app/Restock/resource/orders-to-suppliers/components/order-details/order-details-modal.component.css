@@ -1,0 +1,66 @@
+mat-dialog-content {
+  font-size: 14px;
+  color: #333;
+}
+
+.order-modal-container {
+  max-width: 700px;
+  padding: 16px;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Secciones con espacio y borde inferior opcional */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+h2 {
+  margin-bottom: 0;
+}
+
+h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+/* Grid para información ordenada */
+.info-grid,
+.supply-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+
+.order-info p,
+.supply-grid p {
+  margin: 0;
+}
+
+.provider-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.provider-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.supply-card {
+  margin-bottom: 16px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  border-radius: 8px;
+}

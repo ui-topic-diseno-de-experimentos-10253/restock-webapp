@@ -1,0 +1,1 @@
+npm run start:api //correr json-server

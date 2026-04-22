@@ -1,0 +1,73 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.full-width-table {
+  width: 100%;
+  min-width: 800px;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 100px;
+  color: #757575;
+}
+
+.truck-icon {
+  font-size: 80px;
+  color: #90a4ae;
+  margin-bottom: 16px;
+  display: inline-block;
+  line-height: 1;
+  overflow: visible;
+}
+
+.situation-pending {
+  background-color: rgb(224, 226, 230);
+}
+
+.situation-approved {
+  background-color: rgb(184, 211, 189);
+}
+
+.situation-declined {
+  background-color: rgb(226, 164, 161);
+}
+
+.action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.icon-placeholder {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .full-width-table {
+    font-size: 13px;
+  }
+
+  .action-icons button {
+    padding: 4px;
+  }
+
+  .icon-placeholder {
+    width: 20px;
+    height: 20px;
+  }
+
+  .empty-state {
+    padding: 16px;
+    margin-top: 60px;
+  }
+
+  .truck-icon {
+    font-size: 60px;
+  }
+}

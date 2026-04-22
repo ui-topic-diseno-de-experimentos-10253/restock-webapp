@@ -1,0 +1,34 @@
+<div class="orders-container">
+  <orders-toolbar
+    (createOrder)="onOpenCreateOrderModal()"
+    [suppliers]="supplierOptions"
+    (supplierFilterChanged)="onSupplierFilterChanged($event)"
+    (searchChanged)="onSearchChanged($event)"
+  >
+  </orders-toolbar>
+
+  <orders-table
+    [orders]="filteredOrders"
+    [suppliers]="supplierOptions"
+    (orderSelected)="onOrderSelected($event)"
+    (viewDetails)="openDetails($event)"
+    (deleteOrder)="onDeleteOrder($event)"
+    (leaveFeedback)="openFeedback($event)"
+  >
+  </orders-table>
+
+  <create-orders-modal
+    [providerSupplies]="providerSupplies"
+    [providerProfiles]="providerProfiles"
+  ></create-orders-modal>
+
+  <order-details-modal
+    [order]="selectedOrder"
+    [providerProfiles]="providerProfiles"
+  />
+
+  <order-feedback-modal
+    [order]="selectedOrder"
+    [providerProfiles]="providerProfiles"
+  />
+</div>

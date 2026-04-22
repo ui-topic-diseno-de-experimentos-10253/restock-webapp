@@ -1,0 +1,39 @@
+<form class="custom-supply-form">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Supply</mat-label>
+    <mat-select [(ngModel)]="selectedId" name="supply" (selectionChange)="onSupplyChange($event.value)">
+      @for (supply of supplies; track supply.id) {
+        <mat-option [value]="supply.id">{{ supply.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (selectedSupply){
+    <div>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Description</mat-label>
+        <input matInput type="text" [(ngModel)]="description" name="description" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Min Stock</mat-label>
+        <input matInput type="number" [(ngModel)]="minStock" name="minStock" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Max Stock</mat-label>
+        <input matInput type="number" [(ngModel)]="maxStock" name="maxStock" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Unit Price</mat-label>
+        <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" />
+      </mat-form-field>
+    </div>
+  }
+
+  <div class="actions">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="!selectedSupply">Save</button>
+  </div>
+</form>

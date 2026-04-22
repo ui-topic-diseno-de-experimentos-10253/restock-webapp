@@ -1,0 +1,86 @@
+<div class="security-container">
+
+  <!-- Change password section -->
+  <mat-card class="security-card">
+    <mat-card-header>
+      <mat-card-title>{{ ('profile.settings.change-password') | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="content-container">
+
+        <!-- Current password -->
+        <mat-label>{{ ('profile.settings.current-password') | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput
+                 [(ngModel)]="currentPassword"
+                 [type]="hideCurrentPassword ? 'password' : 'text'"
+                 [placeholder]="'profile.settings.current-password-placeholder' | translate"
+                 aria-label="Current password" />
+          <button mat-icon-button matSuffix class="hide-button"
+                  (click)="hideCurrentPassword = !hideCurrentPassword"
+                  [attr.aria-label]="hideCurrentPassword ? 'Show current password' : 'Hide current password'"
+                  [attr.aria-pressed]="!hideCurrentPassword">
+            <mat-icon>{{ hideCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- New password -->
+        <mat-label>{{ ('profile.settings.new-password') | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput
+                 [(ngModel)]="newPassword"
+                 [type]="hideNewPassword ? 'password' : 'text'"
+                 [placeholder]="'profile.settings.new-password-placeholder' | translate"
+                 aria-label="New password" />
+          <button mat-icon-button matSuffix class="hide-button"
+                  (click)="hideNewPassword = !hideNewPassword"
+                  [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+                  [attr.aria-pressed]="!hideNewPassword">
+            <mat-icon>{{ hideNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Confirm new password -->
+        <mat-label>{{ ('profile.settings.confirm-password') | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput
+                 [(ngModel)]="newPasswordConfirm"
+                 [type]="hideNewPasswordConfirm ? 'password' : 'text'"
+                 [placeholder]="'profile.settings.confirm-password-placeholder' | translate"
+                 aria-label="Confirm new password" />
+          <button mat-icon-button matSuffix class="hide-button"
+                  (click)="hideNewPasswordConfirm = !hideNewPasswordConfirm"
+                  [attr.aria-label]="hideNewPasswordConfirm ? 'Show confirm password' : 'Hide confirm password'"
+                  [attr.aria-pressed]="!hideNewPasswordConfirm">
+            <mat-icon>{{ hideNewPasswordConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button class="save-changes-button" (click)="onSaveChanges()" aria-label="Save password changes">
+        {{ ('profile.settings.save-changes') | translate }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Delete account section -->
+  <mat-card class="security-card">
+    <mat-card-header>
+      <mat-card-title>{{ ('profile.settings.delete-account') | translate }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="content-container">
+        <p>{{ ('profile.settings.delete-account-warning') | translate }}</p>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button class="delete-button">{{ ('profile.settings.confirm-delete') | translate}}</button>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

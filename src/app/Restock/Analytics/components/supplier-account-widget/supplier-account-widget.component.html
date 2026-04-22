@@ -1,0 +1,101 @@
+<div class="account-widget">
+  <div class="header">
+    <h3>Account Overview</h3>
+  </div>
+
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event.index)">
+
+  <!-- TAB 1: EARNINGS -->
+    <mat-tab label="Earnings">
+      <div class="tab-content">
+        <mat-icon>attach_money</mat-icon>
+        <h4>Total Earnings</h4>
+        <p class="amount">S/. {{ filteredEarnings.toFixed(2) }}</p>
+        <p class="subtext">In selected range</p>
+
+        <div class="filters">
+          <mat-form-field appearance="outline" class="range-select">
+            <mat-label>Range</mat-label>
+            <mat-select [(value)]="selectedRange" (selectionChange)="selectPredefinedRange($event.value)">
+              <mat-option *ngFor="let range of predefinedRanges" [value]="range.value">{{ range.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Botón calendario Angular Material -->
+          <div style="display: flex; justify-content: flex-end;">
+            <button mat-stroked-button color="primary" (click)="openCalendarDialog()">
+              <mat-icon>calendar_today</mat-icon>
+              Select range
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 2: SUPPLIES -->
+    <mat-tab label="Supplies Sold">
+      <div class="tab-content">
+        <mat-icon>shopping_cart</mat-icon>
+        <h4>Supplies Sold</h4>
+        <p class="amount">{{ filteredSupplies }}</p>
+        <p class="subtext">In selected range</p>
+
+        <div class="filters">
+          <mat-form-field appearance="outline" class="range-select">
+            <mat-label>Range</mat-label>
+            <mat-select [(value)]="selectedRange" (selectionChange)="selectPredefinedRange($event.value)">
+              <mat-option *ngFor="let range of predefinedRanges" [value]="range.value">{{ range.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Botón calendario Angular Material -->
+          <div style="display: flex; justify-content: flex-end;">
+            <button mat-stroked-button color="primary" (click)="openCalendarDialog()">
+              <mat-icon>calendar_today</mat-icon>
+              Select range
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 3: EARNING STATS -->
+    <mat-tab label="Earning Stats">
+      <div class="tab-content"
+           style="max-height: 400px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <!-- RANGOS (izquierda) -->
+          <mat-button-toggle-group
+            [value]="selectedRange"
+            (change)="selectPredefinedRange($event.value)"
+            class="range-toggle"
+            appearance="legacy">
+            <mat-button-toggle *ngFor="let range of predefinedRanges" [value]="range.value">
+              {{ range.label }}
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <!-- Botón para abrir modal de calendario -->
+          <div style="display: flex; justify-content: flex-end;">
+            <button mat-icon-button color="primary" (click)="openCalendarDialog()" aria-label="Open calendar">
+              <mat-icon>calendar_today</mat-icon>
+            </button>
+          </div>
+        </div>
+
+<!--        &lt;!&ndash; CHART &ndash;&gt;-->
+<!--        <div class="chart-container" style="flex-grow: 1; margin-top: 1rem;">-->
+<!--          <p-chart-->
+<!--            type="line"-->
+<!--            [data]="pChartData"-->
+<!--            [options]="pChartOptions"-->
+<!--            style="height: 20rem; width: 100%;">-->
+<!--          </p-chart>-->
+<!--        </div>-->
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -1,0 +1,45 @@
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 100%;
+  padding: 0.5rem 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.form-toggle {
+  align-self: flex-start;
+}
+
+.file-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.file-upload input[type="file"] {
+  padding-top: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

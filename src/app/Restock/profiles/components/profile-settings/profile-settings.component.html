@@ -1,0 +1,36 @@
+<div class="profile-settings-container">
+  <mat-card class="profile-settings-card">
+    <mat-card-header>
+      <mat-card-title>{{ 'profile.settings.title' | translate}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab [label]="'profile.settings.personal-info' | translate " >
+          <app-personal-data-settings
+            [profile]="profile"
+            (profileUpdated)="onSaveChanges($event)"
+          />
+        </mat-tab>
+
+        <mat-tab [label]="'profile.settings.business-info' | translate ">
+          <app-business-data-settings
+            [business]="profile.business!"
+            [currentCategories]="categories"
+            [categoriesOptions]="categoriesOptions"
+            (profileAndBusinessUpdated)="onProfileAndBusinessChanges($event)"
+          />
+        </mat-tab>
+
+        <mat-tab [label]="'profile.settings.security-info' | translate ">
+          <app-security-settings
+            [user]="profile.user!"
+            (profileAndUserUpdated)="onProfileAndUserChanges($event)"
+          />
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+
+  </mat-card>
+
+
+</div>

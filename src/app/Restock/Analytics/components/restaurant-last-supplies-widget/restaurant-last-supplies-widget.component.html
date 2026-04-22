@@ -1,0 +1,30 @@
+<h3 class="widget-title">Last added supplies</h3>
+
+<!-- Vista desktop: Carrusel con flechas -->
+<div class="carousel-wrapper">
+  <button class="nav-button left" (click)="scrollLeft(containerRef.nativeElement)">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <div #carouselContainer class="carousel-container">
+    <div class="supply-card" *ngFor="let b of batches">
+      <h3>{{ b.supply?.name }}</h3>
+      <p class="category">{{ b.supply?.category || 'Uncategorized' }}</p>
+      <p class="description">{{ b.supply?.description || '-' }}</p>
+    </div>
+  </div>
+
+  <button class="nav-button right" (click)="scrollRight(containerRef.nativeElement)">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>
+
+<!-- Vista mobile: scroll horizontal tipo grilla -->
+<div class="supplies-grid">
+  <div class="ingredient-pair" *ngFor="let pair of getPairs()">
+    <div class="ingredient-card" *ngFor="let b of pair">
+      <h4>{{ b.supply?.name }}</h4>
+      <p class="category">{{ b.supply?.category || 'Uncategorized' }}</p>
+    </div>
+  </div>
+</div>

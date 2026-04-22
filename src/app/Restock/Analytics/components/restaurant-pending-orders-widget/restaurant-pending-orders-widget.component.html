@@ -1,0 +1,22 @@
+<h3 class="widget-title">Pending Orders</h3>
+
+<div class="widget-container">
+  <div class="widget-orders-wrapper">
+    <div class="scroll-wrapper">
+      <div class="custom-orders-table">
+        <orders-table
+          class="widget-context"
+          [orders]="pendingOrders"
+          [suppliers]="suppliers">
+        </orders-table>
+
+      </div>
+    </div>
+
+    <div class="view-all-button-container">
+      <button mat-icon-button (click)="goToOrders()" matTooltip="Ver todas las órdenes">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

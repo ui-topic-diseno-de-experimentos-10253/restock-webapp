@@ -1,0 +1,53 @@
+<div class="profile-details-container">
+  <mat-card class="profile-details-card">
+    <mat-card-header>
+      <mat-card-title class="text">{{ 'profile.title' | translate }}</mat-card-title>
+    </mat-card-header>
+
+    <img mat-card-image [src]="profile.avatar" alt="User photo" class="profile-photo" />
+
+    <mat-card-content class="text">
+      <div class="personal-details-form">
+        <h4 class="name">{{ profile.name }} {{ profile.last_name }}</h4>
+
+        <p class="info"><mat-icon>person</mat-icon> {{ profile.email }}</p>
+
+        <!-- Phone -->
+        <p class="info"><mat-icon>phone</mat-icon> {{ profile.phone }}</p>
+
+        <!-- Address -->
+        <p class="info"><mat-icon>location_on</mat-icon> {{ profile.address }} - {{ profile.country }} </p>
+
+        <hr>
+
+        <!-- Company Name -->
+        <h5 class="subtitle">{{ 'profile.business-name' | translate }}:</h5>
+        <p> {{ profile.business?.name }} </p>
+
+        <!-- Company Address -->
+        <h5 class="subtitle">{{ 'profile.business-address' | translate }}:</h5>
+        <p> {{ profile.business?.address }} </p>
+
+        <!-- Company Phone -->
+        <h5 class="subtitle">{{ 'profile.business-phone' | translate }}:</h5>
+        <p> {{ profile.business?.phone }} </p>
+
+        <!-- Company Email -->
+        <h5 class="subtitle">{{ 'profile.business-email' | translate }}:</h5>
+        <p> {{ profile.business?.email }} </p>
+
+        <h5 class="subtitle">{{ 'profile.categories' | translate }}:</h5>
+
+        <div class="category-chip-list">
+          @for (category of categories; track category) {
+          <mat-chip color="primary" disabled>
+            {{ category }}
+          </mat-chip>
+          }
+        </div>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</div>

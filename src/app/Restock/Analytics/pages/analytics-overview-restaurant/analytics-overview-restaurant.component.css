@@ -1,0 +1,45 @@
+.restaurant-summary-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.row-1 {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.widget-pending-orders {
+  flex: 2;/* 66% aprox */
+}
+
+.widget-last-notifications {
+  flex: 1; /* 33% aprox */
+}
+
+.row-2 {
+  display: flex;
+
+}
+
+.widget-carousel {
+  width: 100%;
+  max-width: 1400px;
+}
+
+@media (max-width: 1190px) {
+  .row-1 {
+    flex-direction: column;
+  }
+
+  .pending-widget,
+  .alerts-widget,
+  .supplies-widget {
+    width: 100% !important;
+  }
+
+  .row-2 {
+    flex-direction: column;
+  }
+}

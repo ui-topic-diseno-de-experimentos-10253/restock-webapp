@@ -1,0 +1,35 @@
+<div class="details-container">
+  @if (data.supply?.description) {
+    <span class="label">{{ 'inventory.descriptionOptional' | translate }}:</span>
+    <span class="value">{{ data.supply?.description }}</span>
+  }
+  <div class="detail-row">
+    <span class="label">{{ 'inventory.tableCategory' | translate }}:</span>
+    <span class="value">{{ data.supply?.category || '-' }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="label">{{ 'inventory.tableUnit' | translate }}:</span>
+    <span class="value">{{ data.supply?.unit_abbreviation || '-' }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="label">{{ 'inventory.unitPrice' | translate }}:</span>
+    <span class="value">{{ data.supply?.price }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="label">{{ 'inventory.tablePerishable' | translate }}:</span>
+    <span class="value">{{ data.supply?.perishable ? ('common.yes' | translate) : ('common.no' | translate) }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="label">{{ 'inventory.tableStock' | translate }}:</span>
+    <span class="value">{{ data.stock }}</span>
+  </div>
+
+  @if (data.expiration_date) {
+    <span class="label">{{ 'inventory.tableExpiration' | translate }}:</span>
+    <span class="value">{{ data.expiration_date | date:'MM/dd/yy' }}</span>
+  }
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="close()">{{ 'common.close' | translate }}</button>
+  </div>
+</div>

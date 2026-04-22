@@ -1,0 +1,65 @@
+<div class="signup-wrapper">
+  <div class="signup-card">
+    <div class="signup-header">
+      <h2 class="title">Sign up</h2>
+      <p class="subtitle">Join Restock and start optimizing today!</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="signup-form">
+      <!-- Username -->
+      <div class="input-field">
+        <mat-icon class="material-icon">person</mat-icon>
+        <input matInput placeholder="Username" formControlName="username" required />
+      </div>
+      <mat-error *ngIf="isInvalidControl(form, 'username')">
+        {{ errorMessagesForControl(form, 'username') }}
+      </mat-error>
+
+      <!-- Password -->
+      <div class="input-field">
+        <mat-icon class="material-icon">lock</mat-icon>
+        <input matInput type="password" placeholder="Password" formControlName="password" required />
+      </div>
+      <mat-error *ngIf="isInvalidControl(form, 'password')">
+        {{ errorMessagesForControl(form, 'password') }}
+      </mat-error>
+
+      <!-- Role selection -->
+      <label class="role-label">Choose your role</label>
+      <div class="role-options">
+        <div
+          class="role-card"
+          [ngClass]="{ 'selected': form.get('role')?.value === 'admin' }"
+          (click)="selectRole(2)"
+
+        >
+          <i class="fas fa-utensils role-icon"></i>
+          <span class="role-name">Administrator</span>
+        </div>
+        <div
+          class="role-card"
+          [ngClass]="{ 'selected': form.get('role')?.value === 'provider' }"
+          (click)="selectRole(1)"
+
+        >
+          <i class="fas fa-truck role-icon"></i>
+          <span class="role-name">Provider</span>
+        </div>
+      </div>
+      <mat-error *ngIf="isInvalidControl(form, 'role')">
+        {{ errorMessagesForControl(form, 'role') }}
+      </mat-error>
+
+      <!-- Submit -->
+      <button mat-raised-button color="primary" class="btn-submit">Sign up</button>
+    </form>
+
+    <!-- Social media -->
+    <div class="social-media">
+      <p class="social-text">Or sign up with</p>
+      <a (click)="onSocialSignUp('Google')" class="social-icon"><i class="fab fa-google"></i></a>
+      <a (click)="onSocialSignUp('Facebook')" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+      <a (click)="onSocialSignUp('Apple')" class="social-icon"><i class="fab fa-apple"></i></a>
+    </div>
+  </div>
+</div>

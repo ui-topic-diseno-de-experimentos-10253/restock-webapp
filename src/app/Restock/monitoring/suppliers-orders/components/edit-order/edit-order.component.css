@@ -1,0 +1,271 @@
+.date-section mat-form-field,
+.time-section mat-form-field,
+.description-section mat-form-field {
+  width: 100%;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-button {
+  color: #666;
+}
+
+.modal-content {
+  padding: 1rem;
+  color: #333;
+}
+
+.subtitle {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+
+.edit-order-dialog {
+  min-width: 500px;
+  max-width: 600px;
+}
+
+.dialog-content {
+  padding: 1rem;
+  color: #333;
+}
+
+.situation-section {
+  margin-bottom: 1rem;
+}
+
+.situation-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.approved-chip {
+  margin-left: 0.5rem;
+  font-size: 12px;
+  background-color: #10b981;
+  color: white;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 24px 0;
+  line-height: 1.4;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.btn-close {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+/* Stepper Styles */
+.stepper-container {
+  position: relative;
+  padding: 0.25rem 0 2rem;
+  margin-top: 1rem;
+}
+
+.progress-line {
+  position: absolute;
+  top: 1.25rem;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  margin-top: 5px;
+  background-color: #e5e7eb;
+  z-index: 1;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.steps-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.truck-container {
+  cursor: grab;
+  animation: bounce 2s infinite;
+  margin-bottom: 0.5rem;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.truck-icon {
+  font-size: 1.5rem !important;
+  color: #3b82f6;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.step-point {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 3;
+
+  &.completed {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  &.active {
+    background-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  }
+
+  &.pending {
+    background-color: #9ca3af;
+  }
+}
+
+.check-icon {
+  font-size: 0.75rem !important;
+  font-weight: bold;
+  margin-top: 0.75rem;
+  margin-right: 0.5rem;
+}
+
+.step-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  max-width: 80px;
+  line-height: 1.2;
+
+  &.active {
+    color: #3b82f6;
+    font-weight: 600;
+  }
+}
+
+/* Form Styles */
+.order-form {
+  width: 100%;
+}
+
+.form-section {
+  margin-bottom: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Dialog Actions */
+.dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  gap: 12px;
+}
+
+/* Animations */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .edit-order-dialog {
+    min-width: 320px;
+    max-width: 95vw;
+  }
+
+  .stepper-container {
+    padding: 1rem 0;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+    max-width: 60px;
+  }
+
+  .truck-icon {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Angular Material Overrides */
+::ng-deep {
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: 8px;
+  }
+
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+    border-radius: 4px;
+  }
+}

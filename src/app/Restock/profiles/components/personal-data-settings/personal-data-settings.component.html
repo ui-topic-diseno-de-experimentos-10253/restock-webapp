@@ -1,0 +1,53 @@
+<div class="personal-data-container">
+
+  <mat-card class="personal-data-card">
+
+    <mat-card-content>
+      <div class="personal-data-form">
+        <!-- Name -->
+        <mat-label>{{ 'profile.name' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [value]="profile.name"  [(ngModel)]="localProfile.name" type="text" placeholder="Enter your name" aria-label="Name" />
+        </mat-form-field>
+
+        <!-- Last name -->
+        <mat-label>{{ 'profile.last-name' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [value]="profile.last_name" [(ngModel)]="localProfile.last_name" type="text" placeholder="Enter your last name"
+            aria-label="Last Name" />
+        </mat-form-field>
+
+
+        <mat-label>{{ 'profile.email' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [value]="profile.email" [(ngModel)]="localProfile.email" type="email" placeholder="Enter your email" aria-label="Email" />
+        </mat-form-field>
+
+        <!-- Phone -->
+        <mat-label>{{ 'profile.phone' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [value]="profile.phone" [(ngModel)]="localProfile.phone" type="text" placeholder="Enter your phone" aria-label="Phone" />
+        </mat-form-field>
+
+        <!-- Address -->
+        <mat-label>{{ 'profile.address' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [value]="profile.address" [(ngModel)]="localProfile.address" type="text" placeholder="Enter your address"
+            aria-label="Address" />
+        </mat-form-field>
+
+        <!-- Country -->
+        <mat-label>{{ 'profile.country' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [value]="profile.country" [(ngModel)]="localProfile.country" type="text" placeholder="Enter your country"
+            aria-label="Country" />
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button class="save-changes-button" aria-label="Save changes" (click)="onSaveChanges()">
+        {{ 'profile.settings.save-changes' | translate }}</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

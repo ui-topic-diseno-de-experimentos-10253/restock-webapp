@@ -1,0 +1,227 @@
+<ng-template #createOrderModal>
+  <div class="order-modal-container">
+    <h2 mat-dialog-title>{{ "order-to-supplier.createOrder" | translate }}</h2>
+
+    <mat-dialog-content>
+      <mat-tab-group [(selectedIndex)]="tabIndex">
+        <mat-tab
+          label="{{
+            'order-to-supplier.create-order-modal.select-supply-tab.title'
+              | translate
+          }}"
+        >
+          <mat-form-field appearance="fill" class="supply-select">
+            <mat-label>{{
+              "order-to-supplier.create-order-modal.select-supply-tab.selectSupply"
+                | translate
+            }}</mat-label>
+            <mat-select
+              [(ngModel)]="selectedSupply"
+              (selectionChange)="onSupplyChange()"
+            >
+              <mat-option
+                *ngFor="let supply of providerSupplies"
+                [value]="supply"
+                >{{ supply.name }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+
+          <div *ngIf="selectedSupply">
+            <div class="sort-section">
+              <span>{{
+                "order-to-supplier.create-order-modal.select-supply-tab.orderByPrice"
+                  | translate
+              }}</span>
+              <button mat-icon-button (click)="toggleSortOrder()">
+                <mat-icon>swap_vert</mat-icon>
+              </button>
+            </div>
+
+            <table
+              mat-table
+              [dataSource]="filteredSuppliers"
+              class="mat-elevation-z1 full-width"
+            >
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{
+                    "order-to-supplier.create-order-modal.select-supply-tab.table.supplier"
+                      | translate
+                  }}
+                </th>
+                <td mat-cell *matCellDef="let el">{{ el.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="price">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{
+                    "order-to-supplier.create-order-modal.select-supply-tab.table.price"
+                      | translate
+                  }}
+                </th>
+                <td mat-cell *matCellDef="let el">S/ {{ el.price }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="available">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{
+                    "order-to-supplier.create-order-modal.select-supply-tab.table.availableStock"
+                      | translate
+                  }}
+                </th>
+                <td mat-cell *matCellDef="let el">{{ el.available }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{
+                    "order-to-supplier.create-order-modal.select-supply-tab.table.select"
+                      | translate
+                  }}
+                </th>
+                <td mat-cell *matCellDef="let el">
+                  <mat-checkbox
+                    [(ngModel)]="el.selected"
+                    [disabled]="el.disabled"
+                  ></mat-checkbox>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="['name', 'price', 'available', 'select']"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="
+                  let row;
+                  columns: ['name', 'price', 'available', 'select']
+                "
+              ></tr>
+            </table>
+          </div>
+
+          <div class="modal-actions">
+            <button mat-flat-button color="warn" (click)="closeModal()">
+              {{
+                "order-to-supplier.create-order-modal.select-supply-tab.cancel"
+                  | translate
+              }}
+            </button>
+            <button
+              mat-flat-button
+              color="accent"
+              (click)="nextTab()"
+              [disabled]="!hasSelection()"
+            >
+              {{
+                "order-to-supplier.create-order-modal.select-supply-tab.next"
+                  | translate
+              }}
+            </button>
+          </div>
+        </mat-tab>
+
+        <mat-tab
+          label="{{
+            'order-to-supplier.create-order-modal.order-details-tab.title'
+              | translate
+          }}"
+        >
+          <div *ngIf="fullOrder.length === 0 && currentSelections.length === 0">
+            {{
+              "order-to-supplier.create-order-modal.order-details-tab.noSuppliesSelected"
+                | translate
+            }}
+          </div>
+
+          <div class="card-grid">
+            <mat-card
+              *ngFor="let s of fullOrder.concat(currentSelections)"
+              class="supply-card"
+            >
+              <mat-card-header>
+                <mat-card-title>{{ s.supplyName }}</mat-card-title>
+                <mat-card-subtitle>{{ s.name }}</mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <p>
+                  <strong
+                    >{{
+                      "order-to-supplier.create-order-modal.order-details-tab.order-details-card.price"
+                        | translate
+                    }}:</strong
+                  >
+                  S/ {{ s.price }}
+                </p>
+                <p>
+                  <strong
+                    >{{
+                      "order-to-supplier.create-order-modal.order-details-tab.order-details-card.availableStock"
+                        | translate
+                    }}:</strong
+                  >
+                  {{ s.available }} unidades
+                </p>
+
+                <mat-form-field appearance="fill" class="quantity-field">
+                  <mat-label>{{
+                    "order-to-supplier.create-order-modal.order-details-tab.order-details-card.quantity"
+                      | translate
+                  }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    [(ngModel)]="s.quantity"
+                    min="1"
+                    [max]="s.available"
+                  />
+                  <mat-hint *ngIf="s.quantity > s.available" style="color: red">
+                    Máx: {{ s.available }} unidades
+                  </mat-hint>
+                </mat-form-field>
+              </mat-card-content>
+
+              <mat-card-actions align="end">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removeSupply(s)"
+                  matTooltip="Eliminar"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+
+          <p>
+            <strong
+              >{{
+                "order-to-supplier.create-order-modal.order-details-tab.total"
+                  | translate
+              }}: S/ {{ getTotal() }}</strong
+            >
+          </p>
+
+          <div class="modal-actions">
+            <button mat-flat-button color="primary" (click)="onCreateOrder()">
+              {{
+                "order-to-supplier.create-order-modal.order-details-tab.placeOrder"
+                  | translate
+              }}
+            </button>
+            <button mat-stroked-button color="accent" (click)="addMoreSupply()">
+              {{
+                "order-to-supplier.create-order-modal.order-details-tab.addMoreSupplies"
+                  | translate
+              }}
+            </button>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-dialog-content>
+  </div>
+</ng-template>

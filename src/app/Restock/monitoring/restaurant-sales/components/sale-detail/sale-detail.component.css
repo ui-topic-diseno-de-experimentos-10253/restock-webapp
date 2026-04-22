@@ -1,0 +1,125 @@
+/* register-sales.component.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* fondo oscuro opaco */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    min-height: 80vh;
+    max-height: 80vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.content {
+    margin-top: 1rem;
+}
+
+.dishes {
+    margin-top: 1rem;
+}
+
+.additionalSupplies {
+    margin-top: 2.6rem;
+}
+
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 23px;
+    z-index: 2;
+}
+
+.title {
+    text-align: center;
+    padding-top: 24px;
+    font-weight: 600;
+}
+
+.sub-text {
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 15px;
+    color: black;
+    margin-bottom: 1rem;
+}
+
+.no-dishes-additonalsupplies-selected {
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    padding-left: 8rem;
+    padding-right: 8rem;
+    text-align: center;
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: 400;
+    color: #808D99;
+}
+
+.modal-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    padding-top: 18px;
+    box-sizing: border-box;
+}
+
+
+.full-width {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+
+.button-cancel {
+    border-radius: 6px;
+    background-color: #D9534F;
+    color: white;
+}
+
+.button-register {
+    border-radius: 6px;
+    background-color: #4F8A5B;
+    color: white;
+}
+
+mat-table {
+    background-color: white;
+}
+
+.quantity {
+    margin-top: 1.2rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mat-elevation-z2 {
+    margin-bottom: 1.5rem;
+}

@@ -1,0 +1,25 @@
+<div class="carousel-wrapper">
+  <button class="nav-button left" (click)="scrollLeft(container)">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <div #container class="carousel-container">
+    @for (supply of supplies; track supply) {
+      <div class="supply-card">
+        <h3>{{ supply.name }}</h3>
+        <p class="category">{{ getCategoryName(supply) }}</p>
+        <p class="description">{{ supply.description || '-' }}</p>
+        <button mat-stroked-button class="edit-btn" (click)="edit.emit(supply)">
+          {{ 'inventory.edit' | translate }}
+        </button>
+        <button mat-stroked-button color="warn" class="edit-btn" (click)="delete.emit(supply)">
+          {{ 'shared.deleteButton' | translate }}
+        </button>
+      </div>
+    }
+  </div>
+
+  <button class="nav-button right" (click)="scrollRight(container)">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

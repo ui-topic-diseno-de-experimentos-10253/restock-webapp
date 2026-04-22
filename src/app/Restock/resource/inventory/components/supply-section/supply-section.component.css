@@ -1,0 +1,56 @@
+.supplies-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 0 1.5rem
+}
+
+.supplies-title {
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: Poppins;
+  margin: 0;
+}
+
+.create-button {
+  gap: 0.5rem;
+  background-color: #4F8A5B !important;
+  color: white !important;
+  border-radius: 2px;
+  padding: 15px 30px;
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.empty-card {
+  border-radius: 1rem;
+  padding: 2rem;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+app-empty-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .supplies-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,81 @@
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.carousel-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1rem;
+  padding: 1rem 2.5rem;
+  scrollbar-width: none;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.supply-card {
+  background: #e8f5e9;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 200px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.supply-card h3 {
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.supply-card .category {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.supply-card .description {
+  font-size: 13px;
+  color: #444;
+}
+
+.edit-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+
+.nav-button {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.nav-button.left {
+  left: 0;
+}
+
+.nav-button.right {
+  right: 0;
+}
+@media (max-width: 768px) {
+  .supply-card {
+    min-width: 150px;
+  }
+
+  .nav-button {
+    display: none;
+  }
+}

@@ -1,0 +1,31 @@
+.details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 100%;
+}
+
+.details-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-weight: 600;
+  color: #607d8b;
+}
+
+.value {
+  color: #424242;
+}
+
+.actions {
+  margin-top: 1rem;
+  align-self: flex-end;
+}

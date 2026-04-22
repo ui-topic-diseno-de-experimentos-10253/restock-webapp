@@ -1,0 +1,33 @@
+<div class="supplier-orders-container">
+  <mat-tab-group>
+    <mat-tab [label]="'supplier-orders.tabs.new-orders' | translate " >
+      <app-new-orders
+        [orders]="newOrders"
+        [adminRestaurantsProfiles]="restaurantNameMap"
+        [orderSuppliesDetails]="detailedSuppliesGroupedByOrder"
+        [batchesGroupedByOrder]="batchesGroupedByOrder"
+        (declineDialog)="openDeleteOrderDialog($event, 'decline')"
+        (manageNewOrderModal)="openManageOrderModal($event)"
+        (detailsModal)="openOrderDetailsModal($event, true)"
+      />
+    </mat-tab>
+
+    <mat-tab [label]="'supplier-orders.tabs.accepted-orders' | translate " >
+      <app-approved-orders
+        [orders]="ordersInProcess"
+        [adminRestaurantsProfiles]="restaurantNameMap"
+        (deleteDialog)="openDeleteOrderDialog($event, 'cancel')"
+        (detailsModal)="openOrderDetailsModal($event, false)"
+        (editModal)="openEditOrderModal($event)"
+      />
+    </mat-tab>
+
+    <mat-tab [label]="'supplier-orders.tabs.history-orders' | translate ">
+      <app-delivered-orders
+        [orders]="deliveredOrders"
+        [adminRestaurantsProfiles]="restaurantNameMap"
+        (detailsModal)="openOrderDetailsModal($event, false)"
+      />
+    </mat-tab>
+  </mat-tab-group>
+</div>

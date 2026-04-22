@@ -1,0 +1,39 @@
+<div class="signin-wrapper">
+  <div class="signin-card">
+    <div class="signin-header">
+      <h2 class="title">Sign in</h2>
+      <p class="subtitle">Welcome back to Restock!</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="signup-form">
+      <!-- Username -->
+      <div class="input-field">
+        <mat-icon class="material-icon">person</mat-icon>
+        <input matInput placeholder="Username" formControlName="username" required />
+      </div>
+      <mat-error *ngIf="isInvalidControl(form, 'username')">
+        {{ errorMessagesForControl(form, 'username') }}
+      </mat-error>
+
+      <!-- Password -->
+      <div class="input-field">
+        <mat-icon class="material-icon">lock</mat-icon>
+        <input matInput type="password" placeholder="Password" formControlName="password" required />
+      </div>
+      <mat-error *ngIf="isInvalidControl(form, 'password')">
+        {{ errorMessagesForControl(form, 'password') }}
+      </mat-error>
+
+      <!-- Submit -->
+      <button mat-raised-button class="btn-submit">Sign In</button>
+    </form>
+
+    <!-- Social media -->
+    <div class="social-media">
+      <p class="social-text">Or sign in with</p>
+      <a (click)="onSocialSignIn('Google')" class="social-icon"><i class="fab fa-google"></i></a>
+      <a (click)="onSocialSignIn('Facebook')" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+      <a (click)="onSocialSignIn('Apple')" class="social-icon"><i class="fab fa-apple"></i></a>
+    </div>
+  </div>
+</div>

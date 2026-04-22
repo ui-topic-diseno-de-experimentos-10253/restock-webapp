@@ -1,0 +1,66 @@
+<div class="business-data-container">
+
+  <mat-card class="business-data-card">
+
+    <mat-card-content>
+      <div class="business-data-form">
+        <!--  Company Name -->
+        <mat-label>{{ 'profile.business-name' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [(ngModel)]="localBusiness.name" type="text" placeholder="Enter your name"
+            aria-label="Business Name" />
+        </mat-form-field>
+
+        <!-- Company Address -->
+        <mat-label>{{ 'profile.business-address' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [(ngModel)]="localBusiness.address" type="text" placeholder="Enter your address"
+            aria-label="Business Address" />
+        </mat-form-field>
+
+        <!-- Company Phone -->
+        <mat-label>{{ 'profile.business-phone' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [(ngModel)]="localBusiness.phone" type="text" placeholder="Enter your phone"
+                 aria-label="Business Phone" />
+        </mat-form-field>
+
+        <!-- Company Email -->
+        <mat-label>{{ 'profile.business-email' | translate }}</mat-label>
+        <mat-form-field class="full-width" appearance="outline">
+          <input matInput [(ngModel)]="localBusiness.email" type="text" placeholder="Enter your email"
+                 aria-label="Business Email" />
+        </mat-form-field>
+
+
+        <!-- Company Categories -->
+        <mat-label>{{ 'profile.business-categories' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select [(ngModel)]="selectedCategories" multiple>
+            <mat-option *ngFor="let category of categoriesOptions" [value]="category">
+              {{ category }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Mostrar chips -->
+        <div class="category-chip-list">
+          @for (category of selectedCategories; track category) {
+          <mat-chip color="primary" selected removable (removed)="removeCategory(category)">
+            {{ category }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          }
+        </div>
+
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button class="save-changes-button" aria-label="Save changes" (click)="onSaveChanges()">SAVE
+        {{ 'profile.settings.save-changes' | translate }}</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

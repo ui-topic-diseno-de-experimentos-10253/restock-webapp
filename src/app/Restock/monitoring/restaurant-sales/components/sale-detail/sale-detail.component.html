@@ -1,0 +1,93 @@
+<!-- Modal backdrop: clicking it will close the modal -->
+<div class="modal-overlay" (click)="closeComponent()">
+
+    <!-- Modal content: click propagation is stopped to prevent accidental closure -->
+    <div class="modal-content modal-scrollable" (click)="$event.stopPropagation()">
+
+        <!-- Close button (top-right corner) -->
+        <button mat-icon-button class="close-button" (click)="closeComponent()">
+            <mat-icon>close</mat-icon>
+        </button>
+
+        <!-- Title -->
+        <h2 class="title">{{'sales_restaurant.sale_details.title' | translate}} "{{sale.code}}".</h2>
+
+        <div class="content">
+            <!-- Scrollable content area -->
+            <p class="sub-text">
+                {{'sales_restaurant.sale_details.number_dishes' | translate}}: {{ sale.recipeCount || 0 }}
+            </p>
+            <p class="sub-text">
+                {{'sales_restaurant.sale_details.number_additional_supplies' | translate}}: {{
+                sale.additionalSupplyCount || 0 }}
+            </p>
+
+            <mat-divider></mat-divider>
+
+
+            <!-- Dishes table -->
+            <div class="dishes">
+                <h3>{{'sales_restaurant.sale_details.dishes' | translate}}</h3>
+                <mat-table [dataSource]="dishes" class="mat-elevation-z2">
+
+                    <!-- Dish name column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sale_details.name' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Dish price column -->
+                    <ng-container matColumnDef="price">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sale_details.unit_price' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">S/ {{ element.unitPrice }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Dish quantity column-->
+                    <ng-container matColumnDef="quantity">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sale_details.quantity' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.quantity }}</mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnsPlatos"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsPlatos;"></mat-row>
+                </mat-table>
+            </div>
+
+            <!-- additional supplies table -->
+            <div class="additionalSupplies">
+                <h3>{{'sales_restaurant.sale_details.additional_supplies' | translate}}</h3>
+                <mat-table [dataSource]="additionalSupplies" class="mat-elevation-z2">
+
+                    <!-- Supply name column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sale_details.name' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Supply price column -->
+                    <ng-container matColumnDef="price">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sale_details.unit_price' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">S/ {{ element.unitPrice }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Supply quantity column with editable input -->
+                    <ng-container matColumnDef="quantity">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sale_details.quantity' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.quantity }}</mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnsInsumos"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsInsumos;"></mat-row>
+                </mat-table>
+            </div>
+
+        </div>
+
+    </div>
+</div>

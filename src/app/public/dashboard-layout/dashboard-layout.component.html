@@ -1,0 +1,23 @@
+<app-navbar></app-navbar>
+
+<mat-sidenav-container class="layout-container">
+  <mat-sidenav #drawer [mode]="isMobile ? 'over' : 'side'" [opened]="!isMobile" [fixedInViewport]="isMobile"
+    fixedTopGap="56" class="sidebar-container">
+    <app-sidebar [menu]="menu" [profile]="profile"></app-sidebar>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content">
+    @if (isMobile) {
+    <button mat-icon-button class="floating-button" (click)="drawer.toggle()" aria-label="Toggle sidebar">
+      <mat-icon>menu</mat-icon>
+    </button>
+    }
+
+    <img src="/assets/imagen-principal.png" alt="Logo" class="principal-image" />
+
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

@@ -1,0 +1,236 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-button {
+  color: #666;
+}
+
+.modal-content {
+  padding: 1rem;
+  color: #333;
+}
+
+.subtitle {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.section-header {
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.25rem 0;
+}
+
+.section-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.section-subtitle {
+  margin-bottom: 0.75rem;
+}
+
+.table-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.supplies-table {
+  width: 100%;
+  font-size: 14px;
+}
+
+.supplies-table th,
+.supplies-table td {
+  padding: 0.5rem 0.75rem !important;
+}
+
+.total-price {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Description Section */
+.description-section {
+  margin-bottom: 0.75rem;
+}
+
+.description-field {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+
+
+/* Step 2 Styles */
+.date-time-section {
+  margin-bottom: 0.75rem;
+}
+
+.date-section,
+.time-section {
+  margin-bottom: 0.75rem;
+}
+
+.date-section mat-form-field,
+.time-section mat-form-field {
+  width: 100%;
+}
+
+.summary-section {
+  margin-top: 0.75rem;
+}
+
+.summary-list-bullets {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.summary-item {
+  margin-bottom: 0.25rem;
+}
+
+.calculated-total {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e0e0e0;
+  position: relative;
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-close {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.btn-close:hover {
+  background-color: #c82333;
+}
+
+.btn-back {
+  background-color: #6c757d;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.btn-back:hover {
+  background-color: #5a6268;
+}
+
+.btn-next,
+.btn-accept {
+  padding: 0.5rem 1rem;
+}
+
+/* Angular Material Form Field Adjustments */
+
+
+::ng-deep .mat-mdc-paginator {
+  padding: 0.5rem 1rem !important;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modal-container {
+    width: 95%;
+    margin: 0.5rem;
+  }
+
+  .modal-content {
+    padding: 0.75rem;
+  }
+
+  .modal-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .stepper-container {
+    padding: 1rem 0;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+  }
+
+  .truck-icon {
+    font-size: 1.25rem !important;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .footer-left,
+  .footer-right {
+    width: 100%;
+    justify-content: center;
+  }
+}

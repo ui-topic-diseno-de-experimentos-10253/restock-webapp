@@ -1,0 +1,26 @@
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem 1rem;
+}
+
+.modal-description {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  padding: 0rem 2rem 0.5rem;
+}
+
+.border {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-content {
+  padding: 0.5rem 2rem;
+}
