@@ -98,6 +98,12 @@ import { environment } from '../../../../environments/environment';
 import { BaseService } from '../../../shared/services/base.service';
 import { Profile } from '../model/profile.entity';
 import { ProfileAssembler } from './profile.assembler';
+import {
+  UpdateBusinessProfileRequest,
+  UpdatePersonalProfileRequest,
+  UpdateProfilePasswordRequest,
+  UserProfile
+} from '../model/user-profile.contract';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService extends BaseService<Profile> {
@@ -107,6 +113,36 @@ export class ProfileService extends BaseService<Profile> {
   constructor() {
     super();
     this.resourceEndpoint = '/profiles';
+  }
+
+  getByUserId(userId: number): Observable<UserProfile> {
+    return this.http
+      .get<any>(`${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}`, this.httpOptions)
+      .pipe(map(response => this.normalizeUserProfileResponse(response)));
+  }
+
+  updatePersonal(userId: number, payload: UpdatePersonalProfileRequest): Observable<any> {
+    return this.http.put(
+      `${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}/personal`,
+      payload,
+      this.httpOptions
+    );
+  }
+
+  updateBusiness(userId: number, payload: UpdateBusinessProfileRequest): Observable<any> {
+    return this.http.put(
+      `${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}/business`,
+      payload,
+      this.httpOptions
+    );
+  }
+
+  updatePassword(userId: number, payload: UpdateProfilePasswordRequest): Observable<any> {
+    return this.http.put(
+      `${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${userId}/password`,
+      payload,
+      this.httpOptions
+    );
   }
 
   getCurrentProfile(): Profile {
@@ -132,7 +168,9 @@ export class ProfileService extends BaseService<Profile> {
 
   async updateProfile(id: number, profile: Profile): Promise<Profile> {
     const dto = ProfileAssembler.toDTO(profile);
-    const updated = await firstValueFrom(this.update(id, dto));
+    const updated = await firstValueFrom(
+      this.http.put<any>(`${environment.serverBaseUrlBackend}${this.resourceEndpoint}/${id}`, dto, this.httpOptions)
+    );
     return ProfileAssembler.toEntity(updated);
   }
 
@@ -150,16 +188,59 @@ export class ProfileService extends BaseService<Profile> {
   }
 
   loadProfileByUserId(userId: number): Observable<Profile> {
-    const url = `${environment.serverBaseUrlBackend}${this.resourceEndpoint}?user_id=${userId}`;
-
-    return this.http.get<any[]>(url).pipe(
-      map(profiles => profiles[0]), // Se espera solo uno
-      map(dto => ProfileAssembler.toEntity(dto)),
+    return this.getByUserId(userId).pipe(
+      map((dto: UserProfile) => this.toLegacyProfile(dto)),
       map(profile => {
         this.profileSubject.next(profile);
         return profile;
       })
     );
+  }
+
+  private normalizeUserProfileResponse(response: any): UserProfile {
+    const raw = Array.isArray(response)
+      ? response[0]
+      : (Array.isArray(response?.value) ? response.value[0] : response);
+    if (!raw) {
+      throw new Error('Profile response is empty');
+    }
+
+    return {
+      userId: Number(raw.userId ?? raw.user_id ?? raw.id ?? 0),
+      firstName: raw.firstName ?? raw.name ?? '',
+      lastName: raw.lastName ?? raw.last_name ?? '',
+      email: raw.email ?? '',
+      phone: raw.phone ?? '',
+      address: raw.address ?? '',
+      country: raw.country ?? '',
+      avatar: raw.avatar ?? '',
+      businessName: raw.businessName ?? raw.business?.name ?? '',
+      businessAddress: raw.businessAddress ?? raw.business?.address ?? '',
+      description: raw.description ?? raw.business?.description ?? '',
+      businessCategories: Array.isArray(raw.businessCategories)
+        ? raw.businessCategories
+        : []
+    };
+  }
+
+  private toLegacyProfile(dto: UserProfile): Profile {
+    return new Profile({
+      id: dto.userId,
+      name: dto.firstName,
+      last_name: dto.lastName,
+      email: dto.email,
+      avatar: dto.avatar,
+      phone: dto.phone,
+      address: dto.address,
+      country: dto.country,
+      user_id: dto.userId,
+      business: {
+        name: dto.businessName,
+        address: dto.businessAddress,
+        categories: dto.businessCategories.map(category => category.name).join(', '),
+        description: dto.description
+      } as any
+    });
   }
   private loadInitialProfile(): Profile {
     return new Profile();

@@ -30,9 +30,7 @@ export class ProfileAssembler {
       address: entity.address,
       country: entity.country,
       business_id: entity.business_id,
-      user_id: entity.user_id,
-      business: entity.business,
-      user: entity.user
+      user_id: entity.user_id
     };
   }
 

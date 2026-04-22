@@ -6,9 +6,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
-import {Profile} from '../../Restock/profiles/model/profile.entity';
-import {ProfileService} from '../../Restock/profiles/services/profile.service';
-import {SessionService} from '../../shared/services/session.service';
+import { Profile } from '../../Restock/profiles/model/profile.entity';
+import { ProfileService } from '../../Restock/profiles/services/profile.service';
+import { SessionService } from '../../shared/services/session.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -17,14 +18,13 @@ import {SessionService} from '../../shared/services/session.service';
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.css']
 })
-
 export class DashboardLayoutComponent implements OnInit {
   menu: Array<{ labelKey: string, icon: string, route: string }> = [];
 
   router = inject(Router);
 
   profile: Profile = new Profile();
-  private currentRole: number | null = null; // Store the current role ID
+  private currentRole: number | null = null;
   isMobile: boolean = false;
   private mobileQuery: MediaQueryList;
 
@@ -42,7 +42,7 @@ export class DashboardLayoutComponent implements OnInit {
   async ngOnInit() {
     const roleId = this.sessionService.getRoleId();
     this.currentRole = roleId;
-    const profileId = this.sessionService.getProfileId();
+
     if (roleId == null) {
       console.error('No roleId found in localStorage/session.');
       this.router.navigate(['/sign-in']).then();
@@ -50,18 +50,24 @@ export class DashboardLayoutComponent implements OnInit {
     }
 
     this.setMenu();
-
-    if (profileId == null) {
-      console.error('No profileId found in localStorage/session.');
-      return;
-    }
-
     await this.loadProfile();
   }
 
   async loadProfile() {
     try {
-      this.profile = await this.profileService.getProfileById(this.sessionService.getProfileId()!);
+      // ✅ Usa userId + loadProfileByUserId en lugar de getProfileById
+      const userId = this.sessionService.getUserId();
+      if (!userId) {
+        console.error('No userId found in session.');
+        return;
+      }
+
+      this.profile = await firstValueFrom(
+        this.profileService.loadProfileByUserId(userId)
+      );
+
+      // Guarda el profileId en sesión para que otros componentes lo usen
+      this.sessionService.setProfileId(this.profile.id);
 
       console.log('Profile loaded:', this.profile);
     } catch (error) {
@@ -79,7 +85,7 @@ export class DashboardLayoutComponent implements OnInit {
         { labelKey: 'sidebar.orders', icon: 'local_shipping', route: '/dashboard/supplier/orders' },
         { labelKey: 'sidebar.reviews', icon: 'reviews', route: '/dashboard/supplier/reviews' },
       ];
-    } else if (this.currentRole=== 2) {
+    } else if (this.currentRole === 2) {
       this.menu = [
         { labelKey: 'sidebar.summary', icon: 'bar_chart', route: '/dashboard/restaurant/summary' },
         { labelKey: 'sidebar.subscription', icon: 'credit_card', route: '/dashboard/restaurant/subscription' },
@@ -91,5 +97,4 @@ export class DashboardLayoutComponent implements OnInit {
       ];
     }
   }
-
 }

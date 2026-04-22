@@ -16,8 +16,17 @@ import {TranslatePipe} from '@ngx-translate/core';
 export class ProfileDetailsComponent {
   @Input() profile: Profile = new Profile();
   @Input() categories: string[] = [];
+  private readonly defaultAvatar = 'assets/admin-avatar.png';
 
   constructor() {
 
+  }
+
+  getAvatarUrl(url: string | null | undefined): string {
+    return url && url.trim() !== '' ? url : this.defaultAvatar;
+  }
+
+  onImageError(event: Event): void {
+    (event.target as HTMLImageElement).src = this.defaultAvatar;
   }
 }
