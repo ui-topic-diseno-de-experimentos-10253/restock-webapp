@@ -5,7 +5,7 @@ export class Subscription {
     price: number;
     status: boolean;
     popular: boolean;
-    features: [];
+    features: string[];
     rol_id: string;
 
 
@@ -17,7 +17,7 @@ export class Subscription {
         price?: number,
         status?: boolean,
         popular?: boolean,
-        features?: [],
+        features?: string[],
         rol_id?: string,
     }) {
         this.id = subscription.id || 0;
