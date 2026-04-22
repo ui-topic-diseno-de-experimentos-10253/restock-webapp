@@ -1,4 +1,4 @@
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, TemplateRef, ViewChild, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -12,11 +12,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTabsModule } from '@angular/material/tabs';
 import { FormsModule } from '@angular/forms';
-import { OrderToSupplier } from '../../model/order-to-supplier.entity';
 import { OrderToSupplierService } from '../../services/order-to-supplier.service';
-import { OrderToSupplierBatch } from '../../model/order-to-supplier-batch.entity';
-import { OrderToSupplierBatchService } from '../../services/order-to-supplier-batch.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { SessionService } from '../../../../../shared/services/session.service';
+import { firstValueFrom } from 'rxjs';
+import { CreateOrderRequest, OrderBatchItem } from '../../model/create-order-request';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'create-orders-modal',
@@ -35,12 +37,15 @@ import { TranslatePipe } from '@ngx-translate/core';
         MatCardModule,
         MatCheckboxModule,
         MatTabsModule,
-        TranslatePipe
+        TranslatePipe,
+        MatProgressSpinnerModule
     ],
 })
 export class CreateOrdersModalComponent {
     @Input() providerSupplies: any[] = [];
     @Input() providerProfiles: any[] = [];
+    @Input() isLoadingBatches = false;
+    @Output() orderCreated = new EventEmitter<void>();
 
     @ViewChild('createOrderModal') createOrderModalRef!: TemplateRef<any>;
 
@@ -50,10 +55,12 @@ export class CreateOrdersModalComponent {
     currentSelections: any[] = [];
     fullOrder: any[] = [];
     sortAsc = true;
+    isSubmitting = signal(false);
 
     constructor(private dialog: MatDialog,
         private orderToSupplierService: OrderToSupplierService,
-        private orderToSupplierBatchService: OrderToSupplierBatchService) {
+        private sessionService: SessionService,
+        private snackBar: MatSnackBar) {
 
     }
 
@@ -96,7 +103,7 @@ export class CreateOrdersModalComponent {
                 ...s,
                 selected: !!already,
                 disabled: !!already,
-                name: `${profile?.name || ''} ${profile?.lastName || ''}`.trim(),
+                name: `${profile?.name || ''} ${profile?.lastName || ''}`.trim() || `Supplier ${s.user_id}`,
                 available: totalAvailable
             };
         });
@@ -191,50 +198,70 @@ export class CreateOrdersModalComponent {
 
     async onCreateOrder(): Promise<void> {
         const finalOrder = [...this.fullOrder, ...this.currentSelections];
-        console.log('Orden final a enviar:', finalOrder);
+        const adminRestaurantId = this.sessionService.getUserId();
+        if (!adminRestaurantId) {
+            console.error('Cannot create order: missing authenticated user');
+            this.snackBar.open('Missing authenticated user', 'Close', { duration: 3000 });
+            return;
+        }
+
         try {
+            this.isSubmitting.set(true);
             for (const supply of finalOrder) {
                 if (!supply.batches || supply.batches.length === 0) {
                     console.warn('No se encontraron batches para el insumo:', supply);
                     continue;
                 }
 
-                const newOrder = new OrderToSupplier({
-                    date: new Date(),
-                    admin_restaurant_id: 2,
-                    supplier_id: supply.user_id,
-                    order_to_supplier_state_id: 1,
-                    order_to_supplier_situation_id: 1,
-                    partially_accepted: false,
-                    totalPrice: supply.quantity * supply.price,
-                    estimated_ship_date: null,
-                    estimated_ship_time: null,
-                    requested_products_count: supply.batches.length
-                });
-
-                const createdOrder = await this.orderToSupplierService.createOrder(newOrder);
-
-                for (const batch of supply.batches) {
-                    if (!batch.id) {
-                        console.warn('Batch inválido para el insumo:', supply);
-                        continue;
-                    }
-
-                    const newSupplyRelation = new OrderToSupplierBatch({
-                        order_to_supplier_id: createdOrder.id,
-                        batch_id: batch.id,
-                        quantity: supply.quantity,
-                        accepted: false,
-                    });
-
-                    await this.orderToSupplierBatchService.createSupply(newSupplyRelation);
+                const batches = this.allocateRequestedQuantity(supply.quantity, supply.batches);
+                if (batches.length === 0) {
+                    console.warn('No hay stock suficiente para crear la orden del insumo:', supply);
+                    this.snackBar.open(`Insufficient stock for ${supply.supplyName}`, 'Close', { duration: 3000 });
+                    continue;
                 }
+
+                const request: CreateOrderRequest = {
+                    adminRestaurantId,
+                    supplierId: Number(supply.user_id),
+                    batches,
+                    description: `Order for ${supply.supplyName}`,
+                    estimatedShipDate: new Date().toISOString().split('T')[0],
+                    estimatedShipTime: '09:00'
+                };
+
+                await firstValueFrom(this.orderToSupplierService.create(request));
             }
 
+            this.orderCreated.emit();
             this.closeModal();
         } catch (error) {
             console.error('Error al crear una de las órdenes o relaciones:', error);
+            this.snackBar.open('Error creating order', 'Close', { duration: 3000 });
+        } finally {
+            this.isSubmitting.set(false);
         }
+    }
+
+    private allocateRequestedQuantity(requested: number, batches: any[]): OrderBatchItem[] {
+        let remaining = Number(requested || 0);
+        const result: OrderBatchItem[] = [];
+
+        for (const batch of batches) {
+            if (remaining <= 0) break;
+            const batchId = Number(batch.id);
+            const stock = Number(batch.stock || 0);
+            if (!batchId || stock <= 0) continue;
+
+            const quantity = Math.min(stock, remaining);
+            result.push({
+                batchId,
+                quantity,
+                accept: true
+            });
+            remaining -= quantity;
+        }
+
+        return remaining > 0 ? [] : result;
     }
 
     getTotal(): number {

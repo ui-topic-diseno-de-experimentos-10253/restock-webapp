@@ -32,15 +32,23 @@ export class BatchService {
 
   async getAllBatchesWithSupplies(): Promise<Batch[]> {
     const userId = this.session.getUserId();
-    const [rawBatches, supplies] = await Promise.all([
+    if (userId == null) return [];
+    return this.getBatchesByUserId(userId);
+  }
+
+  async getBatchesByUserId(userId: number): Promise<Batch[]> {
+    const [batchesResponse, supplies] = await Promise.all([
       firstValueFrom(
-        this.http.get<Batch[]>(`${this.baseUrl}${this.userEndpoint}/${userId}`, this.httpOptions)
+        this.http.get<any>(`${this.baseUrl}${this.userEndpoint}/${userId}`, this.httpOptions)
           .pipe(retry(2), catchError(this.handleError))
       ),
       this.supplyService.getAll()
     ]);
+    const rawBatches: any[] = Array.isArray(batchesResponse)
+      ? batchesResponse
+      : (batchesResponse?.value ?? []);
 
-    return rawBatches.map(batch =>
+    return rawBatches.map((batch: any) =>
       Batch.fromPersistence(
         batch,
         supplies.find(s => s.id === batch.customSupplyId)

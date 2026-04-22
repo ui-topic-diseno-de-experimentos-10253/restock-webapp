@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, signal } from '@angular/core';
 import { OrdersToolbarComponent } from '../../components/orders-toolbar/orders-toolbar.component';
 import { OrdersTableComponent } from '../../components/orders-table/orders-table.component';
 import { CreateOrdersModalComponent } from '../../components/create-orders-modal/create-orders-modal.component';
@@ -12,6 +12,10 @@ import { OrderFeedbackModalComponent } from '../../components/order-feedback-mod
 import { SupplyService } from '../../../inventory/services/supply.service';
 import { Supply } from '../../../inventory/model/supply.entity';
 import { forkJoin } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
+import { SessionService } from '../../../../../shared/services/session.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'orders',
@@ -23,7 +27,8 @@ import { forkJoin } from 'rxjs';
     OrdersTableComponent,
     CreateOrdersModalComponent,
     OrderDetailsModalComponent,
-    OrderFeedbackModalComponent
+    OrderFeedbackModalComponent,
+    MatProgressSpinnerModule
   ],
 })
 export class OrdersComponent implements OnInit {
@@ -34,6 +39,8 @@ export class OrdersComponent implements OnInit {
   searchTerm: string = '';
   selectedSupplierId: number | null = null;
   providerSupplies: Supply[] = [];
+  isLoadingOrders = signal(false);
+  isLoadingBatches = signal(false);
 
   @ViewChild(CreateOrdersModalComponent)
   createOrdersModalComponent!: CreateOrdersModalComponent;
@@ -49,6 +56,8 @@ export class OrdersComponent implements OnInit {
     private userService: UserService,
     private profileService: ProfileService,
     private supplyService: SupplyService,
+    private sessionService: SessionService,
+    private snackBar: MatSnackBar
   ) { }
 
   async ngOnInit() {
@@ -57,47 +66,100 @@ export class OrdersComponent implements OnInit {
   }
 
   async loadOrders() {
-    this.orders = await this.orderService.getAllEnriched();
-    this.filteredOrders = [...this.orders];
+    this.isLoadingOrders.set(true);
+    try {
+      const adminRestaurantId = this.sessionService.getUserId();
+      if (!adminRestaurantId) {
+        this.orders = [];
+        this.filteredOrders = [];
+        return;
+      }
+      this.orders = await firstValueFrom(this.orderService.getByRestaurant(adminRestaurantId));
+      this.filteredOrders = [...this.orders];
+    } catch (error) {
+      console.error('Error loading restaurant orders:', error);
+      this.snackBar.open('Error loading orders', 'Close', { duration: 3000 });
+    } finally {
+      this.isLoadingOrders.set(false);
+    }
   }
   //tester
   async loadProviderProfiles() {
+    this.isLoadingBatches.set(true);
     try {
       const providerUserIds = await this.userService.getSupplierUserIds(); // esto ya es un array de IDs
+      if (!providerUserIds.length) {
+        this.providerProfiles = [];
+        this.supplierOptions = [];
+        this.providerSupplies = [];
+        return;
+      }
 
-      // Mapeamos a múltiples llamados getByQuery("user_id", id)
-      const profileCalls$ = providerUserIds.map(userId =>
-        this.profileService.getByQuery("user_id", userId)
+      const enrichedSupplies = await this.supplyService.getSuppliesEnrichedByUserIds(providerUserIds);
+
+      this.providerSupplies = enrichedSupplies.filter((supply: any) =>
+        Array.isArray(supply.batches) &&
+        supply.batches.some((batch: any) => batch.stock > 0)
       );
 
-      // Ejecutamos todos en paralelo
-      forkJoin(profileCalls$).subscribe(async allResults => {
-        // allResults será un array de arrays (porque getByQuery retorna array)
-        const profiles = allResults.flat(); // aplanamos
+      // Build supplier options from available supplies so Create Order works
+      // even when profile endpoints are unavailable.
+      const supplierIds = Array.from(new Set(
+        this.providerSupplies
+          .map((s: any) => Number(s.user_id))
+          .filter((id: number) => !Number.isNaN(id) && id > 0)
+      ));
 
-        this.providerProfiles = profiles;
-        this.supplierOptions = profiles.map(profile => ({
-          id: profile.id,
-          name: profile.name
-        }));
+      this.supplierOptions = supplierIds.map(id => ({
+        id,
+        name: `Supplier ${id}`
+      }));
 
-        const enrichedSupplies = await this.supplyService.getSuppliesEnrichedByUserIds(providerUserIds);
-
-        this.providerSupplies = enrichedSupplies.filter((supply: any) =>
-          Array.isArray(supply.batches) &&
-          supply.batches.some((batch: any) => batch.stock > 0)
+      // Optional profile enrichment: if it fails, keep fallback names.
+      try {
+        const profileCalls$ = supplierIds.map(userId =>
+          this.profileService.getByQuery('user_id', userId)
         );
-      });
+        if (profileCalls$.length > 0) {
+          const allResults = await firstValueFrom(forkJoin(profileCalls$));
+          const profiles = allResults.flat();
+          this.providerProfiles = profiles;
+
+          const namesById = new Map<number, string>(
+            profiles.map((profile: any) => [Number(profile.user_id ?? profile.userId ?? profile.id), profile.name])
+          );
+          this.supplierOptions = supplierIds.map(id => ({
+            id,
+            name: namesById.get(id) ?? `Supplier ${id}`
+          }));
+        } else {
+          this.providerProfiles = [];
+        }
+      } catch (profileError) {
+        console.warn('Profiles endpoint unavailable, using fallback supplier names.', profileError);
+        this.providerProfiles = [];
+      }
 
     } catch (error) {
-      console.error('Error loading provider profiles or supplies:', error);
+      console.error('Error loading provider supplies:', error);
+      this.snackBar.open('Error loading available supplies', 'Close', { duration: 3000 });
+    } finally {
+      this.isLoadingBatches.set(false);
     }
   }
 
 
   async onDeleteOrder(orderId: number): Promise<void> {
-    await this.orderService.deleteOrder(orderId);
-    await this.loadOrders();
+    try {
+      this.isLoadingOrders.set(true);
+      await firstValueFrom(this.orderService.deleteOrder(orderId));
+      await this.loadOrders();
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      this.snackBar.open('Error deleting order', 'Close', { duration: 3000 });
+    } finally {
+      this.isLoadingOrders.set(false);
+    }
   }
 
   onOpenCreateOrderModal() {

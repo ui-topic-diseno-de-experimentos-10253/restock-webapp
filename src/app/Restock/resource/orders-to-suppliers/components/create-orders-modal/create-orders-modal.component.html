@@ -27,7 +27,11 @@
             </mat-select>
           </mat-form-field>
 
-          <div *ngIf="selectedSupply">
+          @if (isLoadingBatches) {
+            <div class="loading-container">
+              <mat-spinner diameter="36"></mat-spinner>
+            </div>
+          } @else if (selectedSupply) {
             <div class="sort-section">
               <span>{{
                 "order-to-supplier.create-order-modal.select-supply-tab.orderByPrice"
@@ -100,7 +104,7 @@
                 "
               ></tr>
             </table>
-          </div>
+          }
 
           <div class="modal-actions">
             <button mat-flat-button color="warn" (click)="closeModal()">
@@ -207,7 +211,7 @@
           </p>
 
           <div class="modal-actions">
-            <button mat-flat-button color="primary" (click)="onCreateOrder()">
+            <button mat-flat-button color="primary" (click)="onCreateOrder()" [disabled]="isSubmitting()">
               {{
                 "order-to-supplier.create-order-modal.order-details-tab.placeOrder"
                   | translate
@@ -219,6 +223,9 @@
                   | translate
               }}
             </button>
+            @if (isSubmitting()) {
+              <mat-spinner diameter="24"></mat-spinner>
+            }
           </div>
         </mat-tab>
       </mat-tab-group>

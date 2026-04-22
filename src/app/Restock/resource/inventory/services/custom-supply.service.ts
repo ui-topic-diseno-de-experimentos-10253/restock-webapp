@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, firstValueFrom, Observable, retry, throwError } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, retry, throwError } from 'rxjs';
 import { CategoryService } from './category.service';
 import { Supply } from '../model/supply.entity';
 import {environment} from '../../../../../environments/environment';
@@ -29,8 +29,12 @@ export class CustomSupplyService {
 
   getByUser(userId: number): Observable<CustomSupply[]> {
     return this.http
-      .get<CustomSupply[]>(`${this.baseUrl}${this.endpoint}/user/${userId}`, this.httpOptions)
-      .pipe(retry(2), catchError(this.handleError));
+      .get<any>(`${this.baseUrl}${this.endpoint}/user/${userId}`, this.httpOptions)
+      .pipe(
+        retry(2),
+        map(response => Array.isArray(response) ? response : (response?.value ?? [])),
+        catchError(this.handleError)
+      );
   }
 
   getById(id: number): Observable<CustomSupply> {

@@ -15,13 +15,17 @@ export class UserService extends BaseService<User> {
     }
 
     async getAllEnriched(): Promise<User[]> {
-        const [rawUsers, roles] = await Promise.all([
+        const [usersResponse, roles] = await Promise.all([
             firstValueFrom(this.getAll()),
             this.roleService.getAllRoles()
         ]);
+        const rawUsers: any[] = Array.isArray(usersResponse)
+          ? (usersResponse as any[])
+          : (((usersResponse as any)?.value ?? []) as any[]);
 
-        return rawUsers.map(raw => {
-            const role = roles.find(r => r.id === raw.role_id);
+        return rawUsers.map((raw: any) => {
+            const roleId = raw.role_id ?? raw.roleId;
+            const role = roles.find(r => r.id === roleId);
             return UserAssembler.toEntity(raw, role);
         });
     }
@@ -33,16 +37,22 @@ export class UserService extends BaseService<User> {
     }
 
     async getSupplierUserIds(): Promise<number[]> {
-        const rawUsers = await firstValueFrom(this.getAll());
+        const usersResponse = await firstValueFrom(this.getAll());
+        const rawUsers: any[] = Array.isArray(usersResponse)
+          ? (usersResponse as any[])
+          : (((usersResponse as any)?.value ?? []) as any[]);
         return rawUsers
-            .filter(user => user.role_id === 1)
-            .map(user => user.id);
+            .filter((user: any) => (user.role_id ?? user.roleId) === 1)
+            .map((user: any) => user.id);
     }
     async getRestaurantAdminUserIds(): Promise<number[]> {
-        const rawUsers = await firstValueFrom(this.getAll());
+        const usersResponse = await firstValueFrom(this.getAll());
+        const rawUsers: any[] = Array.isArray(usersResponse)
+          ? (usersResponse as any[])
+          : (((usersResponse as any)?.value ?? []) as any[]);
         return rawUsers
-            .filter(user => user.role_id === 2)
-            .map(user => user.id);
+            .filter((user: any) => (user.role_id ?? user.roleId) === 2)
+            .map((user: any) => user.id);
     }
     async createUser(user: User): Promise<User> {
         const dto = UserAssembler.toDTO(user);

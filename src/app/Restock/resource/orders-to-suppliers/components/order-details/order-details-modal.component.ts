@@ -36,7 +36,7 @@ export class OrderDetailsModalComponent {
     this.order = order;
     console.log('Opening order details for:', this.order);
     this.providerProfile = this.providerProfiles.find(
-      profile => profile.id === this.order.supplier_id
+      profile => Number(profile.user_id ?? profile.userId ?? profile.id) === Number(this.order.supplier_id)
     );
     this.dialog.open(this.orderDetailsRef, { width: '600px' });
   }

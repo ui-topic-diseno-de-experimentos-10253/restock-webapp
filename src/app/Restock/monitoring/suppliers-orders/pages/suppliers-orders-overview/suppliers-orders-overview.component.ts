@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, signal} from '@angular/core';
 import {MatTabsModule} from '@angular/material/tabs';
 import {NewOrdersComponent} from '../../components/new-orders/new-orders.component';
 import {ApprovedOrdersComponent} from '../../components/approved-orders/approved-orders.component';
@@ -28,6 +28,8 @@ import {EditOrderComponent} from '../../components/edit-order/edit-order.compone
 import {OrderStateService} from '../../../../resource/orders-to-suppliers/services/order-to-supplier-state.service';
 import {Batch} from '../../../../resource/inventory/model/batch.entity';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import { SessionService } from '../../../../../shared/services/session.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-suppliers-orders-overview',
@@ -36,7 +38,8 @@ import {TranslatePipe, TranslateService} from '@ngx-translate/core';
     NewOrdersComponent,
     ApprovedOrdersComponent,
     DeliveredOrdersComponent,
-    TranslatePipe
+    TranslatePipe,
+    MatProgressSpinnerModule
   ],
   templateUrl: './suppliers-orders-overview.component.html',
   styleUrl: './suppliers-orders-overview.component.css'
@@ -60,6 +63,7 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
   batchesPerOrder: OrderToSupplierBatch[] = [];
   restaurantNameOrderSelected: string = '';
   states: OrderToSupplierState[] = [];
+  isLoading = signal(false);
 
   constructor(
     private orderService: OrderToSupplierService,
@@ -70,14 +74,17 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
     private stateService: OrderStateService,
     private modalService: BaseModalService,
     private snackBar: MatSnackBar,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private sessionService: SessionService
   ) { }
 
   async ngOnInit() {
+    this.isLoading.set(true);
     await this.loadOrders();
     await this.loadGroupedSupplies();
     await this.loadUsersAndProfiles();
     await this.loadStates();
+    this.isLoading.set(false);
   }
 
   buildRestaurantNameMap() {
@@ -99,26 +106,40 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
   }
 
   async loadOrders() {
-    this.orders = await this.orderService.getAllEnriched();
-    console.log('Orders loaded:', this.orders);
+    try {
+      const supplierId = this.sessionService.getUserId();
+      if (!supplierId) {
+        this.orders = [];
+        this.deliveredOrders = [];
+        this.ordersInProcess = [];
+        this.newOrders = [];
+        return;
+      }
+
+      this.orders = await firstValueFrom(this.orderService.getBySupplier(supplierId));
+      console.log('Orders loaded:', this.orders);
 
     // Filter delivered orders
-    this.deliveredOrders = this.orders.filter(order =>
-      order.state?.name.toLowerCase() === 'delivered'
-    );
+      this.deliveredOrders = this.orders.filter(order =>
+        order.state?.name.toLowerCase() === 'delivered'
+      );
 
     // Filter orders in process: situation = approved && state != delivered
-    this.ordersInProcess = this.orders.filter(order =>
-      order.situation?.name.toLowerCase() === 'approved' &&
-      order.state?.name.toLowerCase() !== 'delivered'
-    );
+      this.ordersInProcess = this.orders.filter(order =>
+        order.situation?.name.toLowerCase() === 'approved' &&
+        order.state?.name.toLowerCase() !== 'delivered'
+      );
 
-    this.newOrders = this.orders.filter(order =>
-      order.situation?.name.toLowerCase() === 'pending'
-    );
+      this.newOrders = this.orders.filter(order =>
+        order.situation?.name.toLowerCase() === 'pending'
+      );
 
-    console.log('Delivered Orders:', this.deliveredOrders);
-    console.log('Orders In Process:', this.ordersInProcess);
+      console.log('Delivered Orders:', this.deliveredOrders);
+      console.log('Orders In Process:', this.ordersInProcess);
+    } catch (error) {
+      console.error('Error loading supplier orders:', error);
+      this.snackBar.open('Error loading supplier orders', 'Close', { duration: 3000 });
+    }
   }
   async loadUsersAndProfiles() {
     const restaurantUsersId = await this.userService.getRestaurantAdminUserIds();
@@ -138,7 +159,13 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
 
       const result = await Promise.all(
         this.orders.map(async (order) => {
-          const orderBatches = order.orderBatches || await this.orderToSupplierBatchService.getSupplyByOrder(order.id);
+          const orderBatches = (order.orderBatches || []).map(ob => {
+            const batch = batches.find(b => Number(b.id) === Number(ob.batch_id));
+            return {
+              ...ob,
+              batch
+            };
+          });
 
           // supplyGroupedByOrder: original list
           const supplyGroup = {
@@ -183,6 +210,7 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
 
     } catch (error) {
       console.error('Error loading grouped supplies:', error);
+      this.snackBar.open('Error loading order batches', 'Close', { duration: 3000 });
     }
   }
 
@@ -245,6 +273,7 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
     }).afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
         try {
+          this.isLoading.set(true);
           const updatedOrder: OrderToSupplier = {
             id: order.id,
             date: order.date,
@@ -260,7 +289,10 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
             partially_accepted: order.partially_accepted
           };
 
-          await firstValueFrom(this.orderService.update(order.id, updatedOrder));
+          await firstValueFrom(this.orderService.updateState(order.id, {
+            stateId: updatedOrder.order_to_supplier_state_id,
+            situationId: updatedOrder.order_to_supplier_situation_id
+          }));
 
           if(action === 'cancel')
           {
@@ -282,6 +314,9 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
           console.log('Order updated successfully');
         } catch (error) {
           console.error('Error updating order situation to Declined:', error);
+          this.snackBar.open('Error updating order state', 'Close', { duration: 3000 });
+        } finally {
+          this.isLoading.set(false);
         }
       }
     });
@@ -328,8 +363,9 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
       const instance = dialogRef.componentInstance
         .contentComponentRef?.instance as ManageNewOrdersComponent;
 
-      instance?.acceptSelection.subscribe((order) => {
+      instance?.acceptSelection.subscribe(async (order) => {
         try {
+          this.isLoading.set(true);
           order.orderBatches?.forEach(orderBatch => (orderBatch.accepted = true));
 
           order.state =  this.states.find(state => state.id === order.order_to_supplier_state_id);
@@ -347,7 +383,17 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
             })
             .filter(batch => batch !== null); // Remove null/undefined entries
 
-          this.orderService.updateOrder(order.id, order);
+          await firstValueFrom(this.orderService.updateState(order.id, {
+            stateId: order.order_to_supplier_state_id,
+            situationId: order.order_to_supplier_situation_id,
+            description: order.description ?? undefined,
+            estimatedShipDate: order.estimated_ship_date
+              ? new Date(order.estimated_ship_date).toISOString().split('T')[0]
+              : undefined,
+            estimatedShipTime: order.estimated_ship_time
+              ? new Date(order.estimated_ship_time).toISOString()
+              : undefined
+          }));
 
           order.orderBatches?.forEach(orderBatch => {
             this.orderToSupplierBatchService.updateSupply(orderBatch.id, orderBatch);
@@ -361,11 +407,13 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
 
           this.snackBar.open('Order updated successfully', 'Close', { duration: 3000 });
           dialogRef.close();
-           this.loadOrders();
-           this.loadGroupedSupplies();
+          await this.loadOrders();
+          await this.loadGroupedSupplies();
         } catch (error) {
           console.error('Error updating order:', error);
           this.snackBar.open('Failed to update order', 'Close', { duration: 3000 });
+        } finally {
+          this.isLoading.set(false);
         }
       });
     });
@@ -389,19 +437,31 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
       const instance = dialogRef.componentInstance
         .contentComponentRef?.instance as EditOrderComponent;
 
-      instance?.updateOrder.subscribe((order) => {
+      instance?.updateOrder.subscribe(async (order) => {
         try {
+          this.isLoading.set(true);
           // Update state
           order.state = this.states.find(state => state.id === order.order_to_supplier_state_id);
 
-          this.orderService.updateOrder(order.id, order);
+          await firstValueFrom(this.orderService.updateState(order.id, {
+            stateId: order.order_to_supplier_state_id,
+            description: order.description ?? undefined,
+            estimatedShipDate: order.estimated_ship_date
+              ? new Date(order.estimated_ship_date).toISOString().split('T')[0]
+              : undefined,
+            estimatedShipTime: order.estimated_ship_time
+              ? new Date(order.estimated_ship_time).toISOString()
+              : undefined
+          }));
 
           this.snackBar.open('Order updated successfully', 'Close', { duration: 3000 });
           dialogRef.close();
-          this.loadOrders();
+          await this.loadOrders();
         } catch (error) {
           console.error('Error updating order:', error);
           this.snackBar.open('Failed to update order', 'Close', { duration: 3000 });
+        } finally {
+          this.isLoading.set(false);
         }
       });
     });
