@@ -57,7 +57,9 @@ export class ProfileOverviewComponent implements OnInit {
       this.sessionService.setProfileId(this.profile.id);
 
       await this.loadUser();
-      await this.loadBusiness();
+      // No need to load business separately - it's already in the profile
+      this.business = this.profile.business || new Business();
+      
       this.profile = JSON.parse(JSON.stringify({
         ...this.profile,
         user: this.user,
@@ -140,13 +142,17 @@ export class ProfileOverviewComponent implements OnInit {
   }
 
   async updateProfileAndBusiness(business: Business) {
+    console.log('DEBUG updateProfileAndBusiness - business:', business);
+    console.log('DEBUG updateProfileAndBusiness - profile.business:', this.profile.business);
 
-    if(this.profile.business_id == business.id)
+    // Check if we have a business to update (no need to check business_id since it's not in the API response)
+    if (this.profile.business || business.name || business.address)
     {
       const userId = this.sessionService.getUserId();
+      console.log('DEBUG updateProfileAndBusiness - userId:', userId);
+      
       if (!userId) {
-        this.invalidUpdate('Failed to update business data');
-        console.error('No user ID in session. Cannot update business.');
+        this.invalidUpdate('Failed to update business data - no user ID');
         return;
       }
 
@@ -156,9 +162,22 @@ export class ProfileOverviewComponent implements OnInit {
           businessAddress: business.address,
           description: business.description || ''
         };
-        await this.profileService.updateBusiness(userId, payload);
-        await this.loadProfile();
+        console.log('DEBUG updateProfileAndBusiness - payload:', payload);
+        
+        await this.profileService.updateBusiness(userId, payload).toPromise();
+        console.log('DEBUG updateProfileAndBusiness - update successful');
+        
+        // Force a new object reference to ensure change detection
+        const newProfile = await firstValueFrom(this.profileService.loadProfileByUserId(userId));
+        console.log('DEBUG updateProfileAndBusiness - newProfile:', newProfile);
+        this.profile = JSON.parse(JSON.stringify(newProfile));
+        
         this.refreshTrigger++;
+        console.log('DEBUG updateProfileAndBusiness - refreshTrigger:', this.refreshTrigger);
+        
+        // Force change detection
+        this.cdr.detectChanges();
+        
         this.successfulUpdate('Successful business data update');
       } catch (error) {
         console.error('Error updating business/profile:', error);
@@ -167,7 +186,7 @@ export class ProfileOverviewComponent implements OnInit {
     }
     else
     {
-      this.invalidUpdate('Failed to update business data');
+      this.invalidUpdate('Failed to update business data - no business data');
 
       console.error('Business ID mismatch. Cannot update profile with different business ID.');
     }

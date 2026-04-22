@@ -76,6 +76,9 @@ export class BusinessDataSettingsComponent implements OnChanges {
   }
 
   onSaveChanges() {
+    console.log('DEBUG BusinessDataSettings - onSaveChanges called');
+    console.log('DEBUG BusinessDataSettings - this.business:', this.business);
+    console.log('DEBUG BusinessDataSettings - this.localBusiness:', this.localBusiness);
 
     this.localBusiness.categories = this.selectedCategories.join(', ');
 
@@ -89,6 +92,7 @@ export class BusinessDataSettingsComponent implements OnChanges {
       description: this.localBusiness.description
     };
 
+    console.log('DEBUG BusinessDataSettings - updatedBusiness:', updatedBusiness);
     this.profileAndBusinessUpdated.emit(updatedBusiness);
   }
 }
