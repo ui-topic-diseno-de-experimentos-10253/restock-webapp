@@ -1,28 +1,70 @@
+export class DishSelection {
+    dishId: number;
+    quantity: number;
+    unitPrice: number;
+
+    constructor(data: { dishId?: number; quantity?: number; unitPrice?: number }) {
+        this.dishId = data.dishId || 0;
+        this.quantity = data.quantity || 0;
+        this.unitPrice = data.unitPrice || 0;
+    }
+}
+
+export class SupplySelection {
+    supplyId: number;
+    quantity: number;
+    unitPrice: number;
+
+    constructor(data: { supplyId?: number; quantity?: number; unitPrice?: number }) {
+        this.supplyId = data.supplyId || 0;
+        this.quantity = data.quantity || 0;
+        this.unitPrice = data.unitPrice || 0;
+    }
+}
 
 export class RestaurantSale {
     id?: number;
-    code: string;
-    admin_restaurant_id: number;
-    diner_name: string;
-    totalPrice: number;
-    date: string;
-    added_inventory: boolean;
+    saleNumber: string;
+    totalCost: number;
+    subtotal: number;
+    taxes: number;
+    registeredDate: string;
+    userId: number;
+    status: string;
+    dishSelections: DishSelection[];
+    supplySelections: SupplySelection[];
 
-    constructor(restaurantSale: {
-        id?: number,
-        code?: string,
-        admin_restaurant_id?: number,
-        diner_name?: string,
-      totalPrice?: number,
-        date?: string,
-        added_inventory?: boolean,
+    constructor(data: {
+        id?: number;
+        saleNumber?: string;
+        totalCost?: number;
+        subtotal?: number;
+        taxes?: number;
+        registeredDate?: string;
+        userId?: number;
+        status?: string;
+        dishSelections?: DishSelection[];
+        supplySelections?: SupplySelection[];
     }) {
-        this.id = restaurantSale.id || 0;
-        this.code = restaurantSale.code || '';
-        this.admin_restaurant_id = restaurantSale.admin_restaurant_id || 0;
-        this.diner_name = restaurantSale.diner_name || '';
-        this.totalPrice = restaurantSale.totalPrice || 0;
-        this.date = restaurantSale.date || '';
-        this.added_inventory = restaurantSale.added_inventory || false;
+        this.id = data.id;
+        this.saleNumber = data.saleNumber || '';
+        this.totalCost = data.totalCost || 0;
+        this.subtotal = data.subtotal || 0;
+        this.taxes = data.taxes || 0;
+        this.registeredDate = data.registeredDate || '';
+        this.userId = data.userId || 0;
+        this.status = data.status || '';
+        this.dishSelections = data.dishSelections || [];
+        this.supplySelections = data.supplySelections || [];
     }
+}
+
+// DTO used to POST a new sale
+export interface CreateSaleDto {
+    dishSelections: { dishId: number; quantity: number; unitPrice: number }[];
+    supplySelections: { supplyId: number; quantity: number; unitPrice: number }[];
+    subtotal: number;
+    taxes: number;
+    totalCost: number;
+    userId: number;
 }

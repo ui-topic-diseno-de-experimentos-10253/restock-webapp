@@ -13,219 +13,187 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SaleDetailComponent } from '../sale-detail/sale-detail.component';
 import { forkJoin } from 'rxjs';
 import { RestaurantSaleService } from '../../services/restaurant-sale.service';
-import { SalesRecipeService } from '../../services/sales-recipe.service';
-import { SalesAdditionalSupplyService } from '../../services/sales-additional-supply.service';
-import { SupplyService } from '../../../../resource/inventory/services/supply.service';
-import { RecipeService } from '../../../../planning/recipe/services/recipe.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { RestaurantSale } from '../../model/restaurant-sale.entity';
 
 @Component({
-  selector: 'app-show-sales-not-added-to-inventory',
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatCheckboxModule,
-    MatPaginatorModule,
-    SaleDetailComponent,
-    TranslatePipe
-  ],
-  templateUrl: './show-sales-not-added-to-inventory.component.html',
-  styleUrl: './show-sales-not-added-to-inventory.component.css'
+    selector: 'app-show-sales-not-added-to-inventory',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatIconModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatTableModule,
+        MatCheckboxModule,
+        MatPaginatorModule,
+        SaleDetailComponent,
+        TranslatePipe,
+    ],
+    templateUrl: './show-sales-not-added-to-inventory.component.html',
+    styleUrl: './show-sales-not-added-to-inventory.component.css'
 })
 export class ShowSalesNotAddedToInventoryComponent implements OnInit {
-  selectedSale: any = null;
-  showModalSaleDetail = false;   // Controls visibility of sale-detail modal
 
+    /** Currently selected sale for the detail modal */
+    selectedSale: any = null;
+    /** Controls visibility of the sale-detail modal */
+    showModalSaleDetail = false;
 
-  constructor(
-    private snackBar: MatSnackBar,
-  ) { }
+    @Output() close = new EventEmitter<void>();
 
-  @Output() close = new EventEmitter<void>(); //Envento que se envia para cerrar el modal
+    private restaurantSaleService: RestaurantSaleService = inject(RestaurantSaleService);
+    private snackBar: MatSnackBar = inject(MatSnackBar);
 
-  //Declaracion de services a usar
-  private restaurantSaleService: RestaurantSaleService = inject(RestaurantSaleService);
-  private salesRecipeService: SalesRecipeService = inject(SalesRecipeService);
-  private salesAdditionalSupplyService: SalesAdditionalSupplyService = inject(SalesAdditionalSupplyService);
-  private recipeService: RecipeService = inject(RecipeService)
-  private supplyService: SupplyService = inject(SupplyService);
+    dataSource = new MatTableDataSource<any>([]);
 
-  dataSource = new MatTableDataSource<any>([]);
+    displayedColumnssalesNotAddedToInventory: string[] = [
+        'code', 'quantity_plates', 'quantity_additonal_supplies', 'actions'
+    ];
 
-  salesNotAddedToInventoryWithRecipeAndSupplyCounts: any[] = [];
+    /** Sales selected for deletion / cancellation */
+    selectedSales: any[] = [];
 
+    // ── Lifecycle ──────────────────────────────────────────────────────────────
 
-  //Cerrar componente al presionar "x" o "cancel"
-  closeComponent() {
-    this.close.emit(); // evento para cerrar modal
-  }
-
-  // Columnas
-  displayedColumnssalesNotAddedToInventory: string[] = ['code', 'quantity_plates', 'quantity_additonal_supplies', 'actions'];
-
-  //sales selected to move to inventory
-  selectedSales: any[] = [];
-
-  toggleSelection(element: any, checked: boolean) {
-    if (checked) {
-      this.selectedSales.push(element);
-    } else {
-      this.selectedSales = this.selectedSales.filter(s => s.code !== element.code);
+    ngOnInit(): void {
+        this.loadSales();
     }
-    console.log("selected sales: ", this.selectedSales);
-  }
 
-  isSelected(element: any): boolean {
-    return this.selectedSales.some(s => s.code === element.code);
-  }
+    // ── Close ──────────────────────────────────────────────────────────────────
 
-  //Rrgistra las ventas seleccionadas a inventario
-  registerSalesToInventory() {
+    closeComponent(): void {
+        this.close.emit();
+    }
 
-    //traer el sale original de db.json
-    this.restaurantSaleService.getAll().subscribe(sales => {
-      this.selectedSales = sales;
+    // ── Selection helpers ──────────────────────────────────────────────────────
 
-      const updateCalls = this.selectedSales.map(sale =>
-        this.restaurantSaleService.update(sale.id, {
-          ...sale,
-          added_inventory: true
-        })
-      );
-
-      forkJoin(updateCalls).subscribe({
-        next: () => {
-          this.snackBar.open('Sales added to inventory successfully ✅', 'Close', {
-            duration: 3000,
-            panelClass: 'snackbar-success'
-          });
-          this.closeComponent();
-        },
-        error: () => {
-          this.snackBar.open('Error updating sales ❌', 'Close', {
-            duration: 3000,
-            panelClass: 'snackbar-error'
-          });
+    toggleSelection(element: any, checked: boolean): void {
+        if (checked) {
+            this.selectedSales.push(element);
+        } else {
+            this.selectedSales = this.selectedSales.filter(s => s.id !== element.id);
         }
-      });
-    })
-
-
-
-
-
-  }
-
-
-  toggleAllSelection(checked: boolean) {
-    if (checked) {
-      this.selectedSales = this.dataSource.data.slice(); // Copia todos los elementos
-    } else {
-      this.selectedSales = [];
     }
-    console.log("selected sales: ", this.selectedSales);
 
-  }
+    isSelected(element: any): boolean {
+        return this.selectedSales.some(s => s.id === element.id);
+    }
 
-  isAllSelected(): boolean {
-    return this.selectedSales.length === this.dataSource.data.length;
-  }
+    toggleAllSelection(checked: boolean): void {
+        this.selectedSales = checked ? this.dataSource.data.slice() : [];
+    }
 
-  // Open the modal showing sales detail
-  openSaleDetail(sale: any) {
+    isAllSelected(): boolean {
+        return (
+            this.dataSource.data.length > 0 &&
+            this.selectedSales.length === this.dataSource.data.length
+        );
+    }
 
-    const saleId = sale.id;
+    // ── Cancel selected sales ──────────────────────────────────────────────────
 
-    const recipes$ = this.salesRecipeService.getByQuery("sale_id", saleId)
-    const supplies$ = this.salesAdditionalSupplyService.getByQuery("sale_id", saleId);
-    const allRecipes$ = this.recipeService.getAll();
-    const allSupplies$ = this.supplyService.getAll();
+    /**
+     * Calls DELETE /api/v1/sales/:id for every selected sale.
+     * The API responds 204 on success, 400 if the sale cannot be cancelled,
+     * 401 if unauthorized, 404 if not found.
+     */
+    registerSalesToInventory(): void {
+        if (this.selectedSales.length === 0) {
+            this.snackBar.open('Please select at least one sale.', 'Close', { duration: 3000 });
+            return;
+        }
 
-    forkJoin([recipes$, supplies$, allRecipes$, allSupplies$]).subscribe(
-      ([recipes, additionalSupplies, allRecipes, allSupplies]) => {
-        const enrichedDishes = recipes.map((sr: any) => {
-          const recipe = allRecipes.find((r: any) => r.id === sr.recipe_id);
-          return {
-            name: recipe?.name || 'Desconocido',
-            unitPrice: recipe?.price || 0,
-            quantity: sr.quantity
-          };
+        const deleteCalls = this.selectedSales.map(sale =>
+            this.restaurantSaleService.delete(sale.id)
+        );
+
+        forkJoin(deleteCalls).subscribe({
+            next: () => {
+                this.snackBar.open('Sales cancelled successfully ✅', 'Close', {
+                    duration: 3000,
+                    panelClass: 'snackbar-success'
+                });
+                this.selectedSales = [];
+                this.loadSales(); // Refresh table after deletion
+                this.closeComponent();
+            },
+            error: err => {
+                console.error('Error cancelling sales:', err);
+                const msg = err?.status === 400
+                    ? 'One or more sales cannot be cancelled'
+                    : err?.status === 401
+                        ? 'Unauthorized. Please log in again'
+                        : err?.status === 404
+                            ? 'One or more sales were not found'
+                            : 'Error cancelling sales';
+                this.snackBar.open(msg, 'Close', {
+                    duration: 4000,
+                    panelClass: 'snackbar-error'
+                });
+            }
         });
+    }
 
-        const enrichedSupplies = additionalSupplies.map((sas: any) => {
-          const supply = allSupplies.find((s: any) => s.id === sas.supplyId);
-          return {
-            name: supply?.name || 'Desconocido',
-            unitPrice: supply?.price || 0,
-            quantity: sas.quantity
-          };
-        });
+    // ── Sale detail modal ──────────────────────────────────────────────────────
 
+    openSaleDetail(sale: any): void {
+        // Enrich the sale object with computed counts for the detail view
         this.selectedSale = {
-          ...sale,
-          dishes: enrichedDishes,
-          additionalSupplies: enrichedSupplies
+            ...sale,
+            dishes: (sale.dishSelections || []).map((ds: any) => ({
+                name: `Dish #${ds.dishId}`,   // Replace with recipe lookup if RecipeService is available
+                unitPrice: ds.unitPrice,
+                quantity: ds.quantity
+            })),
+            additionalSupplies: (sale.supplySelections || []).map((ss: any) => ({
+                name: `Supply #${ss.supplyId}`, // Replace with supply lookup if SupplyService is available
+                unitPrice: ss.unitPrice,
+                quantity: ss.quantity
+            }))
         };
-
-        console.log('Selected sale enriched:', this.selectedSale);
         this.showModalSaleDetail = true;
-      },
-      error => {
-        console.error('Error loading sale details:', error);
-      }
-    );
-  }
+    }
 
-  private getAllSalesWithDetails() {
-    // Ejecutar todas las llamadas en paralelo
-    forkJoin({
-      sales: this.restaurantSaleService.getAll(),
-      salesRecipes: this.salesRecipeService.getAll(),
-      salesSupplies: this.salesAdditionalSupplyService.getAll()
-    }).subscribe(({ sales, salesRecipes, salesSupplies }) => {
+    closeSaleDetailModal(): void {
+        this.showModalSaleDetail = false;
+    }
 
-      // Agrupar recetas por sale_id
-      const recipesMap = new Map<number, number>();
-      salesRecipes.forEach(recipe => {
-        recipesMap.set(recipe.sale_id ?? 0, (recipesMap.get(recipe.sale_id ?? 0) || 0) + (recipe.quantity ?? 0));
-      });
+    // ── Data loading ───────────────────────────────────────────────────────────
 
-      // Agrupar insumos adicionales por sale_id
-      const suppliesMap = new Map<number, number>();
-      salesSupplies.forEach(supply => {
-        suppliesMap.set(supply.sale_id, (suppliesMap.get(supply.sale_id) || 0) + (supply.quantity ?? 0));
-      });
+    /**
+     * Loads all sales from the API and maps them into the table data source.
+     * Counts are derived directly from the dishSelections / supplySelections
+     * arrays returned by the API — no extra round-trips needed.
+     */
+    private loadSales(): void {
+        this.restaurantSaleService.getAll().subscribe({
+            next: (sales: RestaurantSale[]) => {
+                const rows = sales.map(sale => ({
+                    id: sale.id,
+                    code: sale.saleNumber,
+                    status: sale.status,
+                    registeredDate: sale.registeredDate,
+                    totalCost: sale.totalCost,
+                    recipeCount: (sale.dishSelections || []).reduce(
+                        (acc, ds) => acc + (ds.quantity || 0), 0
+                    ),
+                    additionalSupplyCount: (sale.supplySelections || []).reduce(
+                        (acc, ss) => acc + (ss.quantity || 0), 0
+                    ),
+                    // Keep raw arrays for the detail modal
+                    dishSelections: sale.dishSelections || [],
+                    supplySelections: sale.supplySelections || [],
+                }));
 
-      // Crear arreglo final
-      this.salesNotAddedToInventoryWithRecipeAndSupplyCounts = sales
-        .filter(sale => sale.added_inventory === false)
-        .map(sale => ({
-          id: sale.id,
-          code: sale.code,
-          recipeCount: recipesMap.get(sale.id ?? -1) || 0,
-          additionalSupplyCount: suppliesMap.get(sale.id ?? -1) || 0
-        }));
-
-      console.log("salesNotAddedToInventoryWithRecipeAndSupplyCounts: ", this.salesNotAddedToInventoryWithRecipeAndSupplyCounts);
-      this.dataSource.data = this.salesNotAddedToInventoryWithRecipeAndSupplyCounts;
-
-    });
-  }
-
-  ngOnInit() {
-    this.getAllSalesWithDetails();
-  }
-
-  // Close the sale detail modal
-  closeSaleDetailModal(): void {
-    this.showModalSaleDetail = false;
-  }
-
-
+                this.dataSource.data = rows;
+            },
+            error: err => {
+                console.error('Error loading sales:', err);
+                this.snackBar.open('Error loading sales', 'Close', { duration: 3000 });
+            }
+        });
+    }
 }
