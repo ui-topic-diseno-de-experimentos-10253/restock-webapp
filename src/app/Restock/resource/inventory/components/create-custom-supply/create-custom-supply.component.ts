@@ -46,7 +46,7 @@ export class CreateCustomSupplyComponent implements OnInit {
   unitPrice: number | null = null;
   description: string | null = null;
   unitName: string | null = null;
-  unitAbbreviaton: string | null = null; // ⚠️ typo intencional del backend
+  unitAbbreviaton: string | null = null; // typo intencional del backend
   selectedUnitOption: string | null = null;
 
   isLoading = signal(false);
@@ -125,7 +125,7 @@ export class CreateCustomSupplyComponent implements OnInit {
       price: this.unitPrice ?? 0,
       userId,
       unitName: String(unitName),
-      unitAbbreviaton: String(unitAbbrev), // ⚠️ typo intencional
+      unitAbbreviaton: String(unitAbbrev), // typo intencional
     };
 
     console.log('[CustomSupply] create/update payload', payload);

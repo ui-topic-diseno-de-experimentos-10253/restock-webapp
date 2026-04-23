@@ -149,7 +149,7 @@ export class CreateAndEditFormComponent implements OnInit {
         this.emitChange();
         this.cdr.markForCheck();
       })
-      .catch(error => console.error('❌ Upload failed:', error));
+      .catch(error => console.error('Upload failed:', error));
   }
 
 

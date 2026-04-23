@@ -6,7 +6,7 @@ export interface CreateCustomSupplyRequest {
   price: number;
   userId: number;
   unitName: string;
-  unitAbbreviaton: string; // ⚠️ typo intencional: así lo espera el backend
+  unitAbbreviaton: string; // typo intencional: así lo espera el backend
 }
 
 export interface CustomSupply {
@@ -23,7 +23,7 @@ export interface CustomSupply {
   maxStock: number;
   price: number;
   unitName: string;
-  unitAbbreviaton: string; // ⚠️ typo intencional
+  unitAbbreviaton: string; // typo intencional
   currencyCode: string;
   userId: number;
 }

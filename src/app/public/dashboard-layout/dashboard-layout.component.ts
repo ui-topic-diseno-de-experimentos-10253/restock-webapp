@@ -55,7 +55,7 @@ export class DashboardLayoutComponent implements OnInit {
 
   async loadProfile() {
     try {
-      // ✅ Usa userId + loadProfileByUserId en lugar de getProfileById
+      //Usa userId + loadProfileByUserId en lugar de getProfileById
       const userId = this.sessionService.getUserId();
       if (!userId) {
         console.error('No userId found in session.');

@@ -12,7 +12,7 @@ import {provideNativeDateAdapter} from '@angular/material/core';
 
 const httpLoaderFactory: (http: HttpClient) =>
   TranslateLoader = (http: HttpClient) =>
-  new TranslateHttpLoader(http, '/assets/i18n/', '.json');
+  new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
 export const appConfig: ApplicationConfig = {
   providers: [

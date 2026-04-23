@@ -112,7 +112,7 @@ export class ShowSalesNotAddedToInventoryComponent implements OnInit {
 
         forkJoin(deleteCalls).subscribe({
             next: () => {
-                this.snackBar.open('Sales cancelled successfully ✅', 'Close', {
+                this.snackBar.open('Sales cancelled successfully', 'Close', {
                     duration: 3000,
                     panelClass: 'snackbar-success'
                 });

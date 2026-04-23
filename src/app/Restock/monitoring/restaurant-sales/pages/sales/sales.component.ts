@@ -133,14 +133,14 @@ export class SalesComponent implements OnInit, AfterViewInit {
           },
           error: err => {
             console.error('Error loading sale details:', err);
-            this.snackBar.open('Error loading sale details ❌', 'Close', { duration: 3000 });
+            this.snackBar.open('Error loading sale details', 'Close', { duration: 3000 });
           }
         });
       },
       
       error: err => {
         console.error('Error loading sales:', err);
-        this.snackBar.open('Error loading sales ❌', 'Close', { duration: 3000 });
+        this.snackBar.open('Error loading sales', 'Close', { duration: 3000 });
       }
     });
     
