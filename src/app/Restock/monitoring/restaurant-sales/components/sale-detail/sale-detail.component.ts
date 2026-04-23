@@ -13,45 +13,63 @@ import { MatDivider } from '@angular/material/divider';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-sale-detail',
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatCheckboxModule,
-    MatPaginatorModule,
-    MatDivider,
-    TranslatePipe
-  ],
-  templateUrl: './sale-detail.component.html',
-  styleUrl: './sale-detail.component.css'
+    selector: 'app-sale-detail',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatIconModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatTableModule,
+        MatCheckboxModule,
+        MatPaginatorModule,
+        MatDivider,
+        TranslatePipe,
+    ],
+    templateUrl: './sale-detail.component.html',
+    styleUrl: './sale-detail.component.css'
 })
 export class SaleDetailComponent implements OnInit {
-  @Output() close = new EventEmitter<void>(); // Emits when modal should be closed
-  @Input() sale: any;
+    @Output() close = new EventEmitter<void>();
 
-  // Closes the component (used by close or cancel buttons)
-  closeComponent() {
-    this.close.emit();
-  }
+    /**
+     * Accepts both the raw API shape (dishSelections / supplySelections)
+     * and the enriched shape produced by the parent (dishes / additionalSupplies).
+     */
+    @Input() sale: any;
 
-  // Table column definitions
-  displayedColumnsPlatos: string[] = ['name', 'price', 'quantity'];
-  displayedColumnsInsumos: string[] = ['name', 'price', 'quantity'];
+    closeComponent(): void {
+        this.close.emit();
+    }
 
-  dishes = new MatTableDataSource<any>([]);
-  additionalSupplies = new MatTableDataSource<any>([]);
+    displayedColumnsPlatos: string[] = ['name', 'price', 'quantity'];
+    displayedColumnsInsumos: string[] = ['name', 'price', 'quantity'];
 
-  ngOnInit() {
-    this.dishes.data = this.sale.dishes || [];
-    this.additionalSupplies.data = this.sale.additionalSupplies || [];
-  }
+    dishes = new MatTableDataSource<any>([]);
+    additionalSupplies = new MatTableDataSource<any>([]);
 
+    ngOnInit(): void {
+        // Support both enriched shape (dishes[]) and raw API shape (dishSelections[])
+        if (this.sale?.dishes) {
+            this.dishes.data = this.sale.dishes;
+        } else if (this.sale?.dishSelections) {
+            this.dishes.data = this.sale.dishSelections.map((ds: any) => ({
+                name: `Dish #${ds.dishId}`,
+                unitPrice: ds.unitPrice,
+                quantity: ds.quantity
+            }));
+        }
 
+        if (this.sale?.additionalSupplies) {
+            this.additionalSupplies.data = this.sale.additionalSupplies;
+        } else if (this.sale?.supplySelections) {
+            this.additionalSupplies.data = this.sale.supplySelections.map((ss: any) => ({
+                name: `Supply #${ss.supplyId}`,
+                unitPrice: ss.unitPrice,
+                quantity: ss.quantity
+            }));
+        }
+    }
 }
-
