@@ -1,0 +1,11 @@
+
+
+<p>{{ 'shared.deleteMessage' | translate }} <strong>{{ data.label }}</strong></p>
+
+<div class="modal-footer mt-4">
+  <button mat-stroked-button class="gray-button" (click)="cancel()">{{ 'shared.cancelButton' | translate }}</button>
+  <button mat-flat-button class="red-button" (click)="confirm()">
+    <mat-icon>delete</mat-icon>
+    {{ 'shared.deleteButton' | translate }}
+  </button>
+</div>

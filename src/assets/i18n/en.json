@@ -1,0 +1,389 @@
+{
+  "sidebar": {
+    "summary": "Summary",
+    "subscription": "Subscription",
+    "inventory": "Inventory",
+    "suppliers": "Suppliers",
+    "notifications": "Notifications",
+    "orders": "Orders",
+    "recipes": "Recipes",
+    "sales": "Sales",
+    "reviews": "Reviews"
+  },
+  "shared": {
+    "deleteTitle": "Confirm Deletion",
+    "deleteMessage": "Are you sure you want to delete this item?",
+    "deleteButton": "Delete",
+    "cancelButton": "Cancel"
+  },
+  "profile": {
+    "title": "Profile Details",
+    "alt-user-photo": "User photo",
+    "name": "Name",
+    "last-name": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "country": "Country",
+    "business-name": "Business Name",
+    "business-address": "Business Address",
+    "business-phone": "Business Phone",
+    "business-email": "Business Email",
+    "categories": "Categories",
+    "business-categories": "Business Categories",
+    "settings": {
+      "title": "Edit Your Information",
+      "personal-info": "Personal Data",
+      "business-info": "Business Data",
+      "security-info": "Security and Privacy",
+      "change-password": "Change password",
+      "current-password": "Current password",
+      "current-password-placeholder": "Enter current password",
+      "new-password": "New password",
+      "new-password-placeholder": "Enter new password",
+      "confirm-password": "Confirm new password",
+      "confirm-password-placeholder": "Confirm new password",
+      "save-changes": "SAVE CHANGES",
+      "delete-account": "Delete account",
+      "delete-account-warning": "This action will permanently delete your account. All your personal data, history and settings will be deleted. You will not be able to recover your account after deletion. Your subscription will be deleted.",
+      "confirm-delete": "CONFIRM DELETE"
+    }
+  },
+  "inventory": {
+    "suppliesTitle": "Supplies",
+    "create": "CREATE",
+    "edit": "Edit",
+    "next": "Next",
+    "back": "Back",
+    "createSupply": "Create supply",
+    "emptyTitle": "You have not added inputs yet.",
+    "emptySubtitle": "Add them to start managing your inventory.",
+    "addInventoryTitle": "Add supply to inventory",
+    "addInventorySubtitle": "Complete the details of the new supply to add it to your inventory.",
+    "supply": "Supply",
+    "stock": "Stock",
+    "expirationDate": "Expiration Date",
+    "cancel": "CANCEL",
+    "add": "ADD",
+    "editSupply": "Edit supply",
+    "editSupplySubtitle": "Update the details of the supply in your inventory.",
+    "name": "Name",
+    "category": "Category",
+    "unitMeasure": "Unit Measure",
+    "descriptionOptional": "Description (optional)",
+    "unitPrice": "Unit Price (S/.)",
+    "perishable": "Perishable",
+    "notPerishable": "It’s not perishable",
+    "isPerishable": "It’s perishable",
+    "update": "Update",
+    "createLabel": "Create",
+    "save": "Save",
+    "inventoryTitle": "Inventory",
+    "searchPlaceholder": "Search supplies",
+    "tableSupply": "Supply",
+    "tableCategory": "Category",
+    "tableUnit": "Unit",
+    "tableExpiration": "Expiration",
+    "tableStock": "Stock",
+    "tablePerishable": "Perishable",
+    "tableActions": "Actions",
+    "inventoryEmptyMessage": "There are no supplies registered. To manage your inventory, you must first create ingredients in the system.",
+    "registeredAlerts": "Registered alerts",
+    "filterBy": "Filter by:",
+    "ingredients": "Ingredients",
+    "location": "Location",
+    "status": "Status",
+    "lastUpdate": "Last update"
+  },
+  "recipes": {
+    "title": "Recipes",
+    "searchPlaceholder": "Search recipes...",
+    "sortByPrice": "Sort by price",
+    "name": "Name",
+    "description": "Description",
+    "dishImage": "Dish Image",
+    "supplies": "Supplies",
+    "totalPrice": "Total Price (S/.)",
+    "create": "Create",
+    "createRecipe": "Create Recipe",
+    "editRecipe": "Edit Recipe",
+    "noRecipes": "You currently have no recipes registered. Create a new recipe to start organizing your preparations and better manage your ingredients from this section.",
+    "totalCost": "Total cost",
+    "selectSupply": "Select supply",
+    "quantity": "Quantity",
+    "table": {
+      "id": "ID",
+      "supply": "Supply",
+      "quantity": "Quantity",
+      "actions": "Actions"
+    }
+  },
+  "order-to-supplier": {
+    "title": "Orders",
+    "emptyState": "You currently have no orders registered. Create a new order to start managing your purchases and supplies from this section.",
+    "searchOrderPlaceholder": "Search orders",
+    "filterBySupplier": "Filter by supplier",
+    "createOrder": "CREATE",
+    "create-order-modal": {
+      "select-supply-tab": {
+        "title": "Select Supply",
+        "selectSupply": "Select Supply",
+        "orderByPrice": "Order by Price",
+        "table": {
+          "supplier": "Supplier",
+          "price": "Price",
+          "availableStock": "Available Stock",
+          "select": "Select"
+        },
+        "cancel": "CANCEL",
+        "next": "NEXT"
+      },
+      "order-details-tab": {
+        "title": "Order Details",
+        "noSuppliesSelected": "No supplies selected.",
+        "order-details-card": {
+          "price": "Price",
+          "availableStock": "Available Stock",
+          "quantity": "Quantity"
+        },
+        "total": "Total",
+        "placeOrder": "Place Order",
+        "addMoreSupplies": "Add more supplies"
+      }
+    },
+    "table": {
+      "situation": "Situation",
+      "state": "State",
+      "shippingDate": "Shipping Date",
+      "supplier": "Supplier",
+      "requestedProducts": "Requested Products",
+      "finalPrice": "Final Price",
+      "actions": "Actions"
+    },
+    "order-details-modal": {
+      "title": "Order Details",
+      "subtitle": "Order information",
+      "state": "State",
+      "situation": "Situation",
+      "orderCreationDate": "Order Creation Date",
+      "estimedShippingDate": "Estimated Shipping Date",
+      "estimatedShippingHour": "Estimated Shipping Hour",
+      "totalPrice": "Total Price",
+      "requestedProducts": "Requested Products",
+      "supplier": "Supplier",
+      "supplierPhone": "Supplier Phone",
+      "supplierAddress": "Supplier Address",
+      "supplies": "Supplies",
+      "supply-description": "Description",
+      "supply-price": "Price",
+      "supply-category": "Category",
+      "supply-unit": "Unit",
+      "supply-requested-quantity": "Requested Quantity",
+      "supply-status": "Accepted"
+    },
+    "order-feedback-modal": {
+      "title": "Send Feedback to ",
+      "subtitle": "Please provide your feedback on the order",
+      "order-feedback-card": {
+        "title": "Order Feedback",
+        "supplier": "Supplier",
+        "phone": "Phone",
+        "date": "Date",
+        "totalPrice": "Total Price"
+      },
+      "rating": "Rating",
+      "comments": "Comments (optional)",
+      "submitFeedback": "Submit Feedback",
+      "cancel": "Cancel"
+    }
+  },
+  "common": {
+    "noOrderDataFound": "No order data found.",
+    "notSpecified": "Not specified",
+    "noProviderInfoFound": "No provider information found.",
+    "unnamedSupply": "Unnamed supply",
+    "noDescription": "No description",
+    "notDefined": "Not defined",
+    "noSuppliesInOrder": "No supplies registered in this order.",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again later.",
+    "success": "Operation completed successfully.",
+    "all": "All"
+  },
+  "notifications_suppliers": {
+    "title": "Orders Notifications",
+    "restaurant": "Restaurant",
+    "evaluate": "Evaluate",
+    "status": "Status",
+    "last-update": "Last Update"
+  },
+  "subscription": {
+    "title1": "FLEXIBLE PLANS TO TAKE YOUR RESTAURANT MANAGEMENT",
+    "title2": "TO THE NEXT LEVEL"
+  },
+  "sales_restaurant": {
+    "register_sale": "Register your sales",
+    "new_sale": "NEW SALE",
+    "update_inventory": "Want to update your inventory? Select the sales you want here:",
+    "registered_sales_not_discounted": "REGISTERED SALES NOT DISCOUNTED IN INVENTORY",
+    "history_sales": "History of sales updated in inventory",
+    "registered_sales": "Registered sales that have already deducted supplies from inventory",
+    "search": "Search for sale by code",
+    "code": "Code",
+    "quantity_dishes": "Quantity of dishes",
+    "quantity_additional_supplies": "Quantity of additional supplies",
+    "actions": "Actions",
+    "sale_details": {
+      "title": "SALE DETAIL",
+      "number_dishes": "Number of dishes",
+      "number_additional_supplies": "Number of additional supplies",
+      "dishes": "Dishes",
+      "additional_supplies": "Additional Supplies",
+      "name": "Name",
+      "unit_price": "Unit Price",
+      "quantity": "Quantity"
+    },
+    "sales_not_added_in_inventory": {
+      "title": "REGISTERED SALES NOT DISCOUNTED IN INVENTORY",
+      "subtitle": "Select the sales you want to deduct the supplies used from the inventory",
+      "selectAll": "Select All",
+      "code": "Code",
+      "quantityDishes": "Quantity of Dishes",
+      "quantityAdditionalSupplies": "Quantity of Additional Supplies",
+      "actions": "Actions"
+    },
+    "sale_confirmation": {
+      "title": "Sale Registered Successfully"
+    }
+  },
+  "supplier-orders": {
+    "title": "My Orders",
+    "tabs": {
+      "new-orders": "New Orders",
+      "history-orders": "Order History",
+      "accepted-orders": "Orders In Progress"
+    },
+    "table": {
+      "date": "Order Date",
+      "restaurant-name": "Restaurant Name",
+      "requested-products": "N° Requested Products",
+      "final-price": "Final Price",
+      "state": "State",
+      "ship-date": "Ship Date",
+      "actions": "Actions"
+    },
+    "description": "Order Description",
+    "restaurant-name": "Restaurant Name",
+    "estimated-ship-date": "Estimated Shipping Date",
+    "estimated-ship-time": "Estimated Shipping Time",
+    "placeholder": {
+      "select-date": "Select date",
+      "select-time": "Select time",
+      "description": "Description"
+    },
+    "details": {
+      "title": "Order Details",
+      "description": "View the details of a registered order.",
+      "estimated-date": "Estimated Ship Date and Time",
+      "buttons": {
+        "back": "Back",
+        "next": "Next",
+        "close": "Close"
+      }
+    },
+    "manage-new-orders": {
+      "title": "New Order Management",
+      "description": "Complete the order details to start tracking your order.",
+      "order-summary": "Order Summary",
+      "new-total": "Selected item total",
+      "buttons": {
+        "submit-order": "Accept selection",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next"
+      }
+    },
+    "update-order": {
+      "title": "Update Order",
+      "description": "Update the details of a registered order.",
+      "order-summary": "Order Summary",
+      "buttons": {
+        "save": "Update Order",
+        "close": "Close"
+      }
+    },
+    "decline": {
+      "title": "Decline Order",
+      "message": "This action is irreversible. Are you sure you want to decline the entire selected order?",
+      "buttons": {
+        "confirm": "Yes, decline",
+        "cancel": "Cancel"
+      }
+    },
+    "cancel": {
+      "title": "Cancel Order",
+      "message": "Are you sure you want to cancel this order?",
+      "buttons": {
+        "confirm": "Yes, decline",
+        "cancel": "Cancel"
+      }
+    },
+    "supplies":
+    {
+      "title": "Supplies",
+      "description": "View the supplies you have available for the order.",
+      "select-all": "Select All",
+      "headers": {
+        "product-name": "Product Name",
+        "quantity": "Quantity",
+        "unit-measure": "Unit Measure"
+      },
+      "total-price": "Total Price"
+    },
+    "notifications": {
+      "summary-success": "Success",
+      "summary-error": "Error",
+      "order-updated": "Order updated successfully",
+      "order-processed": "Order processed successfully",
+      "order-declined": "Order declined successfully",
+      "order-cancelled": "Order cancelled successfully",
+      "error-update": "Failed to update order",
+      "error-process": "Failed to process order",
+      "error-decline": "Failed to decline order",
+      "error-cancel": "Failed to cancel order"
+    },
+    "filters":
+    {
+      "title": "Orders",
+      "search-placeholder": "Search orders by restaurant...",
+      "date-range-placeholder": "Order Date Range",
+      "order-date-button": "Order Date",
+      "status": "Status",
+      "download": "Download History",
+      "last-7days": "Last 7 Days",
+      "last-30days": "Last 30 Days",
+      "last-3months": "Last 3 Months",
+      "all-states": "All States"
+    },
+    "state": {
+      "title": "State",
+      "preparing": "Preparing",
+      "delivered": "Delivered",
+      "on-hold": "On hold",
+      "on-the-way": "On the way"
+    },
+    "situation": {
+      "title": "Situation",
+      "pending": "Pending",
+      "approved": "Approved"
+    },
+    "empty": {
+      "new-orders": "You currently have no orders received.",
+      "history-orders": "You currently have no orders delivered.",
+      "accepted-orders": "You currently have no orders approved."
+    }
+  }
+}

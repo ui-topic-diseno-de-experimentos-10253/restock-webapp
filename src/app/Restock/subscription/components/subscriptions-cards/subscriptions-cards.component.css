@@ -1,0 +1,151 @@
+.plans-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 60px;
+    flex-wrap: wrap;
+}
+
+.plan-card {
+    text-align: center;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    width: 30%;
+    height: 435px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease;
+    border-radius: 0;
+}
+
+
+.mat-card-header {
+    justify-content: center;
+    padding: 16px 0;
+    margin-top: 1.3rem;
+}
+
+
+.plan-card mat-card-title {
+    font-size: 34px;
+    font-weight: 400;
+    color: #4F8A5B;
+}
+
+.plan-card mat-card-subtitle {
+    margin-top: 1rem;
+    font-size: 23px;
+    font-weight: 400;
+    color: #333;
+}
+
+mat-card-content {
+    padding: 1rem;
+}
+
+.plan-card ul {
+    margin-top: 2rem;
+    padding: 0 0px 0px 0px;
+    text-align: left;
+    list-style: none;
+}
+
+.plan-card li {
+    margin-top: .5rem;
+    list-style: none;
+    position: relative;
+    padding-left: 24px;
+    /* Espacio para el check */
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: #000;
+}
+
+.plan-card li::before {
+    content: '✔';
+    position: absolute;
+    left: 0;
+    color: #4F8A5B;
+    font-weight: bold;
+}
+
+.subscribe-button {
+    background-color: #4F8A5B !important;
+    color: white !important;
+    margin-top: 2rem;
+    width: 100%;
+    height: 55%;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 2.4rem .6rem 2rem .6rem;
+    transition: background-color 500ms ease, color 500ms ease;
+
+
+}
+
+.subscribe-button:hover {
+    background-color: rgb(26, 104, 60) !important;
+
+}
+
+.popular-label {
+    position: absolute;
+    top: 12px;
+    right: -40px;
+    /* mueve hacia afuera para que al rotar quede dentro */
+    background-color: #4F8A5B;
+    color: white;
+    font-size: 11px;
+    padding: 4px 40px;
+    border-radius: 0;
+    transform: rotate(45deg);
+    font-weight: bold;
+    z-index: 2;
+}
+
+
+.highlight-card {
+    background-color: #F4F4F4;
+    margin-top: -30px;
+    z-index: 1;
+    position: relative;
+}
+
+
+
+@media (max-width: 1405px) {
+    .plans-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .plan-card {
+        width: 70%;
+        /* max-width: 560px; */
+        height: auto;
+        /* Permite que crezca según el contenido */
+        margin-bottom: 2rem;
+    }
+
+    .highlight-card {
+        margin-top: 0;
+    }
+
+    .plan-card li {
+        font-size: 17px;
+        padding-left: 28px;
+        line-height: 1.6;
+    }
+
+    .subscribe-button {
+        height: 60px;
+        font-size: 16px;
+        margin: 2.4rem 1rem 2rem 1rem;
+    }
+
+    mat-card-content {
+        margin: auto;
+    }
+}

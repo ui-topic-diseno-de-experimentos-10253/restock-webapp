@@ -1,0 +1,38 @@
+<mat-card class="toolbar-card">
+  <h2 class="title">{{ 'inventory.registeredAlerts' | translate }}</h2>
+</mat-card>
+
+<mat-tab-group>
+  <mat-tab label="All">
+    <mat-list>
+      @for (n of notifications; track n) {
+        <mat-list-item>
+          <span class="message">{{ n.message }}</span>
+          <span class="time">{{ n.updatedAt }}</span>
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-tab>
+
+  <mat-tab label="Inventory">
+    <mat-list>
+      @for (n of inventoryNotifications; track n) {
+        <mat-list-item>
+          <span class="message">{{ n.message }}</span>
+          <span class="time">{{ n.updatedAt }}</span>
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-tab>
+
+  <mat-tab label="Orders">
+    <mat-list>
+      @for (n of orderNotifications; track n) {
+        <mat-list-item>
+          <span class="message">{{ n.message }}</span>
+          <span class="time">{{ n.updatedAt }}</span>
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-tab>
+</mat-tab-group>

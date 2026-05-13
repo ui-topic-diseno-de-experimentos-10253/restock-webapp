@@ -1,0 +1,136 @@
+<div class="edit-form">
+  @for (field of fieldsForCurrentStep(); track field) {
+
+
+    <ng-container>
+      <div class="form-field">
+        <label class="form-label" [for]="field.name">
+          {{ field.label }}
+        </label>
+
+        @if (field.type === 'text' || field.type === 'number' || field.type === 'currency') {
+          <mat-form-field class="form-input" appearance="fill">
+            <input
+              matInput
+              [id]="field.name"
+              [placeholder]="field.placeholder"
+              [type]="field.type === 'currency' ? 'number' : field.type"
+              [name]="field.name"
+              [step]="field.type === 'currency' ? '0.01' : '1'"
+              [(ngModel)]="form[field.name]"
+              (ngModelChange)="updateField(field.name, $event)"
+            />
+          </mat-form-field>
+        }
+
+
+        @if (field.type === 'boolean') {
+          <mat-slide-toggle
+            class="form-toggle"
+            [id]="field.name"
+            [(ngModel)]="form[field.name]"
+            (ngModelChange)="updateField(field.name, $event)"
+            [name]="field.name"
+          >
+            {{ field.label }}
+          </mat-slide-toggle>
+        }
+
+        @if (field.type === 'file') {
+          <div class="file-upload">
+            <input
+              type="file"
+              accept="image/*"
+              [id]="field.name"
+              (change)="handleUpload($event, field.name)"
+            />
+          </div>
+        }
+
+        @if (field.type === 'file' && form[field.name]) {
+          <div class="file-preview">
+            <img [src]="form[field.name]" alt="Preview" />
+          </div>
+        }
+
+        @if (field.type === 'select') {
+          <mat-form-field class="form-input" appearance="fill">
+            <mat-label>{{ field.label }}</mat-label>
+            <mat-select
+              [(ngModel)]="form[field.name]"
+              (ngModelChange)="updateField(field.name, $event)"
+              [name]="field.name"
+            >
+              <mat-option
+                *ngFor="let option of field.options"
+                [value]="option.value"
+              >
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (field.type === 'date') {
+          <mat-form-field class="form-input" appearance="fill">
+            <mat-label>{{ field.placeholder }}</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              [(ngModel)]="form[field.name]"
+              (ngModelChange)="updateField(field.name, $event)"
+              [name]="field.name"
+              [id]="field.name"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        }
+
+        @if (field.type === 'custom' && customComponents[field.name]) {
+          <div class="form-custom-component">
+            <ng-container
+              *ngComponentOutlet="customComponents[field.name]; inputs: { supplies: form.supplies }; outputs: { suppliesChange: handleSuppliesChange.bind(this) }"
+            ></ng-container>
+          </div>
+        }
+
+      </div>
+    </ng-container>
+  }
+
+  <div class="form-actions">
+    @if (hasSteps && currentStep > 1) {
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="prevStep()"
+      >
+        {{ 'inventory.back' | translate }}
+      </button>
+    }
+
+    @if (hasSteps && currentStep < totalSteps) {
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="nextStep()"
+        [disabled]="!validateCurrentStep()"
+      >
+        {{ 'inventory.next' | translate }}
+      </button>
+    }
+
+    @if (!hasSteps || currentStep === totalSteps) {
+      <button
+        mat-raised-button
+        class="green-button"
+        type="button"
+        (click)="onSubmit()"
+      >
+        {{ mode === 'edit' ? ('inventory.update' | translate) : ('inventory.save' | translate) }}
+      </button>
+    }
+
+  </div>
+</div>

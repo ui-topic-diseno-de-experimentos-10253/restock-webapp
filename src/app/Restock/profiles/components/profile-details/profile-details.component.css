@@ -1,0 +1,79 @@
+.profile-details-container {
+  padding: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.profile-details-card {
+  width: 100%;
+  max-width: 100%;
+  background-color: #FFFFFF;
+  padding: 16px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+.profile-photo {
+  width: 100%;
+  max-width: 300px;
+  padding: 16px;
+  height: auto;
+  border-radius: 50px;
+  object-fit: cover;
+}
+
+.text {
+  font-size: 3.5vw; /* Escala mejor en móviles */
+}
+
+/* Chips */
+.category-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-chip-list mat-chip {
+  color: #fff;
+  background-color: rgba(170, 179, 165, 0.38);
+}
+
+/* Desktop layout */
+@media (min-width: 768px) {
+  .profile-details-card {
+    max-width: 20vw;
+  }
+
+  .text {
+    font-size: 0.9vw;
+  }
+
+  app-profile-details {
+    flex: 1 1 30%;
+  }
+
+  app-profile-settings {
+    flex: 1 1 68%;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-sections {
+    flex-direction: column;
+  }
+
+  .profile-details-card {
+    max-width: 100%;
+  }
+  .text {
+    font-size: 15px;
+  }
+  app-profile-details,
+  app-profile-settings {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}

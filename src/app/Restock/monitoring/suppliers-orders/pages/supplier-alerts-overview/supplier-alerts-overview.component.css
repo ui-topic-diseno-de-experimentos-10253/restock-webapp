@@ -1,0 +1,77 @@
+.table-container {
+    background: #fff;
+    padding: 0 3.5rem 0 3.5rem;
+    margin: auto;
+    max-width: 1400px;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h2 {
+            font-family: Poppins;
+            font-weight: 400;
+            font-size: 23px;
+        }
+
+        .filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            mat-form-field {
+                width: 100px;
+                margin-left: 0.5rem;
+            }
+        }
+    }
+
+    .mat-elevation-z1 {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    mat-table {
+        background-color: #F4F4F4;
+
+        mat-header-cell {
+            font-weight: bold;
+            font-size: 12px;
+            color: #757575;
+        }
+
+        mat-cell,
+        mat-header-cell {
+            padding: 12px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: #4F8A5B;
+            color: white;
+            font-size: 14px;
+            font-weight: 400;
+            border-radius: 4px;
+            padding: 0px 0px !important;
+            width: 100%;
+            max-width: 200px;
+            height: 30px;
+        }
+
+        mat-icon {
+            vertical-align: middle;
+            font-size: 20px;
+        }
+    }
+
+}
+
+.principal-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    margin-bottom: 32px;
+}

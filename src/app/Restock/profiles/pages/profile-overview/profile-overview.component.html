@@ -1,0 +1,19 @@
+<div class="profile-overview-container">
+  <mat-card class="profile-overview-card">
+    <div class="profile-sections">
+      <app-profile-details
+        [profile]="profile"
+        [categories]="categoriesArray"
+      ></app-profile-details>
+      <app-profile-settings
+        [profile]="profile"
+        [categories]="categoriesArray"
+        [categoriesOptions]="categoriesOptions"
+        [refreshTrigger]="refreshTrigger"
+        (profileUpdated)="updateProfile($event)"
+        (profileAndBusinessUpdated)="updateProfileAndBusiness($event)"
+        (profileAndUserUpdated)="updateProfileAndUser($event)"
+      ></app-profile-settings>
+    </div>
+  </mat-card>
+</div>

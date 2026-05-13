@@ -1,0 +1,84 @@
+<div class="table-container">
+  <!-- Empty -->
+  @if (orders.length <= 0) {
+    <app-empty-section>
+      <div icon>
+        <mat-icon style="color: #bcbcbc;">local_shipping</mat-icon>
+      </div>
+      {{ 'supplier-orders.empty.history-orders' | translate }}
+    </app-empty-section>
+  } @else {
+    <app-filter-section
+      [title]="'supplier-orders.title' | translate"
+      [searchQuery]="searchTerm"
+      [selectedDateRange]="dateRange"
+      [sortOrder]="currentSortOrder"
+      (searchQueryChange)="onSearchChange($event)"
+      (selectedDateRangeChange)="onDateRangeChange($event)"
+      (toggleSort)="onToggleSort()">
+
+      <!-- Action buttons -->
+      <div slot="actions">
+        <button mat-raised-button (click)="exportOrders()">
+          {{ 'supplier-orders.filters.download' | translate }}
+          <mat-icon>download</mat-icon>
+        </button>
+      </div>
+    </app-filter-section>
+
+    <table mat-table [dataSource]="filteredOrders" class="mat-elevation-z1">
+
+      <!-- Order Date -->
+      <ng-container matColumnDef="orderDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'supplier-orders.table.date' | translate }} </th>
+        <td mat-cell *matCellDef="let order"> {{ order.date | date }} </td>
+      </ng-container>
+
+      <!-- Ship Date -->
+      <ng-container matColumnDef="shipDate">
+        <th mat-header-cell *matHeaderCellDef>{{ 'supplier-orders.table.ship-date' | translate}}</th>
+        <td mat-cell *matCellDef="let order"> {{ order.estimated_ship_date | date }} </td>
+      </ng-container>
+
+      <!-- Restaurant Name -->
+      <ng-container matColumnDef="restaurantName">
+        <th mat-header-cell *matHeaderCellDef>{{ 'supplier-orders.table.restaurant-name' | translate }}</th>
+        <td mat-cell *matCellDef="let order">
+          {{ adminRestaurantsProfiles[order.id] }}
+        </td>
+      </ng-container>
+
+      <!-- Requested Products -->
+      <ng-container matColumnDef="requestedProducts">
+        <th mat-header-cell *matHeaderCellDef> {{ 'supplier-orders.table.requested-products' | translate }}</th>
+        <td mat-cell *matCellDef="let order">
+          {{ order.requested_products_count }}
+        </td>
+      </ng-container>
+
+      <!-- Final Price -->
+      <ng-container matColumnDef="finalPrice">
+        <th mat-header-cell *matHeaderCellDef>{{ 'supplier-orders.table.final-price' | translate }}</th>
+        <td mat-cell *matCellDef="let order"> {{ order.totalPrice | currency:'S/':'symbol':'1.2-2' }} </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-cell *matCellDef="let order">
+          <button mat-icon-button  (click)="openOrderDetails(order)" class="open-modal-btn" >
+            <mat-icon>menu_book</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class]="getRowClass(row)"></tr>
+
+    </table>
+
+    <mat-paginator [pageSize]="5" [pageSizeOptions]="[2, 6, 10]" showFirstLastButtons></mat-paginator>
+
+  }
+
+</div>

@@ -1,0 +1,28 @@
+<div class="plans-grid">
+    @for (subscription of subscriptions; track subscription) {
+    <!-- ngClass para expresiones condicionales. -->
+    <mat-card class="plan-card" [ngClass]="{'highlight-card': subscription.popular }" appearance="outlined">
+
+        @if (subscription.popular) {
+        <div class="popular-label">POPULAR</div>
+        }
+
+        <mat-card-header class="mat-card-header">
+            <mat-card-title>{{ subscription.name }}</mat-card-title>
+            <mat-card-subtitle>S/. {{ subscription.price }} / month</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <ul>
+                @for (feature of subscription.features; track feature) {
+                <li>{{ feature }}</li>
+                }
+            </ul>
+        </mat-card-content>
+
+        <mat-card-actions>
+            <button mat-raised-button class="subscribe-button">SUBSCRIBE</button>
+        </mat-card-actions>
+    </mat-card>
+    }
+</div>

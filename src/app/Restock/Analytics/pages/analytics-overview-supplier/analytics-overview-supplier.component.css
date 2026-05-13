@@ -1,0 +1,48 @@
+.analytics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Fila 1: dos widgets */
+.row1 {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Fila 2: centrado horizontal */
+.row2 {
+  display: flex;
+  justify-content: center;
+}
+
+/* Widgets */
+.widget-notifications {
+  flex: 2;
+}
+
+.widget-account {
+  flex: 1;
+}
+
+.widget-frequent {
+  width: 100%;
+}
+
+@media (max-width: 1190px) {
+  .row1 {
+    flex-direction: column;
+  }
+
+  .row2 {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .widget-notifications,
+  .widget-account,
+  .widget-frequent {
+    width: 100% !important;
+  }
+}

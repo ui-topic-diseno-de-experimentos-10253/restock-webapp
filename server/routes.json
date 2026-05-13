@@ -1,0 +1,5 @@
+{
+  "/api/v1/recipes/:recipeId/supplies/:id": "/recipes_supplies/:id",
+  "/api/v1/recipes/:recipeId/supplies": "/recipes_supplies?recipe_id=:recipeId",
+  "/api/v1/*": "/$1"
+}

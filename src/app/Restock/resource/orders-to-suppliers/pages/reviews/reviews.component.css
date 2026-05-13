@@ -1,0 +1,63 @@
+.review-container {
+    padding: 16px;
+    box-shadow: 1px 0px 8px rgba(0, 0, 0, 0.2);
+    margin: 3rem;
+    border-radius: 30px;
+
+}
+
+.reviews-quantity {
+    font-family: Poppins;
+    font-weight: 400;
+    font-size: 23px;
+    margin-left: 3rem;
+    margin-bottom: 2rem;
+    padding: 0 2rem 0 2rem;
+}
+
+.flex {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: auto;
+}
+
+.filter-field {
+    width: 40%;
+    border: 2px;
+}
+
+
+
+.full-width-table {
+    background-color: white;
+}
+
+.table-container {
+    margin: 0 3rem 0 3rem;
+}
+
+.average-review {
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+    margin-top: 3rem;
+    text-align: center;
+    font-family: Poppins;
+    font-weight: 400;
+    font-size: 14px;
+    box-shadow: 1px 0px 8px rgba(0, 0, 0, 0.5);
+    margin-left: auto;
+    width: 20%;
+    border: 2px solid black;
+    /* <-- define grosor, estilo y color del borde */
+    border-radius: 20px;
+    /* <-- redondeado */
+    padding: 5px;
+    /* (opcional) agrega espacio interno para que se vea mejor */
+}
+
+
+
+mat-paginator {
+    background-color: white;
+}

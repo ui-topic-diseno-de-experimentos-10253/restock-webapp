@@ -1,0 +1,34 @@
+@if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="inventory-container">
+
+  <!-- Sección para botón de crear supply -->
+  <app-supplier-supply-section
+    [suppliesLength]="supplies.length"
+    (create)="openCreateModal()"
+  />
+
+  <!-- Carousel (si hay supplies) -->
+  @if (supplies.length > 0) {
+    <app-supply-carousel
+      [supplies]="supplies"
+      [categories]="categories"
+      (edit)="editSupply($event)"
+      (delete)="deleteSupply($event)"
+    />
+  }
+
+  <!-- Tabla de inventario -->
+  <app-inventory-table
+    [batches]="batches"
+    (edit)="editBatch($event)"
+    (delete)="deleteBatch($event)"
+    (create)="openCreateModal()"
+    (add)="openAddSupplyToInventory()"
+  />
+
+  </div>
+}

@@ -1,0 +1,11 @@
+<div class="modal-overlay" (click)="closeComponente()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <button mat-icon-button class="close-button" (click)="closeComponente()">
+            <mat-icon>close</mat-icon>
+        </button>
+
+        <p class="title">{{'sales_restaurant.sale_confirmation.title' |
+            translate}}</p>
+        <mat-icon class="check">check_circle</mat-icon>
+    </div>
+</div>

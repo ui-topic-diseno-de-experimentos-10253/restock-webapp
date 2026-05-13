@@ -1,0 +1,42 @@
+<div class="custom-toolbar">
+  <div class="toolbar-left">
+    <span class="title">{{ "order-to-supplier.title" | translate }}</span>
+  </div>
+
+  <div class="toolbar-center">
+    <div class="search-container">
+      <mat-icon>search</mat-icon>
+      <input
+        matInput
+        [formControl]="searchControl"
+        [placeholder]="'order-to-supplier.searchOrderPlaceholder' | translate"
+      />
+    </div>
+  </div>
+
+  <div class="toolbar-right">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>{{
+        "order-to-supplier.filterBySupplier" | translate
+      }}</mat-label>
+      <mat-select
+        [value]="selectedSupplierFilter"
+        (selectionChange)="onSupplierChange($event.value)"
+      >
+        <mat-option [value]="null">{{ "common.all" | translate }}</mat-option>
+        <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
+          {{ supplier.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button
+      mat-flat-button
+      class="custom-green-button"
+      (click)="onCreateOrder()"
+    >
+      {{ "order-to-supplier.createOrder" | translate }}
+      <mat-icon>add_circle</mat-icon>
+    </button>
+  </div>
+</div>

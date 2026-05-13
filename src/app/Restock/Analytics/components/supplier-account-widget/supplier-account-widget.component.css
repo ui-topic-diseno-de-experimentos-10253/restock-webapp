@@ -1,0 +1,238 @@
+/* ──────────────────────────────── */
+/* BASE STYLES                     */
+/* ──────────────────────────────── */
+body {
+  overflow-x: hidden;
+}
+
+.account-widget {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.header h3 {
+  font-family: Poppins, sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Reduce o elimina el padding para evitar overflow */
+.mat-mdc-tab-body-active>.mat-mdc-tab-body-content {
+  padding: 16px;
+  overflow-x: hidden; /* Previene scroll horizontal */
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ──────────────────────────────── */
+/* TAB CONTENT                     */
+/* ──────────────────────────────── */
+.tab-content {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.tab-content h4 {
+  color: #4F8A5B;
+  font-weight: normal;
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.amount {
+  font-size: 22px;
+  font-weight: bold;
+  color: #4F8A5B;
+  margin: 5px 0;
+}
+
+.subtext {
+  font-size: 12px;
+  color: #777;
+  margin: 0;
+}
+
+/* ──────────────────────────────── */
+/* FILTERS                         */
+/* ──────────────────────────────── */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 10px;
+}
+
+.filters button {
+  margin-top: 8px;
+  align-self: flex-end;
+}
+
+.range-select {
+  width: 100%;
+}
+
+mat-form-field {
+  flex: 1;
+  font-size: 12px;
+}
+
+/* ──────────────────────────────── */
+/* CALENDAR FLOAT BUTTON           */
+/* ──────────────────────────────── */
+.calendar-float-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ──────────────────────────────── */
+/* CHART AREA                      */
+/* ──────────────────────────────── */
+
+.chart-container {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  padding: 0 8px; /* Añade algo de espacio para prevenir corte en extremos */
+}
+
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ──────────────────────────────── */
+/* RANGE TOGGLE & BUTTONS          */
+/* ──────────────────────────────── */
+.range-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem;
+  justify-content: center;
+}
+
+.mat-button-toggle-group:not([class*=mat-elevation-z]) {
+  box-shadow: none;
+}
+.range-toggle ::ng-deep .mat-button-toggle {
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  color: #4F8A5B;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.range-toggle ::ng-deep .mat-button-toggle:hover {
+  background-color: #f0f8f4;
+}
+
+.range-toggle ::ng-deep .mat-button-toggle-checked {
+  background-color: #4F8A5B !important;
+  color: white !important;
+  border-color: #4F8A5B;
+}
+
+.range-toggle ::ng-deep .mat-button-toggle-label-content {
+  font-weight: 500;
+}
+
+.toggle-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.toggle-group mat-button-toggle {
+  font-size: 12px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: none;
+}
+
+.toggle-group mat-button-toggle span {
+  font-weight: 500;
+  font-size: 13px;
+  color: #4F8A5B;
+}
+
+.range-button {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.range-button .btn-icon {
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+.range-button[disabled] {
+  background-color: #4F8A5B;
+  color: #fff;
+}
+
+/* ──────────────────────────────── */
+/* PRIME CALENDAR OVERRIDE         */
+/* ──────────────────────────────── */
+::ng-deep .p-datepicker {
+  z-index: 1300 !important;
+}
+
+/* ──────────────────────────────── */
+/* RESPONSIVE                      */
+/* ──────────────────────────────── */
+@media (max-width: 800px) {
+  .amount {
+    font-size: 18px;
+  }
+
+  .tab-content h4 {
+    font-size: 14px;
+  }
+
+  .subtext {
+    font-size: 12px;
+  }
+
+  .filters {
+    gap: 8px;
+  }
+
+  .range-button {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .date-pickers {
+    flex-direction: column;
+  }
+
+  .chart-container {
+    max-height: 120px;
+  }
+
+  canvas {
+    height: 120px !important;
+  }
+}

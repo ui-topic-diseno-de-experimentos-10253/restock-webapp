@@ -1,0 +1,37 @@
+<div class="sidebar">
+  <div class="logo-section">
+    <img src="./assets/logo-restock.png" alt="Logo" class="logo" aria-label="logo-restock">
+    <h2 class="brand">Restock</h2>
+  </div>
+
+  @if (profile; as u) {
+  <div class="user-info">
+    <img
+      [src]="getAvatarUrl(u.avatar)"
+      [alt]="u.name"
+      class="user-photo"
+      (error)="onImageError($event)">
+    <div>
+      <p class="user-name">{{ u.name }}</p>
+      <p class="user-email">{{ u.email }}</p>
+    </div>
+  </div>
+  }
+
+  <mat-nav-list>
+  @for (item of menu; track item.route) {
+    <a mat-list-item
+       [routerLink]="item.route"
+       routerLinkActive="active-link"
+       class="menu-item">
+      <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+      <span class="label">{{ item.labelKey | translate }}</span>
+    </a>
+  }
+</mat-nav-list>
+
+
+  <div class="language-switcher">
+    <app-language-switcher />
+  </div>
+</div>

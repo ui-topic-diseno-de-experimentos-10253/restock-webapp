@@ -1,0 +1,92 @@
+/* Vista general */
+.recipes-view {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Cabecera */
+.recipes-header {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recipes-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recipes-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.recipes-header__middle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.sort-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recipes-header__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Grilla de recetas */
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+/* Tarjeta de receta */
+.recipe-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px #0000000f;
+}
+
+.recipe-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.recipe-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Título de sección en modales */
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 1rem 0 0.5rem;
+}

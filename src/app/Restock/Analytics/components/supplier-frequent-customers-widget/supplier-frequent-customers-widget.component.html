@@ -1,0 +1,25 @@
+<div class="mobile-header" *ngIf="isMobile"><h3>Frequent Customers</h3></div>
+<div class="frequent-customers-container">
+
+  <!-- Desktop -->
+  <div class="header" *ngIf="!isMobile"><h3>Frequent Customers</h3></div>
+  <div class="cards-grid" *ngIf="!isMobile" [ngClass]="'customers-' + customers.length">
+    <div class="customer-card" *ngFor="let customer of customers">
+      <h4>{{ customer.name }}</h4>
+      <p class="category">{{ customer.category }}</p>
+      <p class="description">{{ customer.description }}</p>
+    </div>
+  </div>
+
+  <!-- Mobile -->
+  <div class="frequent-grid" *ngIf="isMobile">
+    <div class="restaurant-pair" *ngFor="let pair of getPairs()">
+      <div class="restaurant-card" *ngFor="let i of pair">
+        <h4>{{ i.name }}</h4>
+        <p class="category">{{ i.category }}</p>
+        <p class="description">{{ i.description }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>

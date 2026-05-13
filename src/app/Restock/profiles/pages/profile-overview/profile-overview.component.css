@@ -1,0 +1,37 @@
+.profile-sections {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  flex-wrap: wrap;
+  overflow-x: hidden;
+}
+
+app-profile-settings {
+  flex: 1 1 100%;
+}
+
+app-profile-details {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+.profile-overview-container {
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.profile-overview-card {
+  padding: 16px;
+  background-color: #FFFFFF;
+}
+
+@media (min-width: 768px) {
+  app-profile-details {
+    flex: 1 1 30%;
+  }
+
+  app-profile-settings {
+    flex: 1 1 68%;
+  }
+}

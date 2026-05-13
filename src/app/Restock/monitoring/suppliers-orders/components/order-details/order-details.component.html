@@ -1,0 +1,145 @@
+<!-- order-details.component.html -->
+
+    <!-- Modal Content -->
+    <div class="modal-content">
+
+      <!-- Step 1 -->
+      <div *ngIf="step === 1">
+
+        <div class="section-header">
+          <h4 class="subtitle">{{ 'supplier-orders.supplies.title' | translate }}</h4>
+          <p class="section-description">{{ 'supplier-orders.supplies.description' | translate }}</p>
+        </div>
+
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" class="supplies-table">
+
+            <!-- Product Name Column -->
+            <ng-container matColumnDef="productName">
+              <th mat-header-cell *matHeaderCellDef>{{'supplier-orders.supplies.headers.product-name' | translate}}</th>
+              <td mat-cell *matCellDef="let orderBatch">
+                {{ productName(orderBatch.batch.supply.id) }}
+              </td>
+            </ng-container>
+
+            <!-- Quantity Column -->
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef>{{'supplier-orders.supplies.headers.quantity' | translate}}</th>
+              <td mat-cell *matCellDef="let orderBatch">
+                {{ orderBatch.quantity }}
+              </td>
+            </ng-container>
+
+            <!-- Unit Measure Column -->
+            <ng-container matColumnDef="unitMeasure">
+              <th mat-header-cell *matHeaderCellDef>{{'supplier-orders.supplies.headers.quantity' | translate}}</th>
+              <td mat-cell *matCellDef="let orderBatch">
+                {{ orderBatch.batch.supply.unit_abbreviation }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <mat-paginator  #paginator
+                          [pageSize]="4"
+                          [pageSizeOptions]="[2, 3, 4]"
+                          [length]="dataSource.data.length"
+                          showFirstLastButtons>
+
+          </mat-paginator>
+        </div>
+
+        <div class="total-price">
+          <strong>{{'supplier-orders.supplies.total-price' | translate}}: ${{ this.order?.totalPrice }}</strong>
+        </div>
+        @if(!hideState)
+        {
+          <!-- State Stepper -->
+          <div class="state-dragger">
+            <h4 class="subtitle">{{ 'supplier-orders.state.title' | translate }}</h4>
+
+            <div class="stepper-container">
+              <!-- Progress Line -->
+              <div class="progress-line">
+                <div class="progress-fill" [style.width]="getProgressWidth()"></div>
+              </div>
+
+              <!-- Steps -->
+              <div class="steps-wrapper">
+                <div
+                  *ngFor="let stepName of steps; let i = index"
+                  class="step-item"
+                >
+                  <!-- Truck Icon -->
+                  <div *ngIf="computedCurrentIndex === i" class="truck-container">
+                    <mat-icon class="truck-icon">local_shipping</mat-icon>
+                  </div>
+
+                  <!-- Step Point -->
+                  <div class="step-point" [ngClass]="getStepClass(i)">
+                    <mat-icon *ngIf="computedCurrentIndex > i" class="check-icon">check</mat-icon>
+                  </div>
+
+                  <!-- Step Label -->
+                  <span class="step-label" [class.active]="computedCurrentIndex === i">
+                  {{ stepName }}
+                </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- Step 2: Summary -->
+      <div *ngIf="step === 2">
+        <div class="restaurant-section">
+          <p class="subtitle">{{ 'supplier-orders.restaurant-name' | translate }}:</p>
+          <p class="value">{{ adminRestaurantName }}</p>
+        </div>
+
+        @if(hideState)
+        {
+          <!-- Situation Chip -->
+          <div class="situation">
+            <h4 class="subtitle">
+              {{ 'supplier-orders.situation.title' | translate }}
+              <mat-chip class="situation-chip">{{ order?.situation?.name || 'Unknown' }}</mat-chip>
+            </h4>
+          </div>
+        }
+        @else {
+          <div class="date-section">
+            <p class="subtitle">{{ 'supplier-orders.details.estimated-date' | translate}}:</p>
+            <p class="value">{{ this.order?.estimated_ship_date | date }}, {{ this.order?.estimated_ship_time | date:'shortTime'}}</p>
+          </div>
+        }
+
+        <div class="description-section">
+          <p class="subtitle">{{ 'supplier-orders.description' | translate }}</p>
+          <p class="value">{{ this.order?.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <div class="footer-left">
+        <button *ngIf="step === 2" mat-button class="btn-back" (click)="prevStep()">
+          {{'supplier-orders.details.buttons.back' | translate}}
+        </button>
+        <button mat-button class="btn-close" (click)="onClose()">
+          {{ 'supplier-orders.details.buttons.close' | translate }}
+        </button>
+      </div>
+
+      <div class="footer-right">
+        <button *ngIf="step === 1" mat-raised-button color="primary" (click)="nextStep()">
+          {{ 'supplier-orders.details.buttons.next' | translate }}
+        </button>
+      </div>
+    </div>
+

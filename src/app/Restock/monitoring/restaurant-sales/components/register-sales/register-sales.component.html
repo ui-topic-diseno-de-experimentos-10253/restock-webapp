@@ -1,0 +1,145 @@
+<!-- Modal backdrop: clicking it will close the modal -->
+<div class="modal-overlay" (click)="closeComponente()">
+
+    <!-- Modal content: click propagation is stopped to prevent accidental closure -->
+    <div class="modal-content modal-scrollable" (click)="$event.stopPropagation()">
+
+        <!-- Close button (top-right corner) -->
+        <button mat-icon-button class="close-button" (click)="closeComponente()">
+            <mat-icon>close</mat-icon>
+        </button>
+
+        <!-- Title -->
+        <h2 class="title">Register Sale</h2>
+
+        <div class="content">
+            <!-- Scrollable content area -->
+            <p class="sub-text">
+                Complete the details of a new sale to access the inventory update option.
+            </p>
+
+            <!-- Dish selection -->
+            <p>Dishes</p>
+            <mat-form-field class="full-width">
+                <mat-label>Select a dish from your recipe list</mat-label>
+                <mat-select (selectionChange)="agregarPlato($event.value)">
+                    <mat-option *ngFor="let dish of availableDishes" [value]="dish.id">
+                        {{ dish.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Additional supply selection -->
+            <p>Additional Supplies</p>
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Select a supply from your inventory</mat-label>
+                <mat-select (selectionChange)="agregarInsumo($event.value)">
+                    <mat-option *ngFor="let additionalSupply of availableAdditionalSupplies"
+                        [value]="additionalSupply.id">
+                        {{ additionalSupply.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Selected dishes table -->
+            <div *ngIf="selectedDishes.data.length > 0">
+                <h3>Selected dishes</h3>
+                <mat-table [dataSource]="selectedDishes" class="mat-elevation-z2">
+
+                    <!-- Dish name column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Dish price column -->
+                    <ng-container matColumnDef="price">
+                        <mat-header-cell *matHeaderCellDef>Unit Price</mat-header-cell>
+                        <mat-cell *matCellDef="let element">S/ {{ element.totalPrice }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Dish quantity column with editable input -->
+                    <ng-container matColumnDef="quantity">
+                        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+                        <mat-cell class="quantity" *matCellDef="let element">
+                            <mat-form-field>
+                                <input matInput type="number" min="1" [(ngModel)]="element.quantity" />
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Dish delete action -->
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+                        <mat-cell *matCellDef="let element">
+                            <mat-icon (click)="deleteDish(element.id)" class="actions">delete</mat-icon>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnsPlatos"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsPlatos;"></mat-row>
+                </mat-table>
+            </div>
+
+            <!-- Selected additional supplies table -->
+            <div *ngIf="selectedAdditionalSupplies.data.length > 0">
+                <h3>Selected additional supplies</h3>
+                <mat-table [dataSource]="selectedAdditionalSupplies" class="mat-elevation-z2">
+
+                    <!-- Supply name column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Supply price column -->
+                    <ng-container matColumnDef="price">
+                        <mat-header-cell *matHeaderCellDef>Unit Price</mat-header-cell>
+                        <mat-cell *matCellDef="let element">S/ {{ element.price }}</mat-cell>
+                    </ng-container>
+
+                    <!-- Supply quantity column with editable input -->
+                    <ng-container matColumnDef="quantity">
+                        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+                        <mat-cell class="quantity" *matCellDef="let element">
+                            <mat-form-field>
+                                <input matInput type="number" min="1" [(ngModel)]="element.quantity" />
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Supply delete action -->
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+                        <mat-cell *matCellDef="let element">
+                            <mat-icon (click)="deleteAdditionalSupply(element.id)" class="actions">delete</mat-icon>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnsInsumos"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsInsumos;"></mat-row>
+                </mat-table>
+            </div>
+
+            <!-- Message shown when no dishes or supplies are selected -->
+            <div class="no-dishes-additonalsupplies-selected"
+                *ngIf="selectedDishes.data.length === 0 && selectedAdditionalSupplies.data.length === 0">
+                Select the additional dishes and ingredients of the order to view the complete sale.
+            </div>
+        </div>
+
+        <!-- Modal action buttons -->
+        <div class="buttons">
+            <!-- Cancel button -->
+            <button class="button-cancel" mat-raised-button (click)="closeComponente()">
+                CANCEL <mat-icon>cancel</mat-icon>
+            </button>
+
+            <!-- Register button: visible only if at least one item is selected -->
+            <button *ngIf="selectedDishes.data.length != 0 || selectedAdditionalSupplies.data.length != 0"
+                class="button-register" mat-raised-button (click)="registerSale()">
+                REGISTER <mat-icon>check_circle</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

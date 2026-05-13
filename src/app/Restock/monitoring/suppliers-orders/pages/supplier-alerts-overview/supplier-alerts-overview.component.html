@@ -1,0 +1,39 @@
+<div class="table-container">
+
+    <div class="header">
+        <h2>{{'notifications_suppliers.title' | translate}}</h2>
+    </div>
+
+    <mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+        <!-- Restaurant -->
+        <ng-container matColumnDef="restaurant">
+            <mat-header-cell *matHeaderCellDef> {{'notifications_suppliers.restaurant' | translate}} </mat-header-cell>
+            <mat-cell *matCellDef="let alert"> {{ alert.restaurant }} </mat-cell>
+        </ng-container>
+
+        <!-- Details -->
+        <ng-container matColumnDef="details">
+            <mat-header-cell *matHeaderCellDef> {{'notifications_suppliers.evaluate' | translate}} </mat-header-cell>
+            <mat-cell *matCellDef="let alert">
+                <mat-icon>menu_book</mat-icon>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef> {{'notifications_suppliers.status' | translate}} </mat-header-cell>
+            <mat-cell *matCellDef="let alert">
+                <button mat-flat-button>{{ alert.situation }}</button>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last update -->
+        <ng-container matColumnDef="orderPlaced">
+            <mat-header-cell *matHeaderCellDef> {{'notifications_suppliers.last-update' | translate}} </mat-header-cell>
+            <mat-cell *matCellDef="let notification"> {{ notification.elapsedTime }} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+</div>

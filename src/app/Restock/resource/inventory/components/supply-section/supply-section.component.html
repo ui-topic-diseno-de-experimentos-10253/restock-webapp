@@ -1,0 +1,22 @@
+<section class="supplies-section">
+  <div class="supplies-header">
+    <h1 class="supplies-title">{{ 'inventory.suppliesTitle' | translate }}</h1>
+    <button mat-raised-button color="primary" class="create-button" (click)="create.emit()">
+      <span class="btn-content">
+        {{ 'inventory.create' | translate }}<mat-icon>control_point</mat-icon>
+      </span>
+    </button>
+  </div>
+
+  @if (suppliesLength === 0) {
+    <mat-card class="empty-card">
+      <app-empty-section
+        [title]="'inventory.emptyTitle' | translate">
+          <button action mat-stroked-button color="primary" class="create-button" (click)="create.emit()">
+            {{ 'inventory.createSupply' | translate }}
+          </button>
+      </app-empty-section>
+    </mat-card>
+  }
+
+</section>

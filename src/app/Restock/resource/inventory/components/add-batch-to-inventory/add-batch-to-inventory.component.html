@@ -1,0 +1,9 @@
+<div class="batch-modal-content">
+  <app-create-and-edit-form
+    [schema]="currentSchema"
+    [initialData]="initialData"
+    [mode]="mode"
+    (formChange)="handleFormChange($event)"
+    (submit)="onSubmit($event)"
+  />
+</div>

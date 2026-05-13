@@ -1,0 +1,185 @@
+<!-- manage-new-orders.component.html -->
+<div class="order-management-dialog">
+
+  <mat-dialog-content class="modal-content">
+    <!-- Step 1: Supply Selection -->
+
+    <div *ngIf="step === 1" class="step-content">
+
+      <div class="section-subtitle">
+        <p> <span class="subtitle">{{ 'supplier-orders.restaurant-name' | translate }}:</span> {{ adminRestaurantName }} </p>
+      </div>
+
+      <div class="section-header">
+        <h4 class="subtitle">{{ 'supplier-orders.supplies.title' | translate }}</h4>
+        <p class="section-description">{{ 'supplier-orders.supplies.description' | translate }}</p>
+      </div>
+
+
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" class="supplies-table">
+
+          <!-- Product Name Column -->
+          <ng-container matColumnDef="productName">
+            <th mat-header-cell *matHeaderCellDef>{{ 'supplier-orders.supplies.headers.product-name' | translate }}</th>
+            <td mat-cell *matCellDef="let batchOrdered">{{ batchOrdered.batch.supply.name }}</td>
+          </ng-container>
+
+          <!-- Quantity Column -->
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>{{ 'supplier-orders.supplies.headers.quantity' | translate }}</th>
+            <td mat-cell *matCellDef="let batchOrdered">{{ batchOrdered.quantity }}</td>
+          </ng-container>
+
+          <!-- Unit Measure Column -->
+          <ng-container matColumnDef="unitMeasure">
+            <th mat-header-cell *matHeaderCellDef>{{ 'supplier-orders.supplies.headers.unit-measure' | translate }}</th>
+            <td mat-cell *matCellDef="let batchOrdered">{{ batchOrdered.batch.supply.unit_abbreviation }}</td>
+          </ng-container>
+
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox
+                (change)="masterToggle()"
+                [checked]="isAllSelected"
+                [indeterminate]="selection.hasValue() && !isAllSelected">
+                Select All
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let batchOrdered">
+              <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="toggleSelection(batchOrdered.batch.customSupplyId)"
+                [checked]="isSelected(batchOrdered.batch.customSupplyId)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        </table>
+
+
+        <mat-paginator
+          class="paginator"
+          [pageSizeOptions]="[2, 3, 4]"
+          [pageSize]="4"
+          showFirstLastButtons
+          aria-label="Select page of periodic elements">
+        </mat-paginator>
+      </div>
+
+      <div class="total-price">
+        <strong>{{ 'supplier-orders.supplies.total-price' | translate }}: ${{ order?.totalPrice | number:'1.2-2' }}</strong>
+      </div>
+
+      <!-- Description -->
+      <div class="description-section">
+        <mat-form-field appearance="outline" class="description-field">
+          <mat-label>{{ 'supplier-orders.description' | translate }}</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="localOrder.description"
+            placeholder="Enter order description"
+            rows="4">
+          </textarea>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Step 2: Summary and Shipping -->
+    <div *ngIf="step === 2" class="step-content">
+
+      <div class="date-time-section">
+        <h3 class="subtitle">{{ 'supplier-orders.estimated-ship-date' | translate }}</h3>
+        <div class="date-section">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'supplier-orders.estimated-ship-date' | translate }}</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              [(ngModel)]="localOrder.estimatedShipDate"
+              [placeholder]="'supplier-orders.placeholder.select-date' | translate"
+              aria-label="Estimated Shipping Date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <h3 class="subtitle">{{ 'supplier-orders.estimated-ship-time' | translate }}</h3>
+        <div class="time-section">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'supplier-orders.estimated-ship-time' | translate }}</mat-label>
+            <input
+              matInput
+              type="time"
+              [(ngModel)]="localOrder.estimatedShipTime"
+              [placeholder]="'supplier-orders.placeholder.select-time' | translate">
+          </mat-form-field>
+        </div>
+      </div>
+
+      @if(this.selection.selected.length > 0)
+      {
+        <div class="summary-section">
+          <h3 class="subtitle">{{ 'supplier-orders.manage-new-orders.order-summary' | translate}}</h3>
+          <ul class="summary-list-bullets">
+            <li *ngFor="let customSupplyId of selection.selected" class="summary-item">
+              {{ productName(customSupplyId) }}
+            </li>
+          </ul>
+
+          <div class="calculated-total">
+            <h3 class="subtitle"><strong>{{ 'supplier-orders.manage-new-orders.new-total' | translate}}: ${{ calculateNewTotalPrice() | number:'1.2-2' }}</strong> </h3>
+          </div>
+        </div>
+      }
+
+    </div>
+   </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-footer">
+    <div class="footer-left">
+      <button
+        *ngIf="step === 2"
+        mat-button
+        color="primary"
+        (click)="prevStep()"
+        class="btn-back">
+        <mat-icon>arrow_back</mat-icon>
+        {{'supplier-orders.manage-new-orders.buttons.back' | translate}}
+      </button>
+
+      <button
+        mat-button
+        (click)="closeDialog()"
+        class="btn-close">
+        {{'supplier-orders.manage-new-orders.buttons.close' | translate}}
+      </button>
+    </div>
+
+    <div class="footer-right">
+      <button
+        *ngIf="step === 1"
+        mat-raised-button
+        color="primary"
+        (click)="nextStep()"
+        class="btn-next">
+        {{'supplier-orders.manage-new-orders.buttons.next' | translate}}
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button
+        *ngIf="step === 2"
+        mat-raised-button
+        color="accent"
+        (click)="onAcceptSelection()"
+        class="btn-accept">
+        <mat-icon>check</mat-icon>
+        {{'supplier-orders.manage-new-orders.buttons.submit-order' | translate}}
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

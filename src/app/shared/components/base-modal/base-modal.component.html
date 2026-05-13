@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h2 class="modal-title">{{ data.title }}</h2>
+    <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+@if(data.description) {
+  <div class="modal-description">
+    <p>{{ data.description }}</p>
+  </div>
+}
+
+<span class="border"></span>
+
+<div class="modal-content">
+  <ng-template #container></ng-template>
+</div>

@@ -1,0 +1,116 @@
+<div class="modal-content">
+    <!-- Situation Section -->
+    <div class="situation-section">
+      <p class="situation-label">
+        {{ 'supplier-orders.situation.title' | translate }}
+        <mat-chip class="approved-chip">
+          {{ 'supplier-orders.situation.approved' | translate }}
+        </mat-chip>
+      </p>
+    </div>
+
+    <!-- State Section -->
+    <h4 class="section-title">{{ 'supplier-orders.state.title' | translate }}</h4>
+
+    <!-- Stepper Container -->
+    <div class="stepper-container">
+      <!-- Progress Line -->
+      <div class="progress-line">
+        <div class="progress-fill" [style.width]="getProgressWidth()"></div>
+      </div>
+
+      <!-- Steps Wrapper -->
+      <div class="steps-wrapper">
+        <div
+          *ngFor="let stepName of steps; let i = index"
+          class="step-item"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop($event, i)"
+        >
+          <!-- Truck Icon -->
+          <div
+            *ngIf="isStepActive(i)"
+            class="truck-container"
+            draggable="true"
+            (dragstart)="onDragStart($event)"
+          >
+            <mat-icon class="truck-icon">local_shipping</mat-icon>
+          </div>
+
+          <!-- Step Point -->
+          <div
+            class="step-point"
+            [class.completed]="isStepCompleted(i)"
+            [class.active]="isStepActive(i)"
+            [class.pending]="isStepPending(i)"
+          >
+            <mat-icon *ngIf="isStepCompleted(i)" class="check-icon">check</mat-icon>
+          </div>
+
+          <!-- Step Label -->
+          <span
+            class="step-label"
+            [class.active]="isStepActive(i)"
+          >
+            {{ stepName }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+      <!-- Date Section -->
+    <div class="input-section">
+    <h3 class="subtitle">{{ 'supplier-orders.estimated-ship-date' | translate }}</h3>
+    <div class="date-section">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'supplier-orders.estimated-ship-date' | translate }}</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [(ngModel)]="localOrder.estimatedShipDate"
+          [placeholder]="'supplier-orders.estimated-ship-date' | translate"
+          aria-label="Estimated Shipping Date">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Time Section -->
+    <h3 class="subtitle">{{ 'supplier-orders.estimated-ship-time' | translate }}</h3>
+    <div class="time-section">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'supplier-orders.estimated-ship-time' | translate }}</mat-label>
+        <input
+          matInput
+          type="time"
+          [(ngModel)]="localOrder.estimatedShipTime"
+          [placeholder]="'supplier-orders.estimated-ship-time' | translate">
+      </mat-form-field>
+    </div>
+
+    <!-- Description -->
+      <h3 class="subtitle">Description</h3>
+    <div class="description-section">
+      <mat-form-field appearance="outline" class="description-field">
+        <mat-label>{{ 'supplier-orders.description' | translate }}</mat-label>
+        <textarea
+          matInput
+          [(ngModel)]="localOrder.description"
+          placeholder="Enter order description"
+          aria-label="Order Description"
+          rows="2">
+          </textarea>
+      </mat-form-field>
+    </div>
+    </div>
+
+  <!-- Dialog Actions -->
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button color="warn" class="btn-close" (click)="onClose()">
+      {{ 'supplier-orders.update-order.buttons.close' | translate }}
+    </button>
+    <button mat-raised-button color="primary" (click)="onUpdateOrder()">
+      {{ 'supplier-orders.update-order.buttons.save' | translate }}
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,80 @@
+.widget-container {
+  background: #fff;
+  padding: 10px 30px 30px 30px;
+  box-shadow: 1px 0 8px rgba(0, 0, 0, 0.2);
+  border-radius: 30px;
+}
+.header h3{
+  font-family: Poppins, sans-serif;
+  font-weight: bold;
+  font-size: 23px;
+  margin: 10px;
+}
+.widget-container mat-table {
+  background-color: #ffffff;
+}
+
+.widget-container mat-header-cell {
+  font-weight: bold;
+  font-size: 14px;
+  color: #757575;
+}
+
+.widget-container mat-cell,
+.widget-container mat-header-cell {
+  border-bottom-color: #D6D6D6;
+  padding: 12px;
+  justify-content: center;
+}
+
+.widget-container button {
+  background-color: #4F8A5B;
+  color: white;
+  font-size: 14px;
+  font-weight: 400;
+  border-radius: 4px;
+  width: 80%;
+  height: 30px;
+}
+
+.widget-container mat-icon {
+  vertical-align: middle;
+  font-size: 20px;
+}
+.table-scroll-container {
+  max-height: 300px; /* o el alto que quieras */
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
+/* Opcional: estiliza el scrollbar */
+.table-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0;
+  border-radius: 4px;
+}
+
+@media (max-width: 800px) {
+  .mobile-header h3 {
+    font-family: Poppins, sans-serif;
+    font-weight: bold;
+    font-size: 23px;
+    margin-bottom: 10px;
+  }
+
+  .widget-container {
+    padding: 1em 1em 0.2em 1em;
+  }
+
+  .widget-container mat-header-cell {
+    background-color: #F4F4F4;
+    padding: 0;
+  }
+
+  .widget-container mat-cell {
+    background-color: white;
+    height: 10px;
+  }
+}

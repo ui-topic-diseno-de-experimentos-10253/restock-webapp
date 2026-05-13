@@ -1,0 +1,27 @@
+html,
+body {
+    height: 100%;
+    background-color: white;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+.dialog-unified-size {
+  max-height: 80vh;
+  min-height: 20vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.green-button {
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4F8A5B !important;
+  color: white !important;
+  border-radius: 2px;
+  padding: 15px 30px;
+}

@@ -1,0 +1,169 @@
+.inventory-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  font-family: Poppins, sans-serif;
+}
+
+.toolbar-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cfd8dc;
+  border-radius: 24px;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-container mat-icon {
+  margin-right: 0.5rem;
+  color: #607d8b;
+}
+
+.search-container input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-paginator {
+  margin-left: auto;
+}
+
+.inventory-empty {
+  text-align: center;
+  color: #90a4ae;
+}
+
+.empty-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #90a4ae;
+  /* Gris suave */
+}
+
+.empty-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.empty-title {
+  font-size: 30px;
+  color: #607d8b;
+}
+
+.empty-subtitle {
+  font-size: 16px;
+  color: #90a4ae;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.add-btn {
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #808D99 !important;
+  color: white !important;
+  border-radius: 2px;
+  padding: 15px 30px;
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+
+.mat-elevation-z2 {
+  background-color: white;
+}
+
+.toolbar-card {
+  background-color: white;
+}
+
+.inline-paginator {
+  background-color: white;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-container {
+    max-width: none;
+    width: 100%;
+  }
+
+  .inline-paginator {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  mat-table {
+    display: none;
+  }
+
+  .mobile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .inventory-card {
+    padding: 1rem;
+  }
+
+  .card-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}

@@ -1,0 +1,48 @@
+<!-- filter-section.component.html -->
+<div class="filters-section">
+  <div class="filters-left">
+    <h3 class="orders-title">{{ title }}</h3>
+
+    <!-- Search Input -->
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>{{ 'supplier-orders.filters.search-placeholder' | translate }}</mat-label>
+      <input matInput #searchInput [value]="searchQuery" (input)="onSearchChange(searchInput.value)" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!-- Custom filters slot -->
+    <ng-content select="[slot=filters]"></ng-content>
+
+    <!-- Date Range Selector -->
+    <mat-form-field appearance="outline" class="date-range-field">
+      <mat-label>{{ 'supplier-orders.filters.date-range-placeholder' | translate }}</mat-label>
+      <mat-select [value]="selectedDateRange" (selectionChange)="onDateRangeChange($event.value)">
+        <mat-option *ngFor="let option of dateRangeOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+
+      <button
+        mat-icon-button
+        matSuffix
+        *ngIf="selectedDateRange !== ''"
+        (click)="clearDateRange()"
+        aria-label="Clear date range"
+        type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+
+    </mat-form-field>
+
+    <!-- Sort Button -->
+    <button mat-raised-button class="sort-button" color="primary" (click)="onToggleSort()">
+      {{ 'supplier-orders.filters.order-date-button' | translate }}
+      <mat-icon>{{ getSortIcon() }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Actions slot -->
+  <div class="filters-right">
+    <ng-content select="[slot=actions]"></ng-content>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+button {
+  background-color: #4F8A5B;
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  transition: background-color 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+button:hover {
+  background-color: #4F8A5B;
+}

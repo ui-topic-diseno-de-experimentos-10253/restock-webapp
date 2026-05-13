@@ -1,0 +1,139 @@
+.frequent-customers-container {
+  background: #fff;
+  padding: 10px 30px 30px 30px;
+  box-shadow: 1px 0 8px rgba(0, 0, 0, 0.2);
+  border-radius: 30px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: 380px;
+}
+.header h3{
+  font-family: Poppins, sans-serif;
+  font-weight: bold;
+  font-size: 23px;
+  margin: 10px;
+}
+.cards-grid {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+}
+
+.customer-card {
+  background-color: #CDE7D3;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Dynamic widths based on number of customers */
+.cards-grid.customers-1 .customer-card {
+  flex: 0 0 calc(100% - 2rem);
+}
+
+.cards-grid.customers-2 .customer-card {
+  flex: 0 0 calc(50% - 1rem);
+}
+
+.cards-grid.customers-3 .customer-card {
+  flex: 0 0 calc(25% - 1rem);
+}
+
+.cards-grid.customers-4 .customer-card {
+  flex: 0 0 calc(25% - 1rem);
+}
+
+.cards-grid.customers-5 .customer-card,
+.cards-grid.customers-6 .customer-card,
+.cards-grid.customers-7 .customer-card,
+.cards-grid.customers-8 .customer-card {
+  flex: 0 0 calc(25% - 1rem);
+}
+
+.customer-card h4 {
+  margin-bottom: 0.25rem;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.customer-card .category {
+  font-size: 14px;
+  font-weight: 500;
+  color: #757575;
+  margin-bottom: 0.5rem;
+}
+
+.customer-card .description {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Ocultar barra de scroll horizontal en algunos navegadores si quieres visual limpio */
+/* Puedes comentar esto si prefieres mostrar la barra */
+.cards-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.cards-grid::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+  .cards-grid {
+    display: none;
+  }
+
+  .frequent-customers-container .header {
+    display: none;
+  }
+
+  .frequent-customers-container {
+    padding: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .frequent-grid {
+    display: flex;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 30px;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .restaurant-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .restaurant-card {
+    background-color: #F4F4F4;
+    border-radius: 15px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    align-content: center;
+    padding: 1rem;
+  }
+
+  h4 {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  p {
+    font-size: 12px;
+    color: #757575;
+    margin-bottom: 0;
+  }
+}

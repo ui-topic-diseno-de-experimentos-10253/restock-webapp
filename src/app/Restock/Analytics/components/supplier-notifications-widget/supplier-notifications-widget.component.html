@@ -1,0 +1,39 @@
+<div class="mobile-header" *ngIf="isMobile">
+  <h3>Last Notifications</h3>
+</div>
+
+<div class="widget-container">
+  <div class="header" *ngIf="!isMobile"><h3>Last Notifications</h3></div>
+
+  <!-- CONTENEDOR CON SCROLL -->
+  <div class="table-scroll-container">
+    <mat-table [dataSource]="alerts" class="mat-elevation-z1">
+      <ng-container matColumnDef="restaurant">
+        <mat-header-cell *matHeaderCellDef>Restaurant</mat-header-cell>
+        <mat-cell *matCellDef="let alert">{{ alert.restaurant }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="details">
+        <mat-header-cell *matHeaderCellDef>Details</mat-header-cell>
+        <mat-cell *matCellDef="let alert">
+          <mat-icon>menu_book</mat-icon>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+        <mat-cell *matCellDef="let alert">
+          <button mat-flat-button>{{ alert.status }}</button>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="orderPlaced">
+        <mat-header-cell *matHeaderCellDef>Order placed</mat-header-cell>
+        <mat-cell *matCellDef="let alert">{{ alert.orderPlaced }}</mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="getColumns()"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: getColumns()"></mat-row>
+    </mat-table>
+  </div>
+</div>

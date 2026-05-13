@@ -1,0 +1,79 @@
+<div class="modal-overlay" (click)="closeComponent()">
+    <div class="modal-content modal-scrollable" (click)="$event.stopPropagation()">
+        <button mat-icon-button class="close-button" (click)="closeComponent()">
+            <mat-icon>close</mat-icon>
+        </button>
+
+        <div>
+            <h2 class="title">{{'sales_restaurant.sales_not_added_in_inventory.title' | translate}}</h2>
+            <p class="sub-text">{{'sales_restaurant.sales_not_added_in_inventory.subtitle' | translate}}</p>
+            <mat-checkbox class="select-all" [checked]="isAllSelected()"
+                [indeterminate]="selectedSales.length > 0 && !isAllSelected()"
+                (change)="toggleAllSelection($event.checked)">
+                {{'sales_restaurant.sales_not_added_in_inventory.selectAll' | translate}}
+            </mat-checkbox>
+        </div>
+
+
+
+        <div class="content">
+            <!-- Todo el contenido que debe hacer scroll va aquí -->
+            <div>
+                <!-- Tabla de platos -->
+                <mat-table [dataSource]="dataSource" class="mat-elevation-z2">
+                    <ng-container matColumnDef="code">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sales_not_added_in_inventory.code' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{element.code}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="quantity_plates">
+                        <mat-header-cell
+                            *matHeaderCellDef>{{'sales_restaurant.sales_not_added_in_inventory.quantityDishes' |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{element.recipeCount}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="quantity_additonal_supplies">
+                        <mat-header-cell
+                            *matHeaderCellDef>{{'sales_restaurant.sales_not_added_in_inventory.quantityAdditionalSupplies'
+                            |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{element.additionalSupplyCount}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef>{{'sales_restaurant.sales_not_added_in_inventory.actions'
+                            |
+                            translate}}</mat-header-cell>
+                        <mat-cell *matCellDef="let element">
+                            <mat-icon (click)="openSaleDetail(element)">description</mat-icon>
+                            <mat-checkbox (change)="toggleSelection(element, $event.checked)"
+                                [checked]="isSelected(element)">
+                            </mat-checkbox>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnssalesNotAddedToInventory"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnssalesNotAddedToInventory;"></mat-row>
+                </mat-table>
+            </div>
+        </div>
+
+
+
+        <div class="buttons">
+            <button class="button-cancel" mat-raised-button (click)="closeComponent()">
+                CANCEL <mat-icon>cancel</mat-icon>
+            </button>
+
+            <button class="button-register" (click)="registerSalesToInventory()" mat-raised-button>
+                REGISTER <mat-icon>check_circle</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Component: Modal to show sale detail -->
+<app-sale-detail *ngIf="showModalSaleDetail" [sale]="selectedSale" (close)="closeSaleDetailModal()">
+</app-sale-detail>
