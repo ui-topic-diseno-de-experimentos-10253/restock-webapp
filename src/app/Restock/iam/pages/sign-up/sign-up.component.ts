@@ -8,6 +8,7 @@ import { MatButton } from "@angular/material/button";
 import { MatIcon } from '@angular/material/icon';
 import { NgClass, NgIf } from '@angular/common';
 import { BaseFormComponent } from '../../../../shared/components/base-form.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up',
@@ -19,7 +20,8 @@ import { BaseFormComponent } from '../../../../shared/components/base-form.compo
     MatButton,
     MatIcon,
     NgClass,
-    NgIf
+    NgIf,
+    RouterLink
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.css'

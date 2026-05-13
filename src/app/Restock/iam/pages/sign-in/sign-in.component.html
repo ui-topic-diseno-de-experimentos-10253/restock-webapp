@@ -6,7 +6,6 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="signup-form">
-      <!-- Username -->
       <div class="input-field">
         <mat-icon class="material-icon">person</mat-icon>
         <input matInput placeholder="Username" formControlName="username" required />
@@ -15,7 +14,6 @@
         {{ errorMessagesForControl(form, 'username') }}
       </mat-error>
 
-      <!-- Password -->
       <div class="input-field">
         <mat-icon class="material-icon">lock</mat-icon>
         <input matInput type="password" placeholder="Password" formControlName="password" required />
@@ -24,11 +22,14 @@
         {{ errorMessagesForControl(form, 'password') }}
       </mat-error>
 
-      <!-- Submit -->
-      <button mat-raised-button class="btn-submit">Sign In</button>
+      <button mat-raised-button class="btn-submit" type="submit">Sign In</button>
     </form>
 
-    <!-- Social media -->
+    <p class="redirect-text">
+      Don't have an account?
+      <a routerLink="/sign-up" class="redirect-link">Sign up</a>
+    </p>
+
     <div class="social-media">
       <p class="social-text">Or sign in with</p>
       <a (click)="onSocialSignIn('Google')" class="social-icon"><i class="fab fa-google"></i></a>

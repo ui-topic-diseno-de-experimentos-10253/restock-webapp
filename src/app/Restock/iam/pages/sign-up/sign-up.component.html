@@ -28,23 +28,22 @@
       <label class="role-label">Choose your role</label>
       <div class="role-options">
         <div
-          class="role-card"
-          [ngClass]="{ 'selected': form.get('role')?.value === 'admin' }"
-          (click)="selectRole(2)"
+  class="role-card"
+  [ngClass]="{ 'selected': form.get('role')?.value === 2 }"
+  (click)="selectRole(2)"
+>
+  <i class="fas fa-utensils role-icon"></i>
+  <span class="role-name">Administrator</span>
+</div>
 
-        >
-          <i class="fas fa-utensils role-icon"></i>
-          <span class="role-name">Administrator</span>
-        </div>
-        <div
-          class="role-card"
-          [ngClass]="{ 'selected': form.get('role')?.value === 'provider' }"
-          (click)="selectRole(1)"
-
-        >
-          <i class="fas fa-truck role-icon"></i>
-          <span class="role-name">Provider</span>
-        </div>
+<div
+  class="role-card"
+  [ngClass]="{ 'selected': form.get('role')?.value === 1 }"
+  (click)="selectRole(1)"
+>
+  <i class="fas fa-truck role-icon"></i>
+  <span class="role-name">Provider</span>
+</div>
       </div>
       <mat-error *ngIf="isInvalidControl(form, 'role')">
         {{ errorMessagesForControl(form, 'role') }}
@@ -53,6 +52,11 @@
       <!-- Submit -->
       <button mat-raised-button color="primary" class="btn-submit">Sign up</button>
     </form>
+
+    <p class="redirect-text">
+      Already have an account?
+      <a routerLink="/sign-in" class="redirect-link">Sign in</a>
+    </p>
 
     <!-- Social media -->
     <div class="social-media">

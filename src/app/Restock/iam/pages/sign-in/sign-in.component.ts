@@ -8,6 +8,7 @@ import { MatInput } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 import { BaseFormComponent } from '../../../../shared/components/base-form.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sign-in',
@@ -18,7 +19,8 @@ import { BaseFormComponent } from '../../../../shared/components/base-form.compo
     MatError,
     MatInput,
     MatIcon,
-    NgIf
+    NgIf,
+    RouterLink
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.css'
