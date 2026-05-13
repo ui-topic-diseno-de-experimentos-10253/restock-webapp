@@ -157,3 +157,21 @@
   transform: scale(1.15);
   color: #0077ff;
 }
+
+.redirect-text {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.redirect-link {
+  color: #1976d2;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.redirect-link:hover {
+  text-decoration: underline;
+}
