@@ -24,6 +24,7 @@
   <!-- Tabla de inventario -->
   <app-inventory-table
     [batches]="batches"
+    [rotationEnabled]="rotationEnabled"
     (edit)="editBatch($event)"
     (delete)="deleteBatch($event)"
     (create)="openCreateModal()"

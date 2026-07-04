@@ -58,6 +58,29 @@
   margin-left: auto;
 }
 
+.rotation-badge {
+  display: inline-block;
+  padding: 0.15rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.rotation-high {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+
+.rotation-medium {
+  background-color: #fff4e0;
+  color: #b26a00;
+}
+
+.rotation-low {
+  background-color: #fdecea;
+  color: #c62828;
+}
+
 .inventory-empty {
   text-align: center;
   color: #90a4ae;

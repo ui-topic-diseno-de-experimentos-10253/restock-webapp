@@ -18,6 +18,7 @@ import {CustomSupplyService} from '../../services/custom-supply.service';
 import {CreateCustomSupplyComponent} from '../../components/create-custom-supply/create-custom-supply.component';
 import {SessionService} from '../../../../../shared/services/session.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {RotationService} from '../../services/rotation.service';
 
 @Component({
   selector: 'app-restaurant-inventory',
@@ -39,6 +40,8 @@ export class RestaurantInventoryComponent implements OnInit {
   formSchema: FormFieldSchema[] = [];
   private editSchema: FormFieldSchema[] = [];
   isLoading = signal(false);
+  /** Experimento 04 (US-40): true only for the experimental group. */
+  rotationEnabled = false;
 
   constructor(
     private supplyService: SupplyService,
@@ -47,7 +50,8 @@ export class RestaurantInventoryComponent implements OnInit {
     private modalService: BaseModalService,
     private translate: TranslateService,
     private customSupplyService: CustomSupplyService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private rotationService: RotationService
   ) {
   }
 
@@ -158,11 +162,34 @@ export class RestaurantInventoryComponent implements OnInit {
       this.isLoading.set(true);
       this.supplies = await this.customSupplyService.getAll();
       this.batches = await this.batchService.getAllBatchesWithSupplies();
+      this.rotationEnabled = this.sessionService.isInRotationExperimentGroup();
+      if (this.rotationEnabled) {
+        await this.applyRotationLevels();
+      }
     } catch (e) {
       console.error(e);
       this.snackBar.open('Error loading inventory data', 'Close', {duration: 3000});
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Merges the rotation level returned by the To-Be rotation endpoint (US-40)
+   * into the already-loaded batches, matching by custom supply id.
+   */
+  private async applyRotationLevels(): Promise<void> {
+    const userId = this.sessionService.getUserId();
+    if (userId == null) return;
+
+    try {
+      const rotations = await this.rotationService.getRotationByUserId(userId);
+      const rotationByCustomSupplyId = new Map(rotations.map(r => [r.customSupplyId, r.rotationLevel]));
+      this.batches.forEach(batch => {
+        batch.rotationLevel = rotationByCustomSupplyId.get(batch.customSupplyId);
+      });
+    } catch (e) {
+      console.error('Error loading rotation levels', e);
     }
   }
 
