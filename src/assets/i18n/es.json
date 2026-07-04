@@ -85,6 +85,7 @@
     "tableExpiration": "Vencimiento",
     "tableStock": "Stock",
     "tablePerishable": "Perecible",
+    "tableRotation": "Rotación",
     "tableActions": "Acciones",
     "inventoryEmptyMessage": "No hay insumos registrados. Para gestionar tu inventario, primero debes crear ingredientes en el sistema.",
     "registeredAlerts": "Alertas registradas",
