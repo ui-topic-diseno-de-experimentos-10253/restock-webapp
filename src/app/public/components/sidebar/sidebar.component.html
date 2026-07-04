@@ -12,7 +12,7 @@
       class="user-photo"
       (error)="onImageError($event)">
     <div>
-      <p class="user-name">{{ u.name }}</p>
+      <p class="user-name">{{ u.name ? u.name : ('sidebar.defaultUser' | translate) }}</p>
       <p class="user-email">{{ u.email }}</p>
     </div>
   </div>

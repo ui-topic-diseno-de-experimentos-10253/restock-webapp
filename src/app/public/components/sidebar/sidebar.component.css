@@ -66,7 +66,6 @@ mat-nav-list {
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 2rem;
   padding: 0.5rem 0.8rem;
   border-radius: 8px;
   text-decoration: none;
@@ -74,6 +73,17 @@ mat-nav-list {
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   transition: background-color 0.2s ease;
+}
+
+/* Angular Material's MDC list item wraps projected content (icon + label) in
+   .mdc-list-item__content > .mdc-list-item__primary-text, both of which
+   default to display:block and stack the icon and label vertically. Force
+   both back to a row so the icon and label sit side by side. */
+.menu-item ::ng-deep .mdc-list-item__content,
+.menu-item ::ng-deep .mdc-list-item__primary-text {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 a.menu-item {
