@@ -22,7 +22,7 @@
 .scroll-wrapper {
   max-height: 250px;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 .view-all-button-container {
@@ -39,6 +39,23 @@
 ::ng-deep .custom-orders-table .mat-row,
 ::ng-deep .custom-orders-table .mat-header-row {
   border-bottom: 1px solid #e0e0e0;
+}
+
+/* The shared orders-table component sets a fixed min-width (800px) and the
+   default Material type scale, both sized for the full Orders page. Inside
+   this narrow summary widget that forces an unnecessary horizontal scroll,
+   so it's scaled down to fit the card. */
+::ng-deep .custom-orders-table .full-width-table {
+  min-width: 100%;
+  width: 100%;
+  table-layout: auto;
+}
+
+::ng-deep .custom-orders-table .mat-header-cell,
+::ng-deep .custom-orders-table .mat-cell {
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  white-space: nowrap;
 }
 
 /* Ocultar columna "actions" en el widget */
