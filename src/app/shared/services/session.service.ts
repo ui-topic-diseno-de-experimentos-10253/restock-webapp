@@ -46,4 +46,21 @@ export class SessionService {
     this.clearRoleId();
     this.clearProfileId();
   }
+
+  // ROTATION EXPERIMENT GROUP (Experimento 04 - To-Be, US-40)
+  private readonly ROTATION_EXPERIMENT_OVERRIDE_KEY = 'restock_rotation_experiment_override';
+
+  /**
+   * Deterministically assigns a user to the rotation-indicator experimental
+   * group so the control group keeps seeing the original inventory table.
+   * Can be forced via localStorage for manual QA of either group.
+   */
+  isInRotationExperimentGroup(): boolean {
+    const override = localStorage.getItem(this.ROTATION_EXPERIMENT_OVERRIDE_KEY);
+    if (override !== null) return override === 'true';
+
+    const userId = this.getUserId();
+    if (userId == null) return false;
+    return userId % 2 === 0;
+  }
 }

@@ -86,6 +86,7 @@
     "tableExpiration": "Expiration",
     "tableStock": "Stock",
     "tablePerishable": "Perishable",
+    "tableRotation": "Rotation",
     "tableActions": "Actions",
     "inventoryEmptyMessage": "There are no supplies registered. To manage your inventory, you must first create ingredients in the system.",
     "registeredAlerts": "Registered alerts",

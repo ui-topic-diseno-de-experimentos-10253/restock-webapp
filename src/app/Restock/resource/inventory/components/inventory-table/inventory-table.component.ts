@@ -24,6 +24,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {BatchDetailsComponent} from '../batch-details/batch-details.component';
 import {BaseModalService} from '../../../../../shared/services/base-modal.service';
 import {BatchService} from '../../services/batch.service';
+import {RotationAnalyticsService} from '../../services/rotation-analytics.service';
 
 @Component({
   selector: 'app-inventory-table',
@@ -50,6 +51,8 @@ import {BatchService} from '../../services/batch.service';
  */
 export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() batches: Batch[] = [];
+  /** Feature flag for Experimento 04 (US-40): only the experimental group sees the rotation column. */
+  @Input() rotationEnabled = false;
 
   @Output() edit = new EventEmitter<Batch>();
   @Output() delete = new EventEmitter<Batch>();
@@ -60,16 +63,25 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
    * Data source for the inventory table.
    */
   dataSource = new MatTableDataSource<Batch>();
+
   /**
    * Columns to be displayed in the inventory table.
+   * Adds "rotation" only when the experimental feature flag is on,
+   * keeping the control group's table identical to the previous version.
    */
-  displayedColumns = ['description', 'category', 'unit', 'expiration_date', 'stock', 'perishable', 'actions'];
+  get displayedColumns(): string[] {
+    const columns = ['description', 'category', 'unit', 'expiration_date', 'stock', 'perishable'];
+    if (this.rotationEnabled) columns.push('rotation');
+    columns.push('actions');
+    return columns;
+  }
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private modalService: BaseModalService,
-    private batchService: BatchService) {}
+    private batchService: BatchService,
+    private rotationAnalytics: RotationAnalyticsService) {}
 
   isMobile = false;
 
@@ -109,6 +121,9 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
     if (changes['batches']) {
       this.dataSource.data = this.batches;
     }
+    if (this.rotationEnabled && (changes['batches'] || changes['rotationEnabled'])) {
+      this.rotationAnalytics.rotationColumnViewed(this.batches[0]?.user_id ?? 0, this.batches.length);
+    }
   }
 
   onAddSupply() {
@@ -127,6 +142,31 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
 
   checkViewport(): void {
     this.isMobile = window.innerWidth <= 768;
+  }
+
+  private rotationHoverStartMs = new Map<number, number>();
+
+  onRotationHoverStart(supplyId: number): void {
+    this.rotationHoverStartMs.set(supplyId, Date.now());
+  }
+
+  onRotationHoverEnd(supplyId: number, rotationLevel: string): void {
+    const startedAt = this.rotationHoverStartMs.get(supplyId);
+    if (startedAt == null) return;
+    const dwellTimeMs = Date.now() - startedAt;
+    this.rotationHoverStartMs.delete(supplyId);
+    if (dwellTimeMs > 1000) {
+      this.rotationAnalytics.rotationLevelHovered(supplyId, rotationLevel, dwellTimeMs);
+    }
+  }
+
+  rotationBadgeClass(rotationLevel?: string): string {
+    switch (rotationLevel) {
+      case 'Alta': return 'rotation-high';
+      case 'Media': return 'rotation-medium';
+      case 'Baja': return 'rotation-low';
+      default: return '';
+    }
   }
 
   openDetails(batch: Batch): void {

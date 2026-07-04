@@ -1,6 +1,9 @@
 import { Supply } from './supply.entity';
 
 export class Batch {
+  /** Rotation level ("Alta" | "Media" | "Baja") from the To-Be rotation endpoint (US-40). Populated after fetch. */
+  public rotationLevel?: string;
+
   private constructor(
     public readonly id: number | null,
     public readonly customSupplyId: number,

@@ -50,6 +50,18 @@
       <mat-cell *matCellDef="let e"> {{ e.supply?.perishable ? 'SI' : 'NO' }} </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="rotation">
+      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableRotation' | translate }}  </mat-header-cell>
+      <mat-cell *matCellDef="let e">
+        <span
+          class="rotation-badge"
+          [ngClass]="rotationBadgeClass(e.rotationLevel)"
+          (mouseenter)="onRotationHoverStart(e.customSupplyId)"
+          (mouseleave)="onRotationHoverEnd(e.customSupplyId, e.rotationLevel)">
+          {{ e.rotationLevel || '-' }}
+        </span>
+      </mat-cell>
+    </ng-container>
 
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableActions' | translate }}  </mat-header-cell>
@@ -95,6 +107,10 @@
         <div class="card-row">
           <span class="label">{{ 'inventory.tablePerishable' | translate }}</span>
           <span class="value">{{ row.supply?.perishable ? 'SI' : 'NO' }}</span>
+        </div>
+        <div class="card-row" *ngIf="rotationEnabled">
+          <span class="label">{{ 'inventory.tableRotation' | translate }}</span>
+          <span class="value rotation-badge" [ngClass]="rotationBadgeClass(row.rotationLevel)">{{ row.rotationLevel || '-' }}</span>
         </div>
         <div class="card-actions">
           <button mat-icon-button (click)="edit.emit(row); $event.stopPropagation()">
