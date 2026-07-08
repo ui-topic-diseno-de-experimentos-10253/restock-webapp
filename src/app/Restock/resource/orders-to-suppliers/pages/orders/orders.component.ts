@@ -62,8 +62,11 @@ export class OrdersComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    // loadProviderProfiles fetches every supplier's full catalog (batches + custom
+    // supplies) and is only needed for the Create Order modal / supplier name lookups.
+    // It runs in the background so it never blocks the order list from rendering.
+    this.loadProviderProfiles();
     await this.loadOrders();
-    await this.loadProviderProfiles();
   }
 
   async loadOrders() {
