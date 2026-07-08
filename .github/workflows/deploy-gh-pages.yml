@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build (production, base-href /restock-webapp/)
+        run: npx ng build --configuration production --base-href /restock-webapp/
+
+      - name: Prepare SPA fallback and disable Jekyll
+        run: |
+          cp dist/ui-topic-frontend/browser/index.html dist/ui-topic-frontend/browser/404.html
+          touch dist/ui-topic-frontend/browser/.nojekyll
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/ui-topic-frontend/browser
