@@ -61,9 +61,10 @@ export class OrdersComponent implements OnInit {
     private snackBar: MatSnackBar
   ) { }
 
+  private providerProfilesLoaded = false;
+
   async ngOnInit() {
     await this.loadOrders();
-    await this.loadProviderProfiles();
   }
 
   async loadOrders() {
@@ -84,7 +85,9 @@ export class OrdersComponent implements OnInit {
       this.isLoadingOrders.set(false);
     }
   }
-  //tester
+  // Fetches every supplier's full catalog (batches + custom supplies) across the
+  // whole platform. Only needed by the Create Order modal, so it's loaded lazily
+  // the first time that modal opens instead of on every Orders page visit.
   async loadProviderProfiles() {
     this.isLoadingSuppliers.set(true);
     this.isLoadingBatches.set(true);
@@ -142,6 +145,7 @@ export class OrdersComponent implements OnInit {
         this.providerProfiles = [];
       }
 
+      this.providerProfilesLoaded = true;
     } catch (error) {
       console.error('Error loading provider supplies:', error);
       this.snackBar.open('Error loading available supplies', 'Close', { duration: 3000 });
@@ -165,7 +169,10 @@ export class OrdersComponent implements OnInit {
     }
   }
 
-  onOpenCreateOrderModal() {
+  async onOpenCreateOrderModal() {
+    if (!this.providerProfilesLoaded) {
+      await this.loadProviderProfiles();
+    }
     this.createOrdersModalComponent.openCreateOrderModal();
   }
 
