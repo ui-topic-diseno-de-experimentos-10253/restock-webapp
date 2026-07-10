@@ -1,6 +1,6 @@
 <div class="sidebar">
   <div class="logo-section">
-    <img src="./assets/logo-restock.png" alt="Logo" class="logo" aria-label="logo-restock">
+    <img src="./assets/logo-restock.png" alt="" class="logo">
     <h2 class="brand">Restock</h2>
   </div>
 
@@ -11,7 +11,7 @@
       [alt]="u.name"
       class="user-photo"
       (error)="onImageError($event)">
-    <div>
+    <div class="user-copy">
       <p class="user-name">{{ u.name ? u.name : ('sidebar.defaultUser' | translate) }}</p>
       <p class="user-email">{{ u.email }}</p>
     </div>
@@ -23,7 +23,8 @@
     <a mat-list-item
        [routerLink]="item.route"
        routerLinkActive="active-link"
-       class="menu-item">
+       class="menu-item"
+       [attr.aria-label]="item.labelKey | translate">
       <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
       <span class="label">{{ item.labelKey | translate }}</span>
     </a>

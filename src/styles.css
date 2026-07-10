@@ -1,13 +1,20 @@
+@import './app/Restock/iam/pages/auth-layout.css';
+
 html,
 body {
     height: 100%;
-    background-color: white;
+    background-color: #f6f8f6;
 }
 
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
+    color: #1c2c21;
+    -webkit-font-smoothing: antialiased;
 }
+
+button, input, select, textarea { font: inherit; }
+:focus-visible { outline: 3px solid rgba(79, 138, 91, 0.38); outline-offset: 2px; }
 
 
 .dialog-unified-size {
