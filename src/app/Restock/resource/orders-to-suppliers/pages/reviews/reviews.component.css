@@ -1,63 +1,70 @@
-.review-container {
-    padding: 16px;
-    box-shadow: 1px 0px 8px rgba(0, 0, 0, 0.2);
-    margin: 3rem;
-    border-radius: 30px;
+:host { display: block; min-width: 0; }
 
+.review-container {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 22px;
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-radius-lg);
+  background: #fff;
+  box-shadow: var(--rs-shadow-sm);
 }
 
 .reviews-quantity {
-    font-family: Poppins;
-    font-weight: 400;
-    font-size: 23px;
-    margin-left: 3rem;
-    margin-bottom: 2rem;
-    padding: 0 2rem 0 2rem;
+  margin: 0;
+  padding: 0;
+  color: var(--rs-ink);
+  font-size: clamp(1.45rem, 2vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -.03em;
 }
 
 .flex {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin: auto;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
 }
 
-.filter-field {
-    width: 40%;
-    border: 2px;
-}
-
-
-
-.full-width-table {
-    background-color: white;
-}
+.filter-field { width: 100%; min-width: 0; }
+mat-paginator { background: transparent; }
 
 .table-container {
-    margin: 0 3rem 0 3rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow-x: auto;
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-radius-md);
 }
+
+.full-width-table { width: 100%; min-width: 760px; background: #fff; }
 
 .average-review {
-    margin-bottom: 1rem;
-    margin-right: 1rem;
-    margin-top: 3rem;
-    text-align: center;
-    font-family: Poppins;
-    font-weight: 400;
-    font-size: 14px;
-    box-shadow: 1px 0px 8px rgba(0, 0, 0, 0.5);
-    margin-left: auto;
-    width: 20%;
-    border: 2px solid black;
-    /* <-- define grosor, estilo y color del borde */
-    border-radius: 20px;
-    /* <-- redondeado */
-    padding: 5px;
-    /* (opcional) agrega espacio interno para que se vea mejor */
+  justify-self: end;
+  width: auto;
+  min-width: 170px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--rs-border);
+  border-radius: 999px;
+  background: var(--rs-primary-soft);
+  color: var(--rs-primary-hover);
+  box-shadow: none;
+  text-align: center;
+  font-size: .85rem;
+  font-weight: 700;
 }
+.average-review p { margin: 0; }
 
-
-
-mat-paginator {
-    background-color: white;
+@media (max-width: 760px) {
+  .review-container { padding: 16px; border-radius: 16px; }
+  .flex { grid-template-columns: 1fr; }
+  .average-review { justify-self: stretch; width: 100%; }
+  .full-width-table { min-width: 680px; }
 }
