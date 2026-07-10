@@ -1,136 +1,163 @@
-<section class="inventory-section">
-  <mat-card class="toolbar-card">
-    <div class="toolbar">
-      <div class="table-heading"><span class="title">{{ 'inventory.inventoryTitle' | translate }}</span><span class="result-count">{{ dataSource.filteredData.length }} stock entries</span></div>
+<section class="inventory-section" aria-labelledby="inventory-table-title">
+  <mat-card class="inventory-panel">
+    <header class="toolbar">
+      <div class="table-heading">
+        <span id="inventory-table-title" class="title">{{ 'inventory.inventoryTitle' | translate }}</span>
+        <span class="result-count">{{ dataSource.filteredData.length }} stock entries</span>
+      </div>
 
       <div class="search-container">
         <mat-icon>search</mat-icon>
-        <input matInput [attr.aria-label]="'inventory.searchPlaceholder' | translate" placeholder="{{ 'inventory.searchPlaceholder' | translate }}" (input)="applyFilter($event)" />
+        <input
+          matInput
+          [attr.aria-label]="'inventory.searchPlaceholder' | translate"
+          placeholder="{{ 'inventory.searchPlaceholder' | translate }}"
+          (input)="applyFilter($event)" />
       </div>
 
-      <button mat-raised-button color="primary" class="add-btn" (click)="onAddSupply()">
+      <button type="button" mat-raised-button color="primary" class="add-btn" (click)="onAddSupply()">
         <span class="btn-content">
-          {{ 'inventory.add' | translate }}<mat-icon>control_point</mat-icon>
+          <mat-icon>add</mat-icon>
+          {{ 'inventory.add' | translate }}
         </span>
       </button>
+    </header>
 
-    </div>
+    @if (!isMobile && dataSource.data.length > 0) {
+      <div class="table-scroll" role="region" aria-label="Inventory stock entries" tabindex="0">
+        <mat-table [dataSource]="dataSource">
+          <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableSupply' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e">
+              <div class="supply-cell">
+                <span class="supply-name">{{ e.supply?.name || '-' }}</span>
+                <span class="supply-description">{{ e.supply?.description || 'No description' }}</span>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="category">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableCategory' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e">{{ e.supply?.category?.name || e.supply?.category || '-' }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="unit">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableUnit' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e">{{ e.supply?.unit_abbreviation || '-' }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="expiration_date">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableExpiration' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e">
+              <span [class.expiration-alert]="isExpired(e.expiration_date)">
+                {{ e.expiration_date ? (e.expiration_date | date: 'MM/dd/yy') : '-' }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="stock">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableStock' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e"><span class="stock-value">{{ e.stock }}</span></mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="perishable">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tablePerishable' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e">
+              <span class="boolean-badge" [class.is-perishable]="e.supply?.perishable">
+                {{ e.supply?.perishable ? 'Yes' : 'No' }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="rotation">
+            <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableRotation' | translate }} </mat-header-cell>
+            <mat-cell *matCellDef="let e">
+              <span
+                class="rotation-badge"
+                [ngClass]="rotationBadgeClass(e.rotationLevel)"
+                (mouseenter)="onRotationHoverStart(e.customSupplyId)"
+                (mouseleave)="onRotationHoverEnd(e.customSupplyId, e.rotationLevel)">
+                {{ e.rotationLevel || '-' }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="actions-header">{{ 'inventory.tableActions' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let e" class="actions-cell">
+              <button type="button" mat-icon-button aria-label="Edit stock entry" (click)="edit.emit(e); $event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button type="button" mat-icon-button class="delete-action" aria-label="Delete stock entry" (click)="delete.emit(e); $event.stopPropagation()">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            [class.expired-row]="isExpired(row.expiration_date)"
+            (click)="openDetails(row)">
+          </mat-row>
+        </mat-table>
+      </div>
+    }
+
+    @if (isMobile && dataSource.data.length > 0) {
+      <div class="mobile-cards">
+        <mat-card class="inventory-card" *ngFor="let row of dataSource.filteredData" (click)="openDetails(row)">
+          <div class="mobile-card-heading">
+            <div>
+              <span class="mobile-card-eyebrow">{{ row.supply?.category || '-' }}</span>
+              <h3>{{ row.supply?.name || '-' }}</h3>
+            </div>
+            <span class="stock-value">{{ row.stock }} {{ row.supply?.unit_abbreviation || '' }}</span>
+          </div>
+
+          <div class="card-row" *ngIf="row.expiration_date">
+            <span class="label">{{ 'inventory.tableExpiration' | translate }}</span>
+            <span class="value" [class.expiration-alert]="isExpired(row.expiration_date)">{{ row.expiration_date | date:'MM/dd/yy' }}</span>
+          </div>
+          <div class="card-row">
+            <span class="label">{{ 'inventory.tablePerishable' | translate }}</span>
+            <span class="value">{{ row.supply?.perishable ? 'Yes' : 'No' }}</span>
+          </div>
+          <div class="card-row" *ngIf="rotationEnabled">
+            <span class="label">{{ 'inventory.tableRotation' | translate }}</span>
+            <span class="value rotation-badge" [ngClass]="rotationBadgeClass(row.rotationLevel)">{{ row.rotationLevel || '-' }}</span>
+          </div>
+
+          <div class="card-actions">
+            <button type="button" mat-button (click)="edit.emit(row); $event.stopPropagation()">
+              <mat-icon>edit</mat-icon>
+              {{ 'inventory.edit' | translate }}
+            </button>
+            <button type="button" mat-icon-button class="delete-action" aria-label="Delete stock entry" (click)="delete.emit(row); $event.stopPropagation()">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </mat-card>
+      </div>
+    }
+
+    @if (dataSource.data.length === 0) {
+      <div class="inventory-empty">
+        <mat-icon class="empty-icon">inventory_2</mat-icon>
+        <h3>No stock entries yet</h3>
+        <p>Add one of your supplies to start tracking quantities and expiration dates.</p>
+        <button type="button" mat-flat-button color="primary" (click)="onAddSupply()">Add stock entry</button>
+      </div>
+    }
+
+    @if (dataSource.data.length > 0) {
+      <footer class="paginator-row">
+        <mat-paginator
+          [pageSize]="5"
+          [pageSizeOptions]="[5, 10, 20]"
+          showFirstLastButtons
+          class="inline-paginator" />
+      </footer>
+    }
   </mat-card>
-
-
-  @if (!isMobile && dataSource.data.length > 0) {
-  <mat-table [dataSource]="dataSource" class="mat-elevation-z2">
-    <ng-container matColumnDef="description">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableSupply' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.supply?.name || '-' }} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="category">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableCategory' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.supply?.category?.name || e.supply?.category || '-' }} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="unit">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableUnit' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.supply?.unit_abbreviation  || '-' }} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="expiration_date">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableExpiration' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.expiration_date ? (e.expiration_date | date: 'MM/dd/yy') : '-' }} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="stock">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableStock' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.stock }} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="perishable">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tablePerishable' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e"> {{ e.supply?.perishable ? 'SI' : 'NO' }} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="rotation">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableRotation' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e">
-        <span
-          class="rotation-badge"
-          [ngClass]="rotationBadgeClass(e.rotationLevel)"
-          (mouseenter)="onRotationHoverStart(e.customSupplyId)"
-          (mouseleave)="onRotationHoverEnd(e.customSupplyId, e.rotationLevel)">
-          {{ e.rotationLevel || '-' }}
-        </span>
-      </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef> {{ 'inventory.tableActions' | translate }}  </mat-header-cell>
-      <mat-cell *matCellDef="let e">
-        <button mat-icon-button (click)="edit.emit(e); $event.stopPropagation()">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="delete.emit(e); $event.stopPropagation()">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-cell>
-    </ng-container>
-
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns" [class.expired-row]="isExpired(row.expiration_date)" (click)="openDetails(row)" style="cursor: pointer;">
-    </mat-row>
-  </mat-table>
-  }
-
-  @if (isMobile && dataSource.data.length > 0) {
-    <div class="mobile-cards">
-      <mat-card class="inventory-card" *ngFor="let row of dataSource.data" (click)="openDetails(row)">
-        <div class="card-row">
-          <span class="label">{{ 'inventory.tableSupply' | translate }}</span>
-          <span class="value">{{ row.supply?.name || '-' }}</span>
-        </div>
-        <div class="card-row">
-          <span class="label">{{ 'inventory.tableCategory' | translate }}</span>
-          <span class="value">{{ row.supply?.category || '-' }}</span>
-        </div>
-        <div class="card-row">
-          <span class="label">{{ 'inventory.tableUnit' | translate }}</span>
-          <span class="value">{{ row.supply?.unit_abbreviation || '-' }}</span>
-        </div>
-        <div class="card-row" *ngIf="row.expiration_date">
-          <span class="label">{{ 'inventory.tableExpiration' | translate }}</span>
-          <span class="value">{{ row.expiration_date | date:'MM/dd/yy' }}</span>
-        </div>
-        <div class="card-row">
-          <span class="label">{{ 'inventory.tableStock' | translate }}</span>
-          <span class="value">{{ row.stock }}</span>
-        </div>
-        <div class="card-row">
-          <span class="label">{{ 'inventory.tablePerishable' | translate }}</span>
-          <span class="value">{{ row.supply?.perishable ? 'SI' : 'NO' }}</span>
-        </div>
-        <div class="card-row" *ngIf="rotationEnabled">
-          <span class="label">{{ 'inventory.tableRotation' | translate }}</span>
-          <span class="value rotation-badge" [ngClass]="rotationBadgeClass(row.rotationLevel)">{{ row.rotationLevel || '-' }}</span>
-        </div>
-        <div class="card-actions">
-          <button mat-icon-button (click)="edit.emit(row); $event.stopPropagation()">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="delete.emit(row); $event.stopPropagation()">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </mat-card>
-    </div>
-  }
-
-  @if (dataSource.data.length > 0) { <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="inline-paginator" /> }
-
-  @if (dataSource.data.length === 0) {
-  <div class="inventory-empty">
-    <mat-icon class="empty-icon">inventory_2</mat-icon>
-    <h3>No stock entries yet</h3><p>Add one of your supplies to start tracking quantities and expiration dates.</p>
-    <button mat-flat-button color="primary" (click)="onAddSupply()">Add stock entry</button>
-  </div>
-  }
 </section>
