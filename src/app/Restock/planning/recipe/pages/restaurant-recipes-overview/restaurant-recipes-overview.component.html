@@ -1,65 +1,67 @@
-<div class="recipes-view">
-  <!-- Header -->
-  <div class="recipes-header">
-    <div class="recipes-header__top">
-      <h2 class="recipes-title">{{ 'recipes.title' | translate }}</h2>
+<main class="recipes-view">
+  <header class="recipes-header">
+    <div class="recipes-heading">
+      <span class="page-eyebrow">RECIPE LIBRARY</span>
+      <h1>{{ 'recipes.title' | translate }}</h1>
+      <p>Create, review and maintain the dishes that drive your inventory usage.</p>
     </div>
 
-    <div class="recipes-header__middle">
-      <mat-form-field class="search-field" appearance="outline">
-        <input
-          matInput
-          [placeholder]="'recipes.searchPlaceholder' | translate"
-          [(ngModel)]="search"
-        />
-      </mat-form-field>
+    <button class="green-button create-recipe-button" mat-flat-button (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      {{ 'recipes.create' | translate }}
+    </button>
+  </header>
 
-      <div class="sort-toggle">
-        <label for="sortByPrice">{{ 'recipes.sortByPrice' | translate }}</label>
-        <mat-slide-toggle
-          id="sortByPrice"
-          [(ngModel)]="sortByPrice"
-        ></mat-slide-toggle>
+  <section class="recipes-toolbar" aria-label="Recipe tools">
+    <mat-form-field class="search-field" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput [placeholder]="'recipes.searchPlaceholder' | translate" [(ngModel)]="search" />
+    </mat-form-field>
+
+    <div class="sort-toggle">
+      <div>
+        <strong>{{ 'recipes.sortByPrice' | translate }}</strong>
+        <span>Show lower-cost recipes first</span>
       </div>
+      <mat-slide-toggle id="sortByPrice" [(ngModel)]="sortByPrice" aria-label="Sort recipes by price"></mat-slide-toggle>
     </div>
+  </section>
 
-    <div class="recipes-header__actions">
-      <button class="green-button" action mat-stroked-button (click)="openCreateDialog()">
-        <mat-icon>add_circle</mat-icon>
-        {{ 'recipes.create' | translate }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Empty -->
   @if (filteredRecipes.length === 0) {
-    <app-empty-section>
-      <div icon>
-        <mat-icon style="font-size: 3rem; color: #bcbcbc;">assignment</mat-icon>
-      </div>
-      {{ 'recipes.noRecipes' | translate }}
-    </app-empty-section>
+    <section class="recipes-empty">
+      <app-empty-section>
+        <div icon><mat-icon>restaurant_menu</mat-icon></div>
+        {{ 'recipes.noRecipes' | translate }}
+      </app-empty-section>
+    </section>
   }
 
-  <!-- Grid -->
   @if (filteredRecipes.length > 0) {
-    <div class="recipes-grid">
+    <section class="recipes-grid" aria-label="Recipes">
       @for (recipe of filteredRecipes; track recipe.id) {
-        <div class="recipe-card">
-          <img [src]="recipe.imageUrl" alt="Dish image" />
-          <h3>{{ recipe.name }}</h3>
-          <p>{{ 'recipes.totalCost' | translate }}: S/.{{ recipe.price }}</p>
+        <article class="recipe-card">
+          <div class="recipe-media">
+            <img [src]="recipe.imageUrl" [alt]="recipe.name" loading="lazy" />
+            <span class="price-chip">S/. {{ recipe.price }}</span>
+          </div>
+
+          <div class="recipe-copy">
+            <span class="recipe-label">{{ 'recipes.totalCost' | translate }}</span>
+            <h2>{{ recipe.name }}</h2>
+            <p>{{ recipe.description || 'No description added yet.' }}</p>
+          </div>
+
           <div class="recipe-card__actions">
-            <button mat-icon-button (click)="openEditDialog(recipe)">
+            <button mat-stroked-button (click)="openEditDialog(recipe)">
               <mat-icon>edit</mat-icon>
+              Edit
             </button>
-            <button mat-icon-button color="warn" (click)="openDeleteDialog(recipe)">
+            <button mat-icon-button color="warn" (click)="openDeleteDialog(recipe)" aria-label="Delete recipe">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-        </div>
+        </article>
       }
-    </div>
+    </section>
   }
-
-</div>
+</main>
