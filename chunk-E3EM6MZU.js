@@ -1,0 +1,1 @@
+var t=class{isInvalidControl(r,e){return r.controls[e].invalid&&r.controls[e].touched}errorMessageForControl(r,e){return e==="required"?`The field ${r} is required.`:`The field ${r} is invalid.`}errorMessagesForControl(r,e){let i=r.controls[e],o="",s=i.errors;return s&&Object.keys(s).forEach(n=>o+=this.errorMessageForControl(e,n)),o}};export{t as a};
