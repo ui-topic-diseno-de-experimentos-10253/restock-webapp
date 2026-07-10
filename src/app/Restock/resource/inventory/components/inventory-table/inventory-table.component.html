@@ -1,11 +1,11 @@
 <section class="inventory-section">
   <mat-card class="toolbar-card">
     <div class="toolbar">
-      <span class="title">{{ 'inventory.inventoryTitle' | translate }}</span>
+      <div class="table-heading"><span class="title">{{ 'inventory.inventoryTitle' | translate }}</span><span class="result-count">{{ dataSource.filteredData.length }} stock entries</span></div>
 
       <div class="search-container">
         <mat-icon>search</mat-icon>
-        <input matInput placeholder="{{ 'inventory.searchPlaceholder' | translate }}" (keyup)="applyFilter($event)" />
+        <input matInput [attr.aria-label]="'inventory.searchPlaceholder' | translate" placeholder="{{ 'inventory.searchPlaceholder' | translate }}" (input)="applyFilter($event)" />
       </div>
 
       <button mat-raised-button color="primary" class="add-btn" (click)="onAddSupply()">
@@ -124,12 +124,13 @@
     </div>
   }
 
-  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="inline-paginator" />
+  @if (dataSource.data.length > 0) { <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="inline-paginator" /> }
 
   @if (dataSource.data.length === 0) {
   <div class="inventory-empty">
-    <p>There are no supplies registered. To manage your inventory, you must first create ingredients in the system.</p>
     <mat-icon class="empty-icon">inventory_2</mat-icon>
+    <h3>No stock entries yet</h3><p>Add one of your supplies to start tracking quantities and expiration dates.</p>
+    <button mat-flat-button color="primary" (click)="onAddSupply()">Add stock entry</button>
   </div>
   }
 </section>

@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../components/navbar/navbar.component';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -9,7 +9,7 @@ import { MatIconButton } from '@angular/material/button';
 import { Profile } from '../../Restock/profiles/model/profile.entity';
 import { ProfileService } from '../../Restock/profiles/services/profile.service';
 import { SessionService } from '../../shared/services/session.service';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -18,7 +18,7 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.css']
 })
-export class DashboardLayoutComponent implements OnInit {
+export class DashboardLayoutComponent implements OnInit, OnDestroy {
   menu: Array<{ labelKey: string, icon: string, route: string }> = [];
 
   router = inject(Router);
@@ -26,7 +26,10 @@ export class DashboardLayoutComponent implements OnInit {
   profile: Profile = new Profile();
   private currentRole: number | null = null;
   isMobile: boolean = false;
+  currentSection = 'Overview';
   private mobileQuery: MediaQueryList;
+  private readonly mobileQueryListener = () => this.isMobile = this.mobileQuery.matches;
+  private readonly routerSubscription: Subscription;
 
   constructor(
     private profileService: ProfileService,
@@ -34,9 +37,9 @@ export class DashboardLayoutComponent implements OnInit {
   ) {
     this.mobileQuery = window.matchMedia('(max-width: 600px)');
     this.isMobile = this.mobileQuery.matches;
-    this.mobileQuery.addEventListener('change', () => {
-      this.isMobile = this.mobileQuery.matches;
-    });
+    this.mobileQuery.addEventListener('change', this.mobileQueryListener);
+    this.updateCurrentSection(this.router.url);
+    this.routerSubscription = this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(event => this.updateCurrentSection(event.urlAfterRedirects));
   }
 
   async ngOnInit() {
@@ -52,6 +55,8 @@ export class DashboardLayoutComponent implements OnInit {
     this.setMenu();
     await this.loadProfile();
   }
+
+  ngOnDestroy(): void { this.mobileQuery.removeEventListener('change', this.mobileQueryListener); this.routerSubscription.unsubscribe(); }
 
   async loadProfile() {
     try {
@@ -96,5 +101,11 @@ export class DashboardLayoutComponent implements OnInit {
         { labelKey: 'sidebar.sales', icon: 'room_service', route: '/dashboard/restaurant/sales' },
       ];
     }
+  }
+
+  private updateCurrentSection(url: string): void {
+    const segment = url.split('?')[0].split('/').filter(Boolean).at(-1) ?? 'summary';
+    const labels: Record<string,string> = {summary:'Overview',inventory:'Inventory',subscription:'Subscription',notifications:'Notifications',orders:'Orders',recipes:'Recipes',sales:'Sales',reviews:'Reviews',profile:'Profile'};
+    this.currentSection = labels[segment] ?? 'Workspace';
   }
 }

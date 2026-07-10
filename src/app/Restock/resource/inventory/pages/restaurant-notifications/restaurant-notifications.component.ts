@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import {mockRestaurantAlerts} from '../../../../../shared/mocks/alerts.mock';
 import {MatCardModule} from '@angular/material/card';
 import {TranslatePipe} from '@ngx-translate/core';
-import {BatchService} from '../../services/batch.service';
 import {SupplyService} from '../../services/supply.service';
 import {OrderToSupplierService} from '../../../orders-to-suppliers/services/order-to-supplier.service';
 import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatListModule} from '@angular/material/list';
+import {InventoryDataService} from '../../services/inventory-data.service';
+import {SessionService} from '../../../../../shared/services/session.service';
 
 
 @Component({
@@ -20,18 +21,21 @@ import {MatListModule} from '@angular/material/list';
   styleUrls: ['./restaurant-notifications.component.css']
 })
 export class RestaurantNotificationsComponent implements OnInit {
-  private readonly batchService = inject(BatchService);
   private readonly orderService = inject(OrderToSupplierService);
+  private readonly inventoryData = inject(InventoryDataService);
+  private readonly session = inject(SessionService);
 
   notifications: Array<{ type: 'Inventory' | 'Order'; message: string; updatedAt: string; }> = [];
 
   async ngOnInit(): Promise<void> {
-    await this.loadStockNotifications();
-    await this.loadOrderNotifications();
+    const [stock, orders] = await Promise.all([this.loadStockNotifications(), this.loadOrderNotifications()]);
+    this.notifications = [...stock, ...orders];
   }
 
-  private async loadStockNotifications(): Promise<void> {
-    const batches = await this.batchService.getAllBatchesWithSupplies();
+  private async loadStockNotifications(): Promise<Array<{type:'Inventory';message:string;updatedAt:string}>> {
+    const userId = this.session.getUserId();
+    if (userId == null) return [];
+    const {batches} = await this.inventoryData.load(userId);
     const now = new Date();
 
     const stockNotifications = batches
@@ -44,29 +48,31 @@ export class RestaurantNotificationsComponent implements OnInit {
         updatedAt: this.relativeTime(now, b.expiration_date)
       }));
 
-    this.notifications.push(...stockNotifications);
+    return stockNotifications;
   }
 
-  private async loadOrderNotifications(): Promise<void> {
+  private async loadOrderNotifications(): Promise<Array<{type:'Order';message:string;updatedAt:string}>> {
     const orders = await this.orderService.getAllEnriched();
     const now = new Date();
 
+    const notifications: Array<{type:'Order';message:string;updatedAt:string}> = [];
     orders.forEach(order => {
       if (order.situation && order.situation.name && order.situation.name.toLowerCase() !== 'pending') {
-        this.notifications.push({
+        notifications.push({
           type: 'Order',
           message: `Order #${order.id} situation updated to ${order.situation.name} `,
           updatedAt: this.relativeTime(now, order.date)
         });
       }
       if (order.state && order.state.name && order.state.name.toLowerCase() === 'delivered') {
-        this.notifications.push({
+        notifications.push({
           type: 'Order',
           message: `Order #${order.id} was delivered `,
           updatedAt: this.relativeTime(now, order.estimated_ship_date ?? order.date)
         });
       }
     });
+    return notifications;
   }
 
   private relativeTime(now: Date, from?: Date | string | null): string {

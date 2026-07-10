@@ -23,7 +23,6 @@ import {Batch} from '../../model/batch.entity';
 import {TranslatePipe} from '@ngx-translate/core';
 import {BatchDetailsComponent} from '../batch-details/batch-details.component';
 import {BaseModalService} from '../../../../../shared/services/base-modal.service';
-import {BatchService} from '../../services/batch.service';
 import {RotationAnalyticsService} from '../../services/rotation-analytics.service';
 
 @Component({
@@ -80,10 +79,10 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
 
   constructor(
     private modalService: BaseModalService,
-    private batchService: BatchService,
     private rotationAnalytics: RotationAnalyticsService) {}
 
   isMobile = false;
+  private readonly viewportListener = () => this.checkViewport();
 
   /**
    * Initializes the component.
@@ -92,7 +91,7 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
    */
   ngOnInit(): void {
     this.checkViewport();
-    window.addEventListener('resize', this.checkViewport.bind(this));
+    window.addEventListener('resize', this.viewportListener, {passive: true});
     this.dataSource.filterPredicate = (data: Batch, filter: string) => {
       const search = filter.trim().toLowerCase();
       const description= data.supply?.description?.toLowerCase() || '';
@@ -110,7 +109,7 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('resize', this.checkViewport.bind(this));
+    window.removeEventListener('resize', this.viewportListener);
   }
 
   /**
@@ -170,14 +169,6 @@ export class InventoryTableComponent implements OnInit, OnChanges, AfterViewInit
   }
 
   openDetails(batch: Batch): void {
-    this.batchService.getBatchById(batch.id as number).then(full => {
-      this.modalService.open({
-        title: batch.supply?.name || '',
-        contentComponent: BatchDetailsComponent,
-        width: '30rem',
-        height: 'auto',
-        initialData: batch
-      });
-    })
+    this.modalService.open({ title: batch.supply?.name || '', contentComponent: BatchDetailsComponent, width: '30rem', height: 'auto', initialData: batch });
   }
 }

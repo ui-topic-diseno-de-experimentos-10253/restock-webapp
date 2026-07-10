@@ -1,34 +1,36 @@
-@if (isLoading()) {
-  <div class="loading-container">
-    <mat-spinner diameter="40" />
-  </div>
-} @else {
-  <div class="inventory-container">
-
-  <!-- Sección para botón de crear supply -->
-  <app-supplier-supply-section
-    [suppliesLength]="supplies.length"
-    (create)="openCreateModal()"
-  />
-
-  <!-- Carousel (si hay supplies) -->
-  @if (supplies.length > 0) {
-    <app-supply-carousel
-      [supplies]="supplies"
-      [categories]="categories"
-      (edit)="editSupply($event)"
-      (delete)="deleteSupply($event)"
-    />
+<main class="inventory-page">
+  <header class="page-heading">
+    <div>
+      <span class="page-eyebrow">INVENTORY CONTROL</span>
+      <h1>Your inventory, at a glance</h1>
+      <p>Manage your catalog, available stock and expiration dates from one place.</p>
+    </div>
+    <div class="inventory-metrics" aria-label="Inventory summary">
+      <div><strong>{{ supplies.length }}</strong><span>Supplies</span></div>
+      <div><strong>{{ batches.length }}</strong><span>Stock entries</span></div>
+      <div><strong>{{ supplies.length ? 'Active' : '—' }}</strong><span>Catalog status</span></div>
+    </div>
+  </header>
+  @if (loadError() && !hasInventoryData()) {
+    <section class="load-state load-error" role="alert">
+      <span class="state-icon">!</span><h2>We couldn't load your inventory</h2>
+      <p>Check your connection and try again. Your data has not been changed.</p>
+      <button type="button" (click)="loadData()">Try again</button>
+    </section>
+  } @else if (isLoading() && !hasInventoryData()) {
+    <section class="inventory-skeleton" aria-label="Loading inventory" aria-busy="true">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton-grid"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
+      <div class="skeleton skeleton-table"></div>
+    </section>
+  } @else {
+    <div class="inventory-container" [class.is-refreshing]="isLoading()">
+      <app-supplier-supply-section [suppliesLength]="supplies.length" (create)="openCreateModal()" />
+      @if (supplies.length > 0) {
+        <app-supply-carousel [supplies]="supplies" [categories]="categories" (edit)="editSupply($event)" (delete)="deleteSupply($event)" />
+      }
+      <app-inventory-table [batches]="batches"
+        (edit)="editBatch($event)" (delete)="deleteBatch($event)" (create)="openCreateModal()" (add)="openAddSupplyToInventory()" />
+    </div>
   }
-
-  <!-- Tabla de inventario -->
-  <app-inventory-table
-    [batches]="batches"
-    (edit)="editBatch($event)"
-    (delete)="deleteBatch($event)"
-    (create)="openCreateModal()"
-    (add)="openAddSupplyToInventory()"
-  />
-
-  </div>
-}
+</main>

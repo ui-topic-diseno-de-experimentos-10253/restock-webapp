@@ -6,13 +6,18 @@ import { BaseService } from '../../../shared/services/base.service';
 
 @Injectable({ providedIn: 'root' })
 export class RoleService extends BaseService<any> {
+  private rolesRequest?: Promise<Role[]>;
   constructor() {
     super();
     this.resourceEndpoint = '/roles';
   }
 
   async getAllRoles(): Promise<Role[]> {
-    const raw = await firstValueFrom(super.getAll());
-    return raw.map((dto: any) => RoleAssembler.toEntity(dto));
+    if (!this.rolesRequest) {
+      this.rolesRequest = firstValueFrom(super.getAll())
+        .then(raw => raw.map((dto: any) => RoleAssembler.toEntity(dto)))
+        .catch(error => { this.rolesRequest = undefined; throw error; });
+    }
+    return this.rolesRequest;
   }
 }

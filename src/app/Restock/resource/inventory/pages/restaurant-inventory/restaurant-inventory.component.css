@@ -1,7 +1,1 @@
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 240px;
-}
-
+/* Shared inventory page styles are loaded globally. */

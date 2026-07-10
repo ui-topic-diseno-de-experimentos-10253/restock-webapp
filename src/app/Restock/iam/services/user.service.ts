@@ -8,6 +8,9 @@ import { BaseService } from '../../../shared/services/base.service';
 @Injectable({ providedIn: 'root' })
 export class UserService extends BaseService<User> {
     private readonly roleService = inject(RoleService);
+    private usersRequest?: Promise<any[]>;
+    private usersCachedAt = 0;
+    private readonly usersCacheTtlMs = 30_000;
 
     constructor() {
         super();
@@ -15,13 +18,10 @@ export class UserService extends BaseService<User> {
     }
 
     async getAllEnriched(): Promise<User[]> {
-        const [usersResponse, roles] = await Promise.all([
-            firstValueFrom(this.getAll()),
+        const [rawUsers, roles] = await Promise.all([
+            this.getRawUsers(),
             this.roleService.getAllRoles()
         ]);
-        const rawUsers: any[] = Array.isArray(usersResponse)
-          ? (usersResponse as any[])
-          : (((usersResponse as any)?.value ?? []) as any[]);
 
         return rawUsers.map((raw: any) => {
             const roleId = raw.role_id ?? raw.roleId;
@@ -37,19 +37,13 @@ export class UserService extends BaseService<User> {
     }
 
     async getSupplierUserIds(): Promise<number[]> {
-        const usersResponse = await firstValueFrom(this.getAll());
-        const rawUsers: any[] = Array.isArray(usersResponse)
-          ? (usersResponse as any[])
-          : (((usersResponse as any)?.value ?? []) as any[]);
+        const rawUsers = await this.getRawUsers();
         return rawUsers
             .filter((user: any) => (user.role_id ?? user.roleId) === 1)
             .map((user: any) => user.id);
     }
     async getRestaurantAdminUserIds(): Promise<number[]> {
-        const usersResponse = await firstValueFrom(this.getAll());
-        const rawUsers: any[] = Array.isArray(usersResponse)
-          ? (usersResponse as any[])
-          : (((usersResponse as any)?.value ?? []) as any[]);
+        const rawUsers = await this.getRawUsers();
         return rawUsers
             .filter((user: any) => (user.role_id ?? user.roleId) === 2)
             .map((user: any) => user.id);
@@ -57,16 +51,31 @@ export class UserService extends BaseService<User> {
     async createUser(user: User): Promise<User> {
         const dto = UserAssembler.toDTO(user);
         const created = await firstValueFrom(this.create(dto));
+        this.invalidateUsers();
         return UserAssembler.toEntity(created);
     }
 
     async updateUser(id: number, user: User): Promise<User> {
         const dto = UserAssembler.toDTO(user);
         const updated = await firstValueFrom(this.update(id, dto));
+        this.invalidateUsers();
         return UserAssembler.toEntity(updated);
     }
 
     async deleteUser(id: number): Promise<void> {
         await firstValueFrom(this.delete(id));
+        this.invalidateUsers();
     }
+
+    private getRawUsers(): Promise<any[]> {
+        if (!this.usersRequest || Date.now() - this.usersCachedAt > this.usersCacheTtlMs) {
+            this.usersCachedAt = Date.now();
+            this.usersRequest = firstValueFrom(this.getAll())
+              .then(response => Array.isArray(response) ? response as any[] : ((response as any)?.value ?? []))
+              .catch(error => { this.usersRequest = undefined; throw error; });
+        }
+        return this.usersRequest;
+    }
+
+    private invalidateUsers(): void { this.usersRequest = undefined; this.usersCachedAt = 0; }
 }
