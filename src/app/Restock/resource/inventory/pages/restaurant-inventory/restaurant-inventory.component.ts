@@ -18,7 +18,7 @@ import {CustomSupplyService} from '../../services/custom-supply.service';
 import {CreateCustomSupplyComponent} from '../../components/create-custom-supply/create-custom-supply.component';
 import {SessionService} from '../../../../../shared/services/session.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {RotationService} from '../../services/rotation.service';
+import {InventoryDataService} from '../../services/inventory-data.service';
 
 @Component({
   selector: 'app-restaurant-inventory',
@@ -40,6 +40,9 @@ export class RestaurantInventoryComponent implements OnInit {
   formSchema: FormFieldSchema[] = [];
   private editSchema: FormFieldSchema[] = [];
   isLoading = signal(false);
+  loadError = signal(false);
+  private hasLoadedOnce = false;
+  hasInventoryData(): boolean { return this.supplies.length > 0 || this.batches.length > 0; }
   /** Experimento 04 (US-40): true only for the experimental group. */
   rotationEnabled = false;
 
@@ -51,14 +54,13 @@ export class RestaurantInventoryComponent implements OnInit {
     private translate: TranslateService,
     private customSupplyService: CustomSupplyService,
     private sessionService: SessionService,
-    private rotationService: RotationService
+    private inventoryData: InventoryDataService
   ) {
   }
 
   async ngOnInit(): Promise<void> {
     this.buildFormSchema();
     await this.loadData();
-    console.log(this.supplies)
   }
 
   buildFormSchema(): void {
@@ -158,38 +160,22 @@ export class RestaurantInventoryComponent implements OnInit {
   }
 
   async loadData(): Promise<void> {
+    const userId = this.sessionService.getUserId();
+    if (userId == null) return;
     try {
       this.isLoading.set(true);
-      this.supplies = await this.customSupplyService.getAll();
-      this.batches = await this.batchService.getAllBatchesWithSupplies();
+      this.loadError.set(false);
       this.rotationEnabled = this.sessionService.isInRotationExperimentGroup();
-      if (this.rotationEnabled) {
-        await this.applyRotationLevels();
-      }
+      const snapshot = await this.inventoryData.load(userId, {rotation: this.rotationEnabled, force: this.hasLoadedOnce});
+      this.supplies = snapshot.supplies;
+      this.batches = snapshot.batches;
+      this.hasLoadedOnce = true;
     } catch (e) {
       console.error(e);
+      this.loadError.set(true);
       this.snackBar.open('Error loading inventory data', 'Close', {duration: 3000});
     } finally {
       this.isLoading.set(false);
-    }
-  }
-
-  /**
-   * Merges the rotation level returned by the To-Be rotation endpoint (US-40)
-   * into the already-loaded batches, matching by custom supply id.
-   */
-  private async applyRotationLevels(): Promise<void> {
-    const userId = this.sessionService.getUserId();
-    if (userId == null) return;
-
-    try {
-      const rotations = await this.rotationService.getRotationByUserId(userId);
-      const rotationByCustomSupplyId = new Map(rotations.map(r => [r.customSupplyId, r.rotationLevel]));
-      this.batches.forEach(batch => {
-        batch.rotationLevel = rotationByCustomSupplyId.get(batch.customSupplyId);
-      });
-    } catch (e) {
-      console.error('Error loading rotation levels', e);
     }
   }
 

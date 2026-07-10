@@ -18,6 +18,7 @@ import {CustomSupplyService} from '../../services/custom-supply.service';
 import {CreateCustomSupplyComponent} from '../../components/create-custom-supply/create-custom-supply.component';
 import {SessionService} from '../../../../../shared/services/session.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {InventoryDataService} from '../../services/inventory-data.service';
 
 
 @Component({
@@ -40,6 +41,9 @@ export class SupplierInventory implements OnInit {
   formSchema: FormFieldSchema[] = [];
   private editSchema: FormFieldSchema[] = [];
   isLoading = signal(false);
+  loadError = signal(false);
+  private hasLoadedOnce = false;
+  hasInventoryData(): boolean { return this.supplies.length > 0 || this.batches.length > 0; }
 
   constructor(
     private supplyService: SupplyService,
@@ -48,14 +52,14 @@ export class SupplierInventory implements OnInit {
     private modalService: BaseModalService,
     private translate: TranslateService,
     private customSupplyService: CustomSupplyService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private inventoryData: InventoryDataService
   ) {
   }
 
   async ngOnInit(): Promise<void> {
     this.buildFormSchema();
     await this.loadData();
-    console.log(this.supplies)
   }
 
   buildFormSchema(): void {
@@ -155,12 +159,18 @@ export class SupplierInventory implements OnInit {
   }
 
   async loadData(): Promise<void> {
+    const userId = this.sessionService.getUserId();
+    if (userId == null) return;
     try {
       this.isLoading.set(true);
-      this.supplies = await this.customSupplyService.getAll();
-      this.batches = await this.batchService.getAllBatchesWithSupplies();
+      this.loadError.set(false);
+      const snapshot = await this.inventoryData.load(userId, {force: this.hasLoadedOnce});
+      this.supplies = snapshot.supplies;
+      this.batches = snapshot.batches;
+      this.hasLoadedOnce = true;
     } catch (e) {
       console.error(e);
+      this.loadError.set(true);
       this.snackBar.open('Error loading inventory data', 'Close', {duration: 3000});
     } finally {
       this.isLoading.set(false);
