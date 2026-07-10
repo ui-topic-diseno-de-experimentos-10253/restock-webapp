@@ -25,7 +25,7 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
 
   profile: Profile = new Profile();
   private currentRole: number | null = null;
-  isMobile: boolean = false;
+  isMobile = false;
   currentSection = 'Overview';
   private mobileQuery: MediaQueryList;
   private readonly mobileQueryListener = () => this.isMobile = this.mobileQuery.matches;
@@ -35,11 +35,13 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private sessionService: SessionService
   ) {
-    this.mobileQuery = window.matchMedia('(max-width: 600px)');
+    this.mobileQuery = window.matchMedia('(max-width: 1023px)');
     this.isMobile = this.mobileQuery.matches;
     this.mobileQuery.addEventListener('change', this.mobileQueryListener);
     this.updateCurrentSection(this.router.url);
-    this.routerSubscription = this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(event => this.updateCurrentSection(event.urlAfterRedirects));
+    this.routerSubscription = this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => this.updateCurrentSection(event.urlAfterRedirects));
   }
 
   async ngOnInit() {
@@ -56,11 +58,13 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
     await this.loadProfile();
   }
 
-  ngOnDestroy(): void { this.mobileQuery.removeEventListener('change', this.mobileQueryListener); this.routerSubscription.unsubscribe(); }
+  ngOnDestroy(): void {
+    this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
+    this.routerSubscription.unsubscribe();
+  }
 
   async loadProfile() {
     try {
-      //Usa userId + loadProfileByUserId en lugar de getProfileById
       const userId = this.sessionService.getUserId();
       if (!userId) {
         console.error('No userId found in session.');
@@ -70,11 +74,7 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
       this.profile = await firstValueFrom(
         this.profileService.loadProfileByUserId(userId)
       );
-
-      // Guarda el profileId en sesión para que otros componentes lo usen
       this.sessionService.setProfileId(this.profile.id);
-
-      console.log('Profile loaded:', this.profile);
     } catch (error) {
       console.error('Error loading profile:', error);
     }
@@ -105,7 +105,17 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
 
   private updateCurrentSection(url: string): void {
     const segment = url.split('?')[0].split('/').filter(Boolean).at(-1) ?? 'summary';
-    const labels: Record<string,string> = {summary:'Overview',inventory:'Inventory',subscription:'Subscription',notifications:'Notifications',orders:'Orders',recipes:'Recipes',sales:'Sales',reviews:'Reviews',profile:'Profile'};
+    const labels: Record<string, string> = {
+      summary: 'Overview',
+      inventory: 'Inventory',
+      subscription: 'Subscription',
+      notifications: 'Notifications',
+      orders: 'Orders',
+      recipes: 'Recipes',
+      sales: 'Sales',
+      reviews: 'Reviews',
+      profile: 'Profile'
+    };
     this.currentSection = labels[segment] ?? 'Workspace';
   }
 }

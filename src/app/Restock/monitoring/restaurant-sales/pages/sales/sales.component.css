@@ -1,113 +1,117 @@
-.ventas-container {
-    padding: 24px;
-    margin: 0 2rem 0 2rem;
-    /* height: 100vw; */
-}
+:host { display: block; min-width: 0; }
 
-.supplier-text {
-    font-size: 23px;
-    font-weight: 400;
+.ventas-container {
+  display: grid;
+  gap: 22px;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .ventas-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
 }
 
-.nueva-venta-btn {
-    background-color: #4F8A5B !important;
-    color: white !important;
-    border-radius: 2px;
-    padding: 15px;
+.ventas-header h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+  line-height: 1.08;
+  letter-spacing: -.04em;
 }
+
+.nueva-venta-btn,
+.registered-sales-btn {
+  min-height: 44px;
+  padding: 0 18px !important;
+  border-radius: var(--rs-radius-sm) !important;
+}
+
+.nueva-venta-btn { background: var(--rs-primary) !important; color: #fff !important; }
+.registered-sales-btn { background: #fff4e8 !important; color: #9a5700 !important; border: 1px solid #f1d2ab !important; }
 
 .btn-content {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: .88rem;
+  font-weight: 650;
 }
 
-mat-divider {
-    margin-top: 2rem;
-}
-
-
-.ventas-empty {
-    text-align: center;
-    margin-top: 40px;
-    color: #7f8c8d;
-}
-
-.ventas-text {
-    font-size: 16px;
-    margin-bottom: 24px;
-}
-
-.ventas-icon {
-    width: 100%;
-    height: 100%;
-    font-size: 160px;
-    color: #7f8c8d;
-}
-
-mat-paginator {
-    background-color: white;
-    margin-left: auto;
-}
-
-.full-width-table {
-    background-color: white;
-}
-
-.table-container {
-    margin: 0 3rem 0 3rem;
-}
-
-.flex {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin: auto;
-}
-
-.filter-field {
-    margin-top: 1rem;
-    width: 30%;
-    border: 2px;
-}
-
-.flex-title-history-sales {
-    margin-top: 3rem;
-    font-family: Poppins;
-    font-weight: 400;
-    font-size: 23px;
-    display: flex;
-    align-items: start;
-    gap: 1rem;
-    height: 40px;
-}
-
-
-.subtitle {
-    font-family: Poppins;
-    font-weight: 400;
-    font-size: 12px;
-    margin-top: 0;
-}
+mat-divider { margin: 0; }
 
 .text-question {
-    font-family: Poppins;
-    font-weight: 400;
-    font-size: 18px;
-    margin-top: 2rem;
+  margin: 0;
+  color: var(--rs-muted);
+  font-size: .95rem;
+  line-height: 1.55;
 }
 
-.registered-sales-btn {
-    background-color: #F28C38 !important;
-    color: white !important;
-    border-radius: 2px;
-    padding: 15px;
+.ventas-empty {
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  padding: 42px 24px;
+  border: 1px dashed var(--rs-border-strong);
+  border-radius: var(--rs-radius-lg);
+  background: rgba(255,255,255,.7);
+  color: var(--rs-muted);
+  text-align: center;
+}
+
+.ventas-text { max-width: 560px; margin: 0; line-height: 1.65; }
+.ventas-icon { width: auto; height: auto; margin-top: 18px; color: #9aaba0; font-size: 88px; }
+
+.flex-title-history-sales {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 0;
+  margin-top: 8px;
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+.flex-title-history-sales p { margin: 0; }
+.subtitle { margin: -8px 0 0; color: var(--rs-muted); font-size: .82rem; }
+
+.filter-field { width: min(100%, 360px); margin: 0; }
+
+.table-container {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow-x: auto;
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-radius-lg);
+  background: #fff;
+  box-shadow: var(--rs-shadow-sm);
+}
+
+.full-width-table { width: 100%; min-width: 680px; background: #fff; }
+
+.flex {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin: 0;
+}
+
+mat-paginator { width: 100%; background: transparent; }
+
+@media (max-width: 768px) {
+  .ventas-header { align-items: stretch; flex-direction: column; }
+  .nueva-venta-btn { width: 100%; }
+  .registered-sales-btn { width: 100%; }
+  .filter-field { width: 100%; }
+  .full-width-table { min-width: 620px; }
+}
+
+@media (max-width: 600px) {
+  .ventas-container { gap: 16px; }
+  .ventas-empty { min-height: 280px; padding: 30px 18px; border-radius: 16px; }
+  .ventas-icon { font-size: 64px; }
 }

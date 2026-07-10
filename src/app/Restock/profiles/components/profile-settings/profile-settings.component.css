@@ -1,9 +1,25 @@
+:host { display: block; min-width: 0; }
+
+.profile-settings-container { width: 100%; min-width: 0; }
+
 .profile-settings-card {
-  height: 1080px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-width: 60vw;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  padding: 16px;
-  background-color: #FFFFFF;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid var(--rs-border) !important;
+  border-radius: var(--rs-radius-lg) !important;
+  background: #fff;
+  box-shadow: var(--rs-shadow-sm) !important;
+}
+
+.profile-settings-card mat-card-header { padding: 4px 4px 12px; }
+.profile-settings-card mat-card-title { font-size: 1.35rem; font-weight: 700; letter-spacing: -.025em; }
+.profile-settings-card mat-card-content { min-width: 0; padding: 0; }
+.profile-settings-card mat-tab-group { min-width: 0; }
+
+@media (max-width: 600px) {
+  .profile-settings-card { padding: 12px; border-radius: 16px !important; }
 }
