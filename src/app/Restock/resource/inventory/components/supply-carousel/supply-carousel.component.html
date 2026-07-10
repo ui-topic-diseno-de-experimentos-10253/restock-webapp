@@ -1,25 +1,64 @@
-<div class="carousel-wrapper">
-  <button class="nav-button left" (click)="scrollLeft(container)">
-    <mat-icon>chevron_left</mat-icon>
-  </button>
+<section class="carousel-shell" aria-label="Supplies carousel">
+  <div class="carousel-viewport">
+    <div #container class="carousel-track" (scroll)="onScroll()">
+      @for (supply of supplies; track supply.id) {
+        <article class="supply-card">
+          <div class="card-topline">
+            <span class="category-chip">{{ getCategoryName(supply) }}</span>
+            @if (supply.perishable) {
+              <span class="perishable-chip">
+                <mat-icon>schedule</mat-icon>
+                Perishable
+              </span>
+            }
+          </div>
 
-  <div #container class="carousel-container">
-    @for (supply of supplies; track supply) {
-      <div class="supply-card">
-        <h3>{{ supply.name }}</h3>
-        <p class="category">{{ getCategoryName(supply) }}</p>
-        <p class="description">{{ supply.description || '-' }}</p>
-        <button mat-stroked-button class="edit-btn" (click)="edit.emit(supply)">
-          {{ 'inventory.edit' | translate }}
-        </button>
-        <button mat-stroked-button color="warn" class="edit-btn" (click)="delete.emit(supply)">
-          {{ 'shared.deleteButton' | translate }}
-        </button>
-      </div>
-    }
+          <div class="card-content">
+            <h3 [title]="supply.name">{{ supply.name }}</h3>
+            <p class="description" [title]="supply.description || 'No description added'">
+              {{ supply.description || 'No description added' }}
+            </p>
+          </div>
+
+          <div class="card-actions">
+            <button type="button" mat-button class="edit-button" (click)="edit.emit(supply)">
+              <mat-icon>edit</mat-icon>
+              {{ 'inventory.edit' | translate }}
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              class="delete-button"
+              [attr.aria-label]="'Delete ' + supply.name"
+              [title]="'Delete ' + supply.name"
+              (click)="delete.emit(supply)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </article>
+      }
+    </div>
   </div>
 
-  <button class="nav-button right" (click)="scrollRight(container)">
-    <mat-icon>chevron_right</mat-icon>
-  </button>
-</div>
+  @if (supplies.length > 1) {
+    <button
+      type="button"
+      class="nav-button left"
+      [disabled]="!canScrollLeft()"
+      aria-label="Show previous supplies"
+      (click)="scroll('left')">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    <button
+      type="button"
+      class="nav-button right"
+      [disabled]="!canScrollRight()"
+      aria-label="Show next supplies"
+      (click)="scroll('right')">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  }
+
+  <p class="carousel-hint">Scroll horizontally or use the arrows to view more supplies.</p>
+</section>

@@ -1,22 +1,28 @@
-<section class="supplies-section">
+<section class="supplies-section" aria-labelledby="supplies-title">
   <div class="supplies-header">
-    <h1 class="supplies-title">{{ 'inventory.suppliesTitle' | translate }}</h1>
-    <button mat-raised-button color="primary" class="create-button" (click)="create.emit()">
+    <div class="supplies-heading">
+      <div class="title-row">
+        <h2 id="supplies-title" class="supplies-title">{{ 'inventory.suppliesTitle' | translate }}</h2>
+        <span class="supplies-count" aria-label="Registered supplies">{{ suppliesLength }}</span>
+      </div>
+      <p class="supplies-subtitle">Ingredients available to add and track in your inventory.</p>
+    </div>
+
+    <button type="button" mat-raised-button color="primary" class="create-button" (click)="create.emit()">
       <span class="btn-content">
-        {{ 'inventory.create' | translate }}<mat-icon>control_point</mat-icon>
+        <mat-icon>add</mat-icon>
+        {{ 'inventory.create' | translate }}
       </span>
     </button>
   </div>
 
   @if (suppliesLength === 0) {
     <mat-card class="empty-card">
-      <app-empty-section
-        [title]="'inventory.emptyTitle' | translate">
-          <button action mat-stroked-button color="primary" class="create-button" (click)="create.emit()">
-            {{ 'inventory.createSupply' | translate }}
-          </button>
+      <app-empty-section [title]="'inventory.emptyTitle' | translate">
+        <button action type="button" mat-stroked-button color="primary" class="empty-action" (click)="create.emit()">
+          {{ 'inventory.createSupply' | translate }}
+        </button>
       </app-empty-section>
     </mat-card>
   }
-
 </section>
