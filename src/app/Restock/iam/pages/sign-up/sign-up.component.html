@@ -1,69 +1,88 @@
-<div class="signup-wrapper">
-  <div class="signup-card">
-    <div class="signup-header">
-      <h2 class="title">Sign up</h2>
-      <p class="subtitle">Join Restock and start optimizing today!</p>
+<main class="auth-page">
+  <section class="auth-visual" aria-label="Restock inventory management">
+    <img src="assets/imagen-principal.png" alt="Fresh ingredients managed with Restock" />
+    <div class="auth-visual-overlay"></div>
+    <div class="auth-visual-content">
+      <a class="auth-brand" routerLink="/" aria-label="Restock home">
+        <img src="assets/logo-restock.png" alt="" />
+        <span>Restock</span>
+      </a>
+      <div class="auth-message">
+        <span class="auth-eyebrow">BUILT FOR DAILY OPERATIONS</span>
+        <h1>Less waste. More control.</h1>
+        <p>Create your workspace and turn inventory changes into clear, timely actions.</p>
+        <ul class="auth-benefits" aria-label="Restock benefits">
+          <li><mat-icon>notifications_active</mat-icon> Stay ahead of low stock</li>
+          <li><mat-icon>sync_alt</mat-icon> Connect restaurants and suppliers</li>
+          <li><mat-icon>query_stats</mat-icon> Understand your operation</li>
+        </ul>
+      </div>
     </div>
+  </section>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="signup-form">
-      <!-- Username -->
-      <div class="input-field">
-        <mat-icon class="material-icon">person</mat-icon>
-        <input matInput placeholder="Username" formControlName="username" required />
+  <section class="auth-panel auth-panel-scroll">
+    <div class="auth-form-container">
+      <div class="auth-mobile-brand">
+        <img src="assets/logo-restock.png" alt="" />
+        <span>Restock</span>
       </div>
-      <mat-error *ngIf="isInvalidControl(form, 'username')">
-        {{ errorMessagesForControl(form, 'username') }}
-      </mat-error>
-
-      <!-- Password -->
-      <div class="input-field">
-        <mat-icon class="material-icon">lock</mat-icon>
-        <input matInput type="password" placeholder="Password" formControlName="password" required />
+      <div class="auth-header">
+        <span class="auth-eyebrow">GET STARTED</span>
+        <h2>Create your account</h2>
+        <p>Choose how you will use Restock and set up your access.</p>
       </div>
-      <mat-error *ngIf="isInvalidControl(form, 'password')">
-        {{ errorMessagesForControl(form, 'password') }}
-      </mat-error>
 
-      <!-- Role selection -->
-      <label class="role-label">Choose your role</label>
-      <div class="role-options">
-        <div
-  class="role-card"
-  [ngClass]="{ 'selected': form.get('role')?.value === 2 }"
-  (click)="selectRole(2)"
->
-  <i class="fas fa-utensils role-icon"></i>
-  <span class="role-name">Administrator</span>
-</div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+        <div class="auth-field" [class.auth-field-invalid]="isInvalidControl(form, 'username')">
+          <label for="signup-username">Username</label>
+          <div class="auth-input">
+            <mat-icon aria-hidden="true">person_outline</mat-icon>
+            <input id="signup-username" type="text" formControlName="username" autocomplete="username"
+                   placeholder="Choose a username" />
+          </div>
+          <mat-error *ngIf="isInvalidControl(form, 'username')">{{ errorMessagesForControl(form, 'username') }}</mat-error>
+        </div>
 
-<div
-  class="role-card"
-  [ngClass]="{ 'selected': form.get('role')?.value === 1 }"
-  (click)="selectRole(1)"
->
-  <i class="fas fa-truck role-icon"></i>
-  <span class="role-name">Provider</span>
-</div>
-      </div>
-      <mat-error *ngIf="isInvalidControl(form, 'role')">
-        {{ errorMessagesForControl(form, 'role') }}
-      </mat-error>
+        <div class="auth-field" [class.auth-field-invalid]="isInvalidControl(form, 'password')">
+          <label for="signup-password">Password</label>
+          <div class="auth-input">
+            <mat-icon aria-hidden="true">lock_outline</mat-icon>
+            <input id="signup-password" [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                   autocomplete="new-password" placeholder="Create a password" />
+            <button class="password-toggle" type="button" (click)="hidePassword = !hidePassword"
+                    [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <mat-error *ngIf="isInvalidControl(form, 'password')">{{ errorMessagesForControl(form, 'password') }}</mat-error>
+        </div>
 
-      <!-- Submit -->
-      <button mat-raised-button color="primary" class="btn-submit">Sign up</button>
-    </form>
+        <fieldset class="role-fieldset">
+          <legend>How will you use Restock?</legend>
+          <div class="role-options">
+            <button type="button" class="role-card" [class.selected]="form.get('role')?.value === 2"
+                    (click)="selectRole(2)" [attr.aria-pressed]="form.get('role')?.value === 2">
+              <span class="role-icon"><mat-icon>restaurant</mat-icon></span>
+              <span><strong>Restaurant</strong><small>Manage stock, recipes and orders</small></span>
+              <mat-icon class="role-check">check_circle</mat-icon>
+            </button>
+            <button type="button" class="role-card" [class.selected]="form.get('role')?.value === 1"
+                    (click)="selectRole(1)" [attr.aria-pressed]="form.get('role')?.value === 1">
+              <span class="role-icon"><mat-icon>local_shipping</mat-icon></span>
+              <span><strong>Supplier</strong><small>Manage products and fulfill orders</small></span>
+              <mat-icon class="role-check">check_circle</mat-icon>
+            </button>
+          </div>
+          <mat-error *ngIf="isInvalidControl(form, 'role')">{{ errorMessagesForControl(form, 'role') }}</mat-error>
+        </fieldset>
 
-    <p class="redirect-text">
-      Already have an account?
-      <a routerLink="/sign-in" class="redirect-link">Sign in</a>
-    </p>
-
-    <!-- Social media -->
-    <div class="social-media">
-      <p class="social-text">Or sign up with</p>
-      <a (click)="onSocialSignUp('Google')" class="social-icon"><i class="fab fa-google"></i></a>
-      <a (click)="onSocialSignUp('Facebook')" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-      <a (click)="onSocialSignUp('Apple')" class="social-icon"><i class="fab fa-apple"></i></a>
+        <button mat-flat-button class="auth-submit" type="submit" [disabled]="submitted">
+          {{ submitted ? 'Creating account…' : 'Create account' }}
+          <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+        </button>
+      </form>
+      <p class="auth-redirect">Already have an account? <a routerLink="/sign-in">Sign in</a></p>
+      <p class="auth-legal">By creating an account, you agree to Restock's terms and privacy policy.</p>
     </div>
-  </div>
-</div>
+  </section>
+</main>

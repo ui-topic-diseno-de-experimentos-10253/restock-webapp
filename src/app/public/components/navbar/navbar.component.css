@@ -1,25 +1,4 @@
-.navbar-container {
-    position: fixed;
-    top: 20px;
-    left: 94%;
-    transform: translateX(-50%);
-    z-index: 100;
-}
-
-.navbar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.2rem;
-    width: auto;
-    height: 44px;
-    background-color: #f1f2f3;
-    border-radius: 40px;
-    padding: 0 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.icon {
-    font-size: 24px;
-    color: #333;
-}
+.navbar { display: flex; align-items: center; gap: 4px; padding: 4px; border: 1px solid #dfe6e0; border-radius: 12px; background: #f7f9f7; }
+.navbar button { color: #4d5d51; }
+.navbar button:hover { background: #e8f1e9; color: #356942; }
+.icon { font-size: 22px; }

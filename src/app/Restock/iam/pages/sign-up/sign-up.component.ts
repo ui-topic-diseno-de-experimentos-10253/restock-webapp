@@ -3,10 +3,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angula
 import { AuthenticationService } from '../../services/authentication.service';
 import { SignUpRequest } from "../../model/sign-up.request";
 import { MatError } from "@angular/material/form-field";
-import { MatInput } from "@angular/material/input";
 import { MatButton } from "@angular/material/button";
 import { MatIcon } from '@angular/material/icon';
-import { NgClass, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { BaseFormComponent } from '../../../../shared/components/base-form.component';
 import { RouterLink } from '@angular/router';
 
@@ -16,10 +15,8 @@ import { RouterLink } from '@angular/router';
   imports: [
     ReactiveFormsModule,
     MatError,
-    MatInput,
     MatButton,
     MatIcon,
-    NgClass,
     NgIf,
     RouterLink
   ],
@@ -29,6 +26,7 @@ import { RouterLink } from '@angular/router';
 export class SignUpComponent extends BaseFormComponent implements OnInit {
   form!: FormGroup;
   submitted: boolean = false;
+  hidePassword = true;
 
   constructor(
     private builder: FormBuilder,
@@ -46,16 +44,15 @@ export class SignUpComponent extends BaseFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const { username, password, role } = this.form.value;
 
     const signUpRequest = new SignUpRequest(username, password, role);
     this.authenticationService.signUp(signUpRequest);
     this.submitted = true;
-  }
-
-  onSocialSignUp(provider: string) {
-    console.log('Signing up with', provider);
   }
 
   selectRole(roleId: number) {
