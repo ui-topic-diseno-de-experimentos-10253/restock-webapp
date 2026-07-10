@@ -50,13 +50,16 @@ export class ProfileOverviewComponent implements OnInit {
       const userId = this.sessionService.getUserId();
       if (!userId) throw new Error('Missing session user id');
       
-      const rawProfile = await firstValueFrom(this.profileService.loadProfileByUserId(userId));
+      const [rawProfile, user] = await Promise.all([
+        firstValueFrom(this.profileService.loadProfileByUserId(userId)),
+        this.userService.getUserById(userId)
+      ]);
       
       // Create a new object to force change detection
       this.profile = JSON.parse(JSON.stringify(rawProfile));
       this.sessionService.setProfileId(this.profile.id);
 
-      await this.loadUser();
+      this.user = user;
       // No need to load business separately - it's already in the profile
       this.business = this.profile.business || new Business();
       

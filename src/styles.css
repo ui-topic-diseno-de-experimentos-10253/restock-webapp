@@ -1,4 +1,7 @@
 @import './app/Restock/iam/pages/auth-layout.css';
+@import './app/Restock/resource/inventory/pages/inventory-page.css';
+
+:root { --rs-primary:#3f7d4d;--rs-primary-hover:#32663e;--rs-primary-soft:#eaf3ec;--rs-ink:#1c2c21;--rs-muted:#68756c;--rs-border:#dfe7e1;--rs-surface:#fff;--rs-canvas:#f6f8f6;--rs-radius-sm:10px;--rs-radius-md:14px;--rs-radius-lg:20px; }
 
 html,
 body {
@@ -15,6 +18,15 @@ body {
 
 button, input, select, textarea { font: inherit; }
 :focus-visible { outline: 3px solid rgba(79, 138, 91, 0.38); outline-offset: 2px; }
+
+.mat-mdc-card { border:1px solid var(--rs-border)!important;border-radius:var(--rs-radius-md)!important;box-shadow:none!important; }
+.mat-mdc-raised-button.mat-primary,.mat-mdc-unelevated-button.mat-primary { border-radius:var(--rs-radius-sm)!important;background:var(--rs-primary)!important;color:#fff!important; }
+.mat-mdc-raised-button.mat-primary:hover,.mat-mdc-unelevated-button.mat-primary:hover { background:var(--rs-primary-hover)!important; }
+.mat-mdc-dialog-surface { border-radius:var(--rs-radius-lg)!important;box-shadow:0 24px 70px rgba(17,36,22,.2)!important; }
+.mat-mdc-table { overflow:hidden;border:1px solid var(--rs-border);border-radius:var(--rs-radius-md);background:var(--rs-surface)!important; }
+.mat-mdc-header-row { background:#f3f7f4!important; }.mat-mdc-header-cell { color:#536159!important;font-weight:700!important; }.mat-mdc-row:hover { background:#f7faf7!important; }
+.mat-mdc-paginator { color:var(--rs-muted);background:transparent!important; }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important; } }
 
 
 .dialog-unified-size {

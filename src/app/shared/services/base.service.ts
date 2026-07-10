@@ -39,44 +39,44 @@ export abstract class BaseService<T> {
     // Crea un recurso en el backend (POST)
     public create(resource: T): Observable<T> {
         return this.http.post<T>(this.resourcePath(), JSON.stringify(resource), this.httpOptions)
-            .pipe(retry(2), catchError(this.handleError));
+            .pipe(catchError(this.handleError));
     }
 
     // Elimina un recurso por ID (DELETE)
     public delete(id: any): Observable<any> {
         return this.http.delete(`${this.resourcePath()}/${id}`, this.httpOptions)
-            .pipe(retry(2), catchError(this.handleError));
+            .pipe(catchError(this.handleError));
     }
 
     // Actualiza un recurso por ID (PUT)
     public update(id: any, resource: T): Observable<T> {
         return this.http.put<T>(`${this.resourcePath()}/${id}`, JSON.stringify(resource), this.httpOptions)
-            .pipe(retry(2), catchError(this.handleError));
+            .pipe(catchError(this.handleError));
     }
 
     // Obtiene todos los recursos (GET)
     public getAll(): Observable<Array<T>> {
         return this.http.get<Array<T>>(this.resourcePath(), this.httpOptions)
-            .pipe(retry(2), catchError(this.handleError));
+            .pipe(retry({count: 1, delay: 250}), catchError(this.handleError));
     }
 
     // Obtiene un recurso por ID (GET)
     public getById(id: any): Observable<T> {
         return this.http.get<T>(`${this.resourcePath()}/${id}`, this.httpOptions)
-            .pipe(retry(2), catchError(this.handleError));
+            .pipe(retry({count: 1, delay: 250}), catchError(this.handleError));
     }
 
     public getByQuery(param: string, value: any): Observable<Array<T>> {
         const url = `${this.resourcePath()}?${param}=${value}`;
         return this.http.get<Array<T>>(url, this.httpOptions)
-            .pipe(retry(2), catchError(this.handleError));
+            .pipe(retry({count: 1, delay: 250}), catchError(this.handleError));
     }
 
     public deleteByCompositeKey(keys: { [key: string]: any }): Observable<any> {
     const params = new URLSearchParams();
     Object.entries(keys).forEach(([k, v]) => params.append(k, v));
     return this.http.delete(`${this.resourcePath()}?${params.toString()}`, this.httpOptions)
-      .pipe(retry(2), catchError(this.handleError));
+      .pipe(catchError(this.handleError));
   }
 
 

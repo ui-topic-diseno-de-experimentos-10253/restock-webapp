@@ -80,11 +80,10 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
 
   async ngOnInit() {
     this.isLoading.set(true);
-    await this.loadOrders();
-    await this.loadGroupedSupplies();
-    await this.loadUsersAndProfiles();
-    await this.loadStates();
-    this.isLoading.set(false);
+    try {
+      await Promise.all([this.loadOrders(), this.loadUsersAndProfiles(), this.loadStates()]);
+      await this.loadGroupedSupplies();
+    } finally { this.isLoading.set(false); }
   }
 
   buildRestaurantNameMap() {
@@ -144,12 +143,9 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
   async loadUsersAndProfiles() {
     const restaurantUsersId = await this.userService.getRestaurantAdminUserIds();
 
-    this.profileService.loadProfilesByUserIds(restaurantUsersId).subscribe((profiles) => {
-      this.adminRestaurantsProfiles.splice(0, this.adminRestaurantsProfiles.length, ...profiles);
-      console.log('Loaded restaurant profiles:', this.adminRestaurantsProfiles);
-
-      this.buildRestaurantNameMap();
-    });
+    const profiles = await firstValueFrom(this.profileService.loadProfilesByUserIds(restaurantUsersId));
+    this.adminRestaurantsProfiles.splice(0, this.adminRestaurantsProfiles.length, ...profiles);
+    this.buildRestaurantNameMap();
   }
 
 
@@ -469,4 +465,3 @@ export class SuppliersOrdersOverviewComponent implements OnInit {
   }
 
 }
-
