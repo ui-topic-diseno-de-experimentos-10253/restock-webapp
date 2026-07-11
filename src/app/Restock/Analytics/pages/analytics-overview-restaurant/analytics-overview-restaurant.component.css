@@ -1,46 +1,49 @@
-.restaurant-summary-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 0;
-}
-
-.row-1 {
-  display: flex;
-  gap: 1.5rem;
-  align-items: stretch;
-}
-
-.widget-pending-orders {
-  flex: 2;/* 66% aprox */
-}
-
-.widget-last-notifications {
-  flex: 1; /* 33% aprox */
-}
-
-.row-2 {
-  display: flex;
-
-}
-
-.widget-carousel {
+:host {
+  display: block;
   width: 100%;
-  max-width: 1400px;
+  min-width: 0;
 }
 
-@media (max-width: 1190px) {
-  .row-1 {
-    flex-direction: column;
+.restaurant-summary-grid {
+  display: grid;
+  gap: 24px;
+  width: min(100%, 1320px);
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.summary-primary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(320px, .72fr);
+  gap: 24px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.widget-orders,
+.widget-notifications,
+.widget-supplies,
+.widget-orders > *,
+.widget-notifications > *,
+.widget-supplies > * {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 1260px) {
+  .summary-primary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .restaurant-summary-grid {
+    gap: 18px;
   }
 
-  .pending-widget,
-  .alerts-widget,
-  .supplies-widget {
-    width: 100% !important;
-  }
-
-  .row-2 {
-    flex-direction: column;
+  .summary-primary {
+    gap: 18px;
   }
 }

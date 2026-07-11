@@ -1,87 +1,233 @@
-.widget-title {
-  font-family: Poppins, sans-serif;
-  font-weight: 400;
-  font-size: 23px;
-  margin-bottom: 10px;
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
 }
 
-.widget-container {
-  background: #fff;
-  padding: 20px 30px;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 30px;
-  max-height: 300px;
-  overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
+.orders-widget {
   display: flex;
   flex-direction: column;
-  min-height: 330px;
-  }
-
-.scroll-wrapper {
-  max-height: 250px;
-  overflow-y: auto;
-  overflow-x: auto;
+  min-width: 0;
+  min-height: 390px;
+  height: 100%;
+  overflow: hidden;
 }
 
-.view-all-button-container {
-  text-align: right;
-  margin-top: 10px;
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--rs-border);
 }
 
-/* Estilos exclusivos para la tabla del widget */
-::ng-deep .custom-orders-table table.mat-table {
-  background-color: white !important;
-  border-collapse: collapse;
+.widget-header h2 {
+  margin: 2px 0 0;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.2;
+  letter-spacing: -.025em;
 }
 
-::ng-deep .custom-orders-table .mat-row,
-::ng-deep .custom-orders-table .mat-header-row {
-  border-bottom: 1px solid #e0e0e0;
+.widget-eyebrow {
+  margin: 0;
+  color: var(--rs-primary);
+  font-size: .68rem;
+  font-weight: 750;
+  letter-spacing: .13em;
+  text-transform: uppercase;
 }
 
-/* The shared orders-table component sets a fixed min-width (800px) and the
-   default Material type scale, both sized for the full Orders page. Inside
-   this narrow summary widget that forces an unnecessary horizontal scroll,
-   so it's scaled down to fit the card. */
-::ng-deep .custom-orders-table .full-width-table {
-  min-width: 100%;
+.widget-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.count-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--rs-primary-soft);
+  color: var(--rs-primary);
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.orders-scroll {
+  min-width: 0;
   width: 100%;
-  table-layout: auto;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
-::ng-deep .custom-orders-table .mat-header-cell,
-::ng-deep .custom-orders-table .mat-cell {
-  font-size: 13px !important;
-  padding: 8px 12px !important;
+.orders-scroll:focus-visible {
+  outline-offset: -3px;
+}
+
+table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf1ee;
+  text-align: left;
   white-space: nowrap;
 }
 
-/* Ocultar columna "actions" en el widget */
-::ng-deep .custom-orders-table .mat-column-actions {
-  display: none !important;
+th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f3f7f4;
+  color: #536159;
+  font-size: .76rem;
+  font-weight: 750;
 }
-/* Forzar fondo blanco en todas las filas de situación solo en el widget */
-::ng-deep .widget-context .situation-pending,
-::ng-deep .widget-context .situation-approved,
-::ng-deep .widget-context .situation-declined {
-  background-color: white !important;
+
+td {
+  color: #344039;
+  font-size: .84rem;
 }
-/* Responsive: ocultar columnas menos relevantes en mobile */
-@media (max-width: 768px) {
-  ::ng-deep .custom-orders-table .mat-column-situation,
-  ::ng-deep .custom-orders-table .mat-column-date,
-  ::ng-deep .custom-orders-table .mat-column-requestedProducts {
-    display: none !important;
+
+tbody tr:hover {
+  background: #f8faf8;
+}
+
+.supplier-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.supplier-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #eef4ef;
+  color: #416d4b;
+  font-size: .7rem;
+  font-weight: 750;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eef2ef;
+  color: #526058;
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.status-delivered,
+.status-approved {
+  background: #e5f4e8;
+  color: #2f6c3e;
+}
+
+.status-pending,
+.status-on-hold,
+.status-preparing {
+  background: #fff2d8;
+  color: #8a5900;
+}
+
+.status-declined,
+.status-cancelled {
+  background: #fdebea;
+  color: #a83027;
+}
+
+.status-on-the-way {
+  background: #e8f0fb;
+  color: #2f5f9a;
+}
+
+.price-cell {
+  color: #26362b;
+  font-weight: 700;
+}
+
+.widget-state {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  flex: 1;
+  min-height: 280px;
+  padding: 30px;
+  color: var(--rs-muted);
+  text-align: center;
+}
+
+.widget-state mat-icon {
+  width: 44px;
+  height: 44px;
+  color: #91a39a;
+  font-size: 44px;
+}
+
+.widget-state p {
+  max-width: 500px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.widget-state--error mat-icon {
+  color: var(--rs-danger);
+}
+
+.loading-bar {
+  width: min(280px, 70%);
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7ede8;
+}
+
+.loading-bar::after {
+  content: '';
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--rs-primary);
+  animation: summary-loading 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes summary-loading {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(150%); }
+}
+
+@media (max-width: 720px) {
+  .orders-widget {
+    min-height: 350px;
   }
 
-  ::ng-deep .custom-orders-table .mat-header-cell,
-  ::ng-deep .custom-orders-table .mat-cell {
-    font-size: 11px !important;
-    padding: 6px 8px !important;
+  .widget-header {
+    padding: 16px;
   }
-  .widget-container {
-    padding: 15px;
+
+  th,
+  td {
+    padding: 12px 14px;
   }
 }

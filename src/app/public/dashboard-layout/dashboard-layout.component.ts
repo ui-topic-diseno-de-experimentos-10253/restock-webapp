@@ -6,6 +6,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 import { Profile } from '../../Restock/profiles/model/profile.entity';
 import { ProfileService } from '../../Restock/profiles/services/profile.service';
 import { SessionService } from '../../shared/services/session.service';
@@ -14,7 +15,16 @@ import { filter, firstValueFrom, Subscription } from 'rxjs';
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [NavbarComponent, SidebarComponent, RouterOutlet, MatSidenavModule, MatToolbarModule, MatIconModule, MatIconButton],
+  imports: [
+    NavbarComponent,
+    SidebarComponent,
+    RouterOutlet,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatIconButton,
+    TranslateModule
+  ],
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.css']
 })
@@ -26,7 +36,7 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   profile: Profile = new Profile();
   private currentRole: number | null = null;
   isMobile = false;
-  currentSection = 'Overview';
+  currentSectionKey = 'sidebar.summary';
   private mobileQuery: MediaQueryList;
   private readonly mobileQueryListener = () => this.isMobile = this.mobileQuery.matches;
   private readonly routerSubscription: Subscription;
@@ -106,16 +116,16 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   private updateCurrentSection(url: string): void {
     const segment = url.split('?')[0].split('/').filter(Boolean).at(-1) ?? 'summary';
     const labels: Record<string, string> = {
-      summary: 'Overview',
-      inventory: 'Inventory',
-      subscription: 'Subscription',
-      notifications: 'Notifications',
-      orders: 'Orders',
-      recipes: 'Recipes',
-      sales: 'Sales',
-      reviews: 'Reviews',
-      profile: 'Profile'
+      summary: 'sidebar.summary',
+      inventory: 'sidebar.inventory',
+      subscription: 'sidebar.subscription',
+      notifications: 'sidebar.notifications',
+      orders: 'sidebar.orders',
+      recipes: 'sidebar.recipes',
+      sales: 'sidebar.sales',
+      reviews: 'sidebar.reviews',
+      profile: 'profile.title'
     };
-    this.currentSection = labels[segment] ?? 'Workspace';
+    this.currentSectionKey = labels[segment] ?? 'sidebar.summary';
   }
 }
