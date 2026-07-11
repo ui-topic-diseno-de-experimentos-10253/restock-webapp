@@ -1,6 +1,6 @@
 <main class="auth-page">
   <section class="auth-visual" aria-label="Restock inventory management">
-    <img src="assets/imagen-principal.png" alt="Fresh ingredients managed with Restock" />
+    <img [src]="heroImage" (error)="onHeroImageError()" alt="Fresh ingredients managed with Restock" />
     <div class="auth-visual-overlay"></div>
     <div class="auth-visual-content">
       <a class="auth-brand" routerLink="/" aria-label="Restock home">
