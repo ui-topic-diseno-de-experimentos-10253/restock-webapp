@@ -1,30 +1,53 @@
-<h3 class="widget-title">Last added supplies</h3>
-
-<!-- Vista desktop: Carrusel con flechas -->
-<div class="carousel-wrapper">
-  <button class="nav-button left" (click)="scrollLeft(containerRef.nativeElement)">
-    <mat-icon>chevron_left</mat-icon>
-  </button>
-
-  <div #carouselContainer class="carousel-container">
-    <div class="supply-card" *ngFor="let b of batches">
-      <h3>{{ b.supply?.name }}</h3>
-      <p class="category">{{ b.supply?.category || 'Uncategorized' }}</p>
-      <p class="description">{{ b.supply?.description || '-' }}</p>
+<section class="recent-supplies rs-panel">
+  <header class="widget-header">
+    <div>
+      <p class="widget-eyebrow">{{ 'sidebar.summary' | translate }}</p>
+      <h2>{{ 'inventory.suppliesTitle' | translate }}</h2>
     </div>
-  </div>
 
-  <button class="nav-button right" (click)="scrollRight(containerRef.nativeElement)">
-    <mat-icon>chevron_right</mat-icon>
-  </button>
-</div>
-
-<!-- Vista mobile: scroll horizontal tipo grilla -->
-<div class="supplies-grid">
-  <div class="ingredient-pair" *ngFor="let pair of getPairs()">
-    <div class="ingredient-card" *ngFor="let b of pair">
-      <h4>{{ b.supply?.name }}</h4>
-      <p class="category">{{ b.supply?.category || 'Uncategorized' }}</p>
+    <div class="carousel-actions">
+      <button mat-icon-button type="button" (click)="scroll(-1)" [attr.aria-label]="'inventory.back' | translate">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-icon-button type="button" (click)="scroll(1)" [attr.aria-label]="'inventory.next' | translate">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
     </div>
-  </div>
-</div>
+  </header>
+
+  @if (isLoading) {
+    <div class="widget-state" aria-live="polite">
+      <div class="skeleton-row">
+        <span></span><span></span><span></span>
+      </div>
+      <p>{{ 'common.loading' | translate }}</p>
+    </div>
+  } @else if (hasError) {
+    <div class="widget-state widget-state--error" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ 'common.error' | translate }}</p>
+    </div>
+  } @else if (batches.length === 0) {
+    <div class="widget-state">
+      <mat-icon>inventory_2</mat-icon>
+      <p>{{ 'inventory.inventoryEmptyMessage' | translate }}</p>
+    </div>
+  } @else {
+    <div #carouselContainer class="carousel-container" tabindex="0">
+      @for (batch of batches; track batch.id) {
+        <article class="supply-card">
+          <div class="card-icon"><mat-icon>inventory_2</mat-icon></div>
+          <div class="card-copy">
+            <span class="category">{{ batch.supply?.category || ('common.notSpecified' | translate) }}</span>
+            <h3>{{ batch.supply?.name }}</h3>
+            <p>{{ batch.supply?.description || ('common.noDescription' | translate) }}</p>
+          </div>
+          <div class="stock-value">
+            <strong>{{ batch.stock }}</strong>
+            <span>{{ batch.supply?.unit_abbreviation }}</span>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
