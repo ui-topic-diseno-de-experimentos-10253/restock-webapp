@@ -1,15 +1,15 @@
-<div class="restaurant-summary-grid"> <!-- Row 1: Pending Orders + Last Alerts -->
-  <div class="row-1">
-    <div class="widget-pending-orders">
-      <app-restaurant-pending-orders-widget></app-restaurant-pending-orders-widget>
+<main class="restaurant-summary-grid">
+  <section class="summary-primary" aria-label="Restaurant overview">
+    <div class="widget-orders">
+      <app-restaurant-pending-orders-widget />
     </div>
-    <div class="widget-last-notifications">
-        <app-restaurant-notifications-widget></app-restaurant-notifications-widget>
+
+    <div class="widget-notifications">
+      <app-restaurant-notifications-widget />
     </div>
-  </div> <!-- Row 2: Carrusel de Clientes Frecuentes -->
-  <div class="row-2">
-    <div class="widget-carousel">
-      <app-restaurant-last-supplies-widget/>
-    </div>
-  </div>
-</div>
+  </section>
+
+  <section class="widget-supplies">
+    <app-restaurant-last-supplies-widget />
+  </section>
+</main>

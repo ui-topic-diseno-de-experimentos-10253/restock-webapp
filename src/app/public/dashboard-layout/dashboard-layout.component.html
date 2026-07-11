@@ -1,28 +1,37 @@
 <mat-sidenav-container class="layout-container">
-  <mat-sidenav #drawer [mode]="isMobile ? 'over' : 'side'" [opened]="!isMobile" [fixedInViewport]="isMobile"
-    fixedTopGap="56" class="sidebar-container">
-    <app-sidebar [menu]="menu" [profile]="profile"></app-sidebar>
+  <mat-sidenav
+    #drawer
+    [mode]="isMobile ? 'over' : 'side'"
+    [opened]="!isMobile"
+    [fixedInViewport]="isMobile"
+    fixedTopGap="56"
+    class="sidebar-container">
+    <app-sidebar [menu]="menu" [profile]="profile" />
   </mat-sidenav>
 
   <mat-sidenav-content class="main-content">
     <header class="app-header">
       <div class="header-start">
         @if (isMobile) {
-          <button mat-icon-button class="menu-button" (click)="drawer.toggle()" aria-label="Open navigation">
+          <button
+            mat-icon-button
+            class="menu-button"
+            type="button"
+            (click)="drawer.toggle()"
+            [attr.aria-label]="'sidebar.summary' | translate">
             <mat-icon>menu</mat-icon>
           </button>
         }
         <div>
-          <span class="header-eyebrow">RESTOCK WORKSPACE</span>
-          <p class="header-title">{{ currentSection }}</p>
+          <span class="header-eyebrow">RESTOCK</span>
+          <p class="header-title">{{ currentSectionKey | translate }}</p>
         </div>
       </div>
-      <app-navbar></app-navbar>
+      <app-navbar />
     </header>
 
     <div class="content-wrapper">
-      <router-outlet></router-outlet>
+      <router-outlet />
     </div>
   </mat-sidenav-content>
-
 </mat-sidenav-container>

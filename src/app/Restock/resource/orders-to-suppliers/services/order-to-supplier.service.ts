@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, firstValueFrom, map, shareReplay, tap, throwError } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { OrderToSupplier } from '../model/order-to-supplier.entity';
 import { OrderToSupplierBatch } from '../model/order-to-supplier-batch.entity';
@@ -9,99 +9,164 @@ import {
   UpdateOrderStateRequest
 } from '../model/create-order-request';
 
+interface OrdersCacheEntry {
+  expiresAt: number;
+  stream: Observable<OrderToSupplier[]>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class OrderToSupplierService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.serverBaseUrlBackend;
   private readonly endpoint = '/orders';
+  private readonly cacheTtlMs = 30_000;
+  private readonly restaurantCache = new Map<number, OrdersCacheEntry>();
+  private readonly supplierCache = new Map<number, OrdersCacheEntry>();
+  private allOrdersCache?: OrdersCacheEntry;
 
   create(payload: CreateOrderRequest): Observable<any> {
-    return this.http.post(`${this.baseUrl}${this.endpoint}`, payload);
+    return this.http.post(`${this.baseUrl}${this.endpoint}`, payload).pipe(
+      tap(() => this.invalidateCache())
+    );
   }
 
-  getByRestaurant(adminRestaurantId: number): Observable<OrderToSupplier[]> {
-    return this.http
+  getByRestaurant(adminRestaurantId: number, force = false): Observable<OrderToSupplier[]> {
+    const cached = this.restaurantCache.get(adminRestaurantId);
+    if (!force && cached && cached.expiresAt > Date.now()) return cached.stream;
+
+    const stream = this.http
       .get<any>(`${this.baseUrl}${this.endpoint}/admin-restaurant/${adminRestaurantId}`)
       .pipe(
         map(response => this.extractArray(response)),
-        map(items => items.map(item => this.toEntity(item)))
+        map(items => items.map(item => this.toEntity(item))),
+        shareReplay({ bufferSize: 1, refCount: false }),
+        catchError(error => {
+          this.restaurantCache.delete(adminRestaurantId);
+          return throwError(() => error);
+        })
       );
+
+    this.restaurantCache.set(adminRestaurantId, {
+      expiresAt: Date.now() + this.cacheTtlMs,
+      stream
+    });
+    return stream;
   }
 
-  getBySupplier(supplierId: number): Observable<OrderToSupplier[]> {
-    return this.http
+  getBySupplier(supplierId: number, force = false): Observable<OrderToSupplier[]> {
+    const cached = this.supplierCache.get(supplierId);
+    if (!force && cached && cached.expiresAt > Date.now()) return cached.stream;
+
+    const stream = this.http
       .get<any>(`${this.baseUrl}${this.endpoint}/supplier/${supplierId}`)
       .pipe(
         map(response => this.extractArray(response)),
-        map(items => items.map(item => this.toEntity(item)))
+        map(items => items.map(item => this.toEntity(item))),
+        shareReplay({ bufferSize: 1, refCount: false }),
+        catchError(error => {
+          this.supplierCache.delete(supplierId);
+          return throwError(() => error);
+        })
       );
+
+    this.supplierCache.set(supplierId, {
+      expiresAt: Date.now() + this.cacheTtlMs,
+      stream
+    });
+    return stream;
   }
 
   updateState(orderId: number, state: UpdateOrderStateRequest): Observable<any> {
-    return this.http.put(`${this.baseUrl}${this.endpoint}/${orderId}/state`, state);
+    return this.http.put(`${this.baseUrl}${this.endpoint}/${orderId}/state`, state).pipe(
+      tap(() => this.invalidateCache())
+    );
   }
 
-  getAllOrders(): Promise<OrderToSupplier[]> {
-    return new Promise((resolve, reject) => {
-      this.http.get<any[]>(`${this.baseUrl}${this.endpoint}`)
-        .pipe(
-          map(response => this.extractArray(response)),
-          map(items => items.map(item => this.toEntity(item)))
-        )
-        .subscribe({
-          next: resolve,
-          error: reject
-        });
-    });
+  async getAllOrders(force = false): Promise<OrderToSupplier[]> {
+    if (!force && this.allOrdersCache && this.allOrdersCache.expiresAt > Date.now()) {
+      return firstValueFrom(this.allOrdersCache.stream);
+    }
+
+    const stream = this.http.get<any[]>(`${this.baseUrl}${this.endpoint}`).pipe(
+      map(response => this.extractArray(response)),
+      map(items => items.map(item => this.toEntity(item))),
+      shareReplay({ bufferSize: 1, refCount: false }),
+      catchError(error => {
+        this.allOrdersCache = undefined;
+        return throwError(() => error);
+      })
+    );
+
+    this.allOrdersCache = {
+      expiresAt: Date.now() + this.cacheTtlMs,
+      stream
+    };
+    return firstValueFrom(stream);
   }
 
-  // Legacy method kept for existing widgets/components.
-  getAllEnriched(): Promise<OrderToSupplier[]> {
-    return this.getAllOrders();
+  getAllEnriched(force = false): Promise<OrderToSupplier[]> {
+    return this.getAllOrders(force);
   }
 
   getOrderById(id: number): Promise<OrderToSupplier> {
-    return new Promise((resolve, reject) => {
-      this.http.get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
-        .pipe(map(item => this.toEntity(item)))
-        .subscribe({
-          next: resolve,
-          error: reject
-        });
-    });
+    return firstValueFrom(
+      this.http.get<any>(`${this.baseUrl}${this.endpoint}/${id}`).pipe(
+        map(item => this.toEntity(item))
+      )
+    );
   }
 
-  // Legacy query-style API used by some widgets.
   getByQuery(field: string, value: string | number): Observable<OrderToSupplier[]> {
-    return this.http.get<any[]>(`${this.baseUrl}${this.endpoint}`).pipe(
-      map(response => this.extractArray(response)),
-      map(items => items.map(item => this.toEntity(item))),
+    return this.getAllOrdersStream().pipe(
       map(items => items.filter(item => (item as any)[field] === value))
     );
   }
 
-  updateOrder(id: number, order: OrderToSupplier): Promise<OrderToSupplier> {
-    return new Promise((resolve, reject) => {
-      this.http.put<any>(`${this.baseUrl}${this.endpoint}/${id}`, order)
-        .pipe(map(item => this.toEntity(item)))
-        .subscribe({
-          next: resolve,
-          error: reject
-        });
-    });
+  async updateOrder(id: number, order: OrderToSupplier): Promise<OrderToSupplier> {
+    const updated = await firstValueFrom(
+      this.http.put<any>(`${this.baseUrl}${this.endpoint}/${id}`, order).pipe(
+        map(item => this.toEntity(item))
+      )
+    );
+    this.invalidateCache();
+    return updated;
   }
 
-  createOrder(order: CreateOrderRequest): Promise<OrderToSupplier> {
-    return new Promise((resolve, reject) => {
-      this.create(order).pipe(map(item => this.toEntity(item))).subscribe({
-        next: resolve,
-        error: reject
-      });
-    });
+  async createOrder(order: CreateOrderRequest): Promise<OrderToSupplier> {
+    const created = await firstValueFrom(
+      this.create(order).pipe(map(item => this.toEntity(item)))
+    );
+    return created;
   }
 
   deleteOrder(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}${this.endpoint}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}${this.endpoint}/${id}`).pipe(
+      tap(() => this.invalidateCache())
+    );
+  }
+
+  invalidateCache(): void {
+    this.restaurantCache.clear();
+    this.supplierCache.clear();
+    this.allOrdersCache = undefined;
+  }
+
+  private getAllOrdersStream(): Observable<OrderToSupplier[]> {
+    if (this.allOrdersCache && this.allOrdersCache.expiresAt > Date.now()) {
+      return this.allOrdersCache.stream;
+    }
+
+    const stream = this.http.get<any[]>(`${this.baseUrl}${this.endpoint}`).pipe(
+      map(response => this.extractArray(response)),
+      map(items => items.map(item => this.toEntity(item))),
+      shareReplay({ bufferSize: 1, refCount: false }),
+      catchError(error => {
+        this.allOrdersCache = undefined;
+        return throwError(() => error);
+      })
+    );
+    this.allOrdersCache = { expiresAt: Date.now() + this.cacheTtlMs, stream };
+    return stream;
   }
 
   private toEntity(raw: any): OrderToSupplier {
@@ -134,14 +199,8 @@ export class OrderToSupplierService {
       requested_products_count: Number(raw.requestedProductsCount ?? raw.requested_products_count ?? orderBatches.length),
       partially_accepted: Boolean(raw.partiallyAccepted ?? raw.partially_accepted ?? false),
       orderBatches,
-      state: {
-        id: stateId,
-        name: stateName
-      } as any,
-      situation: {
-        id: situationId,
-        name: situationName
-      } as any
+      state: { id: stateId, name: stateName } as any,
+      situation: { id: situationId, name: situationName } as any
     });
   }
 

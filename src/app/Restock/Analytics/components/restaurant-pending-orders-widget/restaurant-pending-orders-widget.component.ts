@@ -1,57 +1,61 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {CommonModule} from '@angular/common';
-import { forkJoin, lastValueFrom } from 'rxjs';
-import {OrderToSupplierService} from '../../../resource/orders-to-suppliers/services/order-to-supplier.service';
-import {
-  OrdersTableComponent
-} from '../../../resource/orders-to-suppliers/components/orders-table/orders-table.component';
-import {OrderToSupplier} from '../../../resource/orders-to-suppliers/model/order-to-supplier.entity';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatTooltip} from '@angular/material/tooltip';
-import {MatIcon} from '@angular/material/icon';
-import {UserService} from '../../../iam/services/user.service';
-import {ProfileService} from '../../../profiles/services/profile.service';
-import {Profile} from '../../../profiles/model/profile.entity';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
+import { OrderToSupplierService } from '../../../resource/orders-to-suppliers/services/order-to-supplier.service';
+import { OrderToSupplier } from '../../../resource/orders-to-suppliers/model/order-to-supplier.entity';
+import { SessionService } from '../../../../shared/services/session.service';
 
 @Component({
   selector: 'app-restaurant-pending-orders-widget',
   standalone: true,
-  imports: [CommonModule, OrdersTableComponent, MatIcon, MatIconButton, MatTooltip],
+  imports: [CommonModule, MatIcon, MatIconButton, TranslateModule],
   templateUrl: './restaurant-pending-orders-widget.component.html',
   styleUrl: './restaurant-pending-orders-widget.component.css'
 })
 export class RestaurantPendingOrdersWidgetComponent implements OnInit {
-  pendingOrders: OrderToSupplier[] = [];
-  suppliers: { id: number; name: string }[] = [];
+  orders: OrderToSupplier[] = [];
+  isLoading = true;
+  hasError = false;
 
   constructor(
-    private orderService: OrderToSupplierService,
-    private router: Router,
-    private userService: UserService,
-    private profileService: ProfileService
+    private readonly orderService: OrderToSupplierService,
+    private readonly router: Router,
+    private readonly session: SessionService
   ) {}
 
-  async ngOnInit() {
-    const orders = await this.orderService.getAllEnriched();
+  async ngOnInit(): Promise<void> {
+    const restaurantId = this.session.getUserId();
+    if (!restaurantId) {
+      this.isLoading = false;
+      this.hasError = true;
+      return;
+    }
 
-    this.pendingOrders = orders.filter(
-      (o) => o.situation?.name?.toLowerCase() === 'pending'
-    );
+    try {
+      this.orders = await firstValueFrom(this.orderService.getByRestaurant(restaurantId));
+    } catch (error) {
+      console.error('Error loading restaurant orders summary:', error);
+      this.hasError = true;
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
-    const supplierUserIds = await this.userService.getSupplierUserIds();
+  getSupplierName(supplierId: number): string {
+    return `#${supplierId}`;
+  }
 
-    const profileObservables = supplierUserIds.map(id =>
-      this.profileService.getByQuery('user_id', id)
-    );
+  getStatus(order: OrderToSupplier): string {
+    return order.state?.name || order.situation?.name || '—';
+  }
 
-    const allProfilesNested = await lastValueFrom(forkJoin(profileObservables));
-    const allProfiles = allProfilesNested.flat();
-
-    this.suppliers = allProfiles.map((profile) => ({
-      id: profile.id,
-      name: profile.name
-    }));
+  getStatusClass(order: OrderToSupplier): string {
+    const status = this.getStatus(order).toLowerCase().replace(/\s+/g, '-');
+    return `status-${status}`;
   }
 
   goToOrders(): void {

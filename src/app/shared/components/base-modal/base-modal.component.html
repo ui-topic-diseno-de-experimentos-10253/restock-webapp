@@ -1,18 +1,27 @@
-<div class="modal-header">
-  <h2 class="modal-title">{{ data.title }}</h2>
-    <button mat-icon-button (click)="close()">
-    <mat-icon>close</mat-icon>
+<section class="modal-shell" role="document">
+  <header class="modal-header">
+    <div class="modal-heading">
+      <span class="modal-kicker">Restock</span>
+      <h2 class="modal-title">{{ data.title }}</h2>
+      @if (data.description) {
+        <p class="modal-description">{{ data.description }}</p>
+      }
+    </div>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="modal-close"
+      (click)="close()"
+      [attr.aria-label]="'common.close' | translate"
+      [attr.title]="'common.close' | translate">
+      <mat-icon>close</mat-icon>
     </button>
-</div>
+  </header>
 
-@if(data.description) {
-  <div class="modal-description">
-    <p>{{ data.description }}</p>
+  <div class="modal-divider"></div>
+
+  <div class="modal-content">
+    <ng-template #container></ng-template>
   </div>
-}
-
-<span class="border"></span>
-
-<div class="modal-content">
-  <ng-template #container></ng-template>
-</div>
+</section>
