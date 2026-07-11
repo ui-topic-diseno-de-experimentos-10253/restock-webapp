@@ -27,6 +27,11 @@ export class SignUpComponent extends BaseFormComponent implements OnInit {
   form!: FormGroup;
   submitted: boolean = false;
   hidePassword = true;
+  heroImage = 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1920&q=80';
+
+  onHeroImageError(): void {
+    this.heroImage = 'assets/imagen-principal.png';
+  }
 
   constructor(
     private builder: FormBuilder,
