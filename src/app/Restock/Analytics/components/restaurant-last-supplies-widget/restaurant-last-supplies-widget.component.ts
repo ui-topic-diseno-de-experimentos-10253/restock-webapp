@@ -1,50 +1,58 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BatchService } from '../../../resource/inventory/services/batch.service';
-import { Batch } from '../../../resource/inventory/model/batch.entity';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
+import { Batch } from '../../../resource/inventory/model/batch.entity';
+import { InventoryDataService } from '../../../resource/inventory/services/inventory-data.service';
+import { SessionService } from '../../../../shared/services/session.service';
 
 @Component({
   selector: 'app-restaurant-last-supplies-widget',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, MatIconModule, TranslateModule],
   templateUrl: './restaurant-last-supplies-widget.component.html',
   styleUrls: ['./restaurant-last-supplies-widget.component.css']
 })
 export class RestaurantLastSuppliesWidgetComponent implements OnInit {
   batches: Batch[] = [];
+  isLoading = true;
+  hasError = false;
 
-  @ViewChild('carouselContainer', { static: false }) containerRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('carouselContainer', { static: false }) containerRef?: ElementRef<HTMLDivElement>;
 
-  constructor(private batchService: BatchService) {}
+  constructor(
+    private readonly inventoryData: InventoryDataService,
+    private readonly session: SessionService
+  ) {}
 
   async ngOnInit(): Promise<void> {
-    const all = await this.batchService.getAllBatchesWithSupplies();
-    this.batches = [...all]
-      .sort((a, b) => {
-        const aDate = (a as any).created_at || a.id || 0;
-        const bDate = (b as any).created_at || b.id || 0;
-        return bDate - aDate;
-      })
-      .slice(0, 10);
-  }
-
-  scrollLeft(container: HTMLElement): void {
-    container.scrollLeft -= 250;
-  }
-
-  scrollRight(container: HTMLElement): void {
-    container.scrollLeft += 250;
-  }
-
-  getPairs() {
-    const pairs: Batch[][] = [];
-    for (let i = 0; i < this.batches.length; i += 2) {
-      pairs.push(this.batches.slice(i, i + 2));
+    const userId = this.session.getUserId();
+    if (!userId) {
+      this.isLoading = false;
+      this.hasError = true;
+      return;
     }
-    return pairs;
+
+    try {
+      const snapshot = await this.inventoryData.load(userId);
+      this.batches = [...snapshot.batches]
+        .sort((a, b) => {
+          const aValue = Number((a as any).created_at ?? a.id ?? 0);
+          const bValue = Number((b as any).created_at ?? b.id ?? 0);
+          return bValue - aValue;
+        })
+        .slice(0, 12);
+    } catch (error) {
+      console.error('Error loading recent supplies:', error);
+      this.hasError = true;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  scroll(direction: -1 | 1): void {
+    const container = this.containerRef?.nativeElement;
+    if (!container) return;
+    container.scrollBy({ left: direction * Math.max(260, container.clientWidth * .72), behavior: 'smooth' });
   }
 }
